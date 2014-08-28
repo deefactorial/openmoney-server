@@ -3,9 +3,10 @@ Couchbase Lite > Sync Gateway > Couchbase DB Server
 
 Required Frameworks:
 http://docs.slimframework.com/
+http://docs.couchbase.com/couchbase-sdk-php-1.1/
 
 Authentication is negociated using the server side API.
-https://username:password@couchbase.triskaideca.com/login
+https://username:password@cloud.openmoney.cc/login
 which sets a session cookie for the domain.
 
 P2P Archetecture:
@@ -21,7 +22,7 @@ Create User example API:
 
 
 ```
-http POST http://couchbase.triskaideca.com/registration username=deefactorial+6@gmail.com password=password
+http POST http://cloud.openmoney.cc/registration username=deefactorial@gmail.com password=password
 HTTP/1.1 200 OK
 Content-Length: 131
 Content-Type: application/json
@@ -29,7 +30,9 @@ Date: Mon, 11 Aug 2014 19:12:24 GMT
 Server: Apache/2.2.22 (Ubuntu)
 Set-Cookie: SyncGatewaySession=1babed8e140cb51f6cecb83679124c90772b4d42
 X-Powered-By: PHP/5.3.10-1ubuntu3.13
+```
 
+```javascript
 {
     "error": false, 
     "expires": "2014-08-12T12:12:25.114909773-07:00", 
@@ -40,7 +43,8 @@ X-Powered-By: PHP/5.3.10-1ubuntu3.13
 
 Login example API:
 
-http POST http://couchbase.triskaideca.com/login username=deefactorial+6@gmail.com password=password
+```
+http POST http://cloud.openmoney.cc/login username=deefactorial+6@gmail.com password=password
 HTTP/1.1 200 OK
 Content-Length: 131
 Content-Type: application/json
@@ -55,11 +59,12 @@ X-Powered-By: PHP/5.3.10-1ubuntu3.13
     "sessionID": "e033315a7f1561944d38cba6b6ffeec611641073", 
     "status": 200
 }
-
+```
 
 Trading Name Example API:
 
-http PUT http://deefactorial+6@gmail.com:password@couchbase.triskaideca.com:4984/openmoney_shadow/trading_name,deefactorial6 trading_name=deefactorial6 trading_name_space=cc currency=cc steward=deefactorial+6@gmail.com
+```
+http PUT http://deefactorial+6@gmail.com:password@cloud.openmoney.cc:4984/openmoney_shadow/trading_name,deefactorial6 trading_name=deefactorial6 trading_name_space=cc currency=cc steward=deefactorial+6@gmail.com
 HTTP/1.1 201 Created
 Content-Length: 88
 Content-Type: application/json
@@ -72,7 +77,9 @@ Server: Couchbase Sync Gateway/1.00
     "ok": true, 
     "rev": "1-3ae9a28cbf7d3ba7b4df103e1b4d9a53"
 }
+```
 
+```
 http --auth jane.victoria.bc.ca:cryptosaltedhash PUT http://localhost:4984/openmoney_shadow/trading_name,jane.victoria.bc.ca trading_name=jane trading_name_space=victoria.bc.ca currency=vi$ steward=jane.victoria.bc.ca
 HTTP/1.1 201 Created
 Content-Length: 94
@@ -89,7 +96,7 @@ Server: Couchbase Sync Gateway/1.00
 
 Currency Creation API:
 
-http PUT http://deefactorial+6@gmail.com:password@couchbase.triskaideca.com:4984/openmoney_shadow/currency,barter$ type=currency currency=barter$ currency_network=currency_network,cc name='Barter Dollars' steward:='["deefactorial+6@gmail.com"]'
+http PUT http://deefactorial+6@gmail.com:password@cloud.openmoney.cc:4984/openmoney_shadow/currency,barter$ type=currency currency=barter$ currency_network=currency_network,cc name='Barter Dollars' steward:='["deefactorial+6@gmail.com"]'
 HTTP/1.1 201 Created
 Content-Length: 78
 Content-Type: application/json
@@ -106,7 +113,7 @@ Server: Couchbase Sync Gateway/1.00
 
 Trading Name Journal Entry Example API:
 
-http PUT http://deefactorial+6@gmail.com:password@couchbase.triskaideca.com:4984/openmoney_shadow/trading_name_journal,deefactorial6.cc,deefactorial.cc,2014-08-10T21:39:08.811Z amount=15.00 currency=cc description=message from=deefactorial6.cc to=deefactorial.cc type=trading_name_journal timestamp=2014-08-10T21:39:08.811Z
+http PUT http://deefactorial+6@gmail.com:password@cloud.openmoney.cc:4984/openmoney_shadow/trading_name_journal,deefactorial6.cc,deefactorial.cc,2014-08-10T21:39:08.811Z amount=15.00 currency=cc description=message from=deefactorial6.cc to=deefactorial.cc type=trading_name_journal timestamp=2014-08-10T21:39:08.811Z
 HTTP/1.1 201 Created
 Content-Length: 140
 Content-Type: application/json
