@@ -7,8 +7,8 @@ require 'vendor/autoload.php';
 
 $app = new \Slim\Slim ();
 
-$app->view ( new \JsonApiView () );
-$app->add ( new \JsonApiMiddleware () );
+//$app->view ( new \JsonApiView () );
+//$app->add ( new \JsonApiMiddleware () );
 $app->get ( '/', function () use($app) {
 	$app->render ( 200, array ('message' => "Welcome the openmoney json API! go to http://cloud.openmoney.cc/README.md for more information.") );
 } );
