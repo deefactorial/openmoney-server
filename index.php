@@ -165,11 +165,11 @@ $app->post ( '/registration', function () use($app) {
 		
 		$trading_name ['type'] = "trading_name";
 		$trading_name ['trading_name'] = $subusername ;
-		$trading_name ['trading_name_space'] = "cc";
+		$trading_name ['trading_name_space'] = "";
 		$trading_name ['currency'] = "cc";
 		$trading_name ['steward'] = array( $username );
 		
-		$cb->set( "trading_name," . $trading_name ['trading_name'] . "." . $trading_name ['trading_name_space'] . "," . $trading_name ['currency'], json_encode( $trading_name ) );
+		$cb->set( "trading_name," . $trading_name ['trading_name'] . "," . $trading_name ['currency'], json_encode( $trading_name ) );
 		
 		//TODO: send email verification or write an email bot to look for new registrations
 		
