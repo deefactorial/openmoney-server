@@ -160,11 +160,14 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name_space ['type'] = "trading_name_space";
 		$trading_name_space ['space'] = $subusername;
 		$trading_name_space ['steward'] = array( $username );
+		$trading_name_space ['trading_name_subspace'] = '';
+		$trading_name_space ['trading_space'] = $subusername;
 		
 		$cb->set( "trading_name_space," . $trading_name_space ['space'], json_encode( $trading_name_space ) );
 		
 		$trading_name ['type'] = "trading_name";
 		$trading_name ['trading_name'] = $subusername ;
+		$trading_name ['name'] = $subusername;
 		$trading_name ['trading_name_space'] = "";
 		$trading_name ['currency'] = "cc";
 		$trading_name ['steward'] = array( $username );
