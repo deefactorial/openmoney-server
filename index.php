@@ -372,7 +372,7 @@ $app->post ( '/lostpw', function () use($app) {
 		$user ['reset_token_key'] = $reset_key;
 		$cb->set ( "users," . $username, json_encode ( $user ) );
 		
-		$msg = "To Reset your password click on this link <a href='http://couchbase.triskaideca.com/resetPassword.php?email=" . urlencode ( $user ['username'] ) . "&reset=" . urlencode ( $reset_hash ) . "'>Reset Password</a>";
+		$msg = "To Reset your password click on this link <a href='http://cloud.openmoney.cc/resetPassword.php?email=" . urlencode ( $user ['username'] ) . "&reset=" . urlencode ( $reset_hash ) . "'>Reset Password</a>";
 		$msg .= "<p>OpenMoney IT Team</p>";
 		$msg .= "If you did not initiate the lost password link request then ignore this and your password will remain the same.";
 		
