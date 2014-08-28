@@ -12,7 +12,7 @@ $app->response->headers->set('Content-Type', 'application/json');
 //$app->view ( new \JsonApiView () );
 //$app->add ( new \JsonApiMiddleware () );
 $app->get ( '/', function () use($app) {
-	echo array ('message' => "Welcome the openmoney json API! go to http://cloud.openmoney.cc/README.md for more information.");
+	echo json_encode( array ('message' => "Welcome the openmoney json API! go to http://cloud.openmoney.cc/README.md for more information.") );
 } );
 
 $app->post ( '/login', function () use($app) {
