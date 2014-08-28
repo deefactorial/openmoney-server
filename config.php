@@ -7,11 +7,11 @@ $CFG = new stdClass();
 
 $CFG->admin_email = 'deefactorial@gmail.com';
 $CFG->maintainer = 'deefactorial@gmail.com';
-$CFG->system_email = '"openmoney"<noreply@openmoney.org>';
+$CFG->system_email = '"openmoney"<noreply@openmoney.cc>';
 $CFG->site_name = 'Open Money'; 
 $CFG->site_type = 'sandbox';  //Live OR sandbox   
-$CFG->site_Xname = 'couchbase.triskaideca.com';
-$CFG->url = 'http://couchbase.triskaideca.com'; //base URL
+$CFG->site_Xname = 'cloud.openmoney.cc';
+$CFG->url = 'http://cloud.openmoney.cc'; //base URL
 $CFG->default_currency = 'cc';
 $CFG->default_space = '';
 

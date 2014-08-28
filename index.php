@@ -31,8 +31,7 @@ $app->post ( '/login', function () use($app) {
 		$password = $post ['password'];
 		
 		if ($username == '' && $password == '') {
-			$app->render ( 401, array ('error' => true, 'msg' => 'Email and password are required !') );
-			exit ();
+			$app->halt( 401, json_encode( array( 'error' => true, 'msg' => 'Email and password are required !' ) ) );
 		}
 	} else {
 		if ($username == '' && $password == '') {
@@ -91,16 +90,14 @@ $app->post ( '/login', function () use($app) {
 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
 			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires']);
 			
-			$app->render ( 200, $result );
+			echo json_encode( $result );
+			$app->stop();
 			
-			exit ();
 		} else {
-			$app->render ( 401, array ('error' => true, 'msg' => 'The session could not be set!') );
-			exit ();
+			$app->halt( 401, json_encode( array ('error' => true, 'msg' => 'The session could not be set!' ) ) );
 		}
 	} else {
-		$app->render ( 401, array ('error' => true, 'msg' => 'Password did not match!') );
-		exit ();
+		$app->halt( 401, json_encode( array ('error' => true, 'msg' => 'Password did not match!') ) );
 	}
 } );
 
@@ -120,8 +117,7 @@ $app->post ( '/registration', function () use($app) {
 		$password = $post ['password'];
 		
 		if ($username == '' && $password == '') {
-			$app->render ( 401, array ('error' => true, 'msg' => 'Email and password are required !') );
-			exit ();
+			$app->halt( 401,json_encode( array( 'error' => true, 'msg' => 'Email and password are required !') ) );
 		}
 	} else {
 		if ($username == '' && $password == '') {
@@ -130,7 +126,7 @@ $app->post ( '/registration', function () use($app) {
 		}
 	}
 	
-	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
+	$cb = new Couchbase( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 	
 	$user = $cb->get ( "users," . $username );
 	
@@ -212,16 +208,15 @@ $app->post ( '/registration', function () use($app) {
 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
 			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires']);
 			
-			$app->render ( 200, $result );
+			echo json_encode( $result );
 			
-			exit ();
+			$app->stop();
 		} else {
-			$app->render ( 401, array ('error' => true, 'msg' => 'The session could not be set!') );
-			exit ();
+			$app->halt( 401, json_encode( array ('error' => true, 'msg' => 'The session could not be set!') ) );
+			
 		}
 	} else {
-		$app->render ( 401, array ('error' => true, 'msg' => 'User already exists!') );
-		exit ();
+		$app->halt( 401, json_encode( array ('error' => true, 'msg' => 'User already exists!') ) );
 	}
 } );
 
@@ -230,7 +225,8 @@ $app->get ( '/logout', function () use($app) {
 	unset ( $_COOKIE ['SyncGatewaySession'] );
 	setcookie ( "SyncGatewaySession", '', time () - 3600, '/' );
 	
-	$app->render ( 200, array ('error' => false, 'msg' => 'you are now logged out') );
+	echo json_encode( array ('error' => false, 'msg' => 'you are now logged out') );
+	$app->stop();
 } );
 
 $app->post ( '/todologin', function () use($app) {
@@ -249,8 +245,7 @@ $app->post ( '/todologin', function () use($app) {
 			$username = $post ['username'];
 			$password = $post ['password'];
 		} else {
-			$app->render ( 401, array ('error' => true, 'msg' => 'Username and password required!') );
-			exit ();
+			$app->halt( 401, json_encode( array ('error' => true, 'msg' => 'Username and password required!') ) );
 		}
 	} else {
 		if ($username == '' && $password == '') {
@@ -295,8 +290,7 @@ $app->post ( '/todologin', function () use($app) {
 			
 			$result = file_get_contents ( $url, false, $context );
 		} else {
-			$app->render ( $responseCode, array ('error' => true) );
-			exit ();
+			$app->halt( $responseCode, json_encode( array ('error' => true) ) );
 		}
 		
 		$json = json_decode ( $result, true );
@@ -305,29 +299,18 @@ $app->post ( '/todologin', function () use($app) {
 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
 			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => $username, 'password' => $password);
 			
-			$app->render ( 200, $result );
+			echo json_encode( $result );
 			
-			exit ();
+			$app->stop();
 		} else {
 			
-			$app->render ( 401, array ('error' => true) );
-			exit ();
+			$app->halt ( 401, json_encode( array ('error' => true) ) );
+			
 		}
 	} else {
-		$app->render ( 401, array ('error' => true) );
-		exit ();
-	}
-} );
-
-$app->get ( '/todologout', function () use($app) {
-	if (isset ( $_SERVER ['PHP_AUTH_USER'] )) {
-		$username = $_SERVER ['PHP_AUTH_USER'];
-		$password = $_SERVER ['PHP_AUTH_PW'];
+		$app->halt ( 401, json_encode( array ('error' => true) ) );
 		
-		unset ( $_COOKIE ['SyncGatewaySession'] );
-		setcookie ( "SyncGatewaySession", '', time () - 3600, '/' );
 	}
-	$app->render ( 200, array ('error' => false, 'message' => 'You are now logged out!') );
 } );
 
 $app->post ( '/lostpw', function () use($app) {
@@ -364,8 +347,7 @@ $app->post ( '/lostpw', function () use($app) {
 		if (! isset ( $user ['username'] ) || $user ['username'] == '') {
 			// user is undefined
 			$responseCode = 404;
-			$app->render ( $responseCode, array ('error' => true, 'msg' => 'Email ' . $username . ' was not found !' . $user) );
-			exit ();
+			$app->halt ( $responseCode, json_encode( array ('error' => true, 'msg' => 'Email ' . $username . ' was not found !' . $user) ) );
 		}
 		
 		require ("password.php");
@@ -394,11 +376,10 @@ $app->post ( '/lostpw', function () use($app) {
 		$dear = $username;
 		
 		$sentEmail = email_letter ( "\"" . $dear . "\"<" . $username . ">", "noreply@openmoney.cc", $subject, $msg );
-		$app->render ( 200, array ('sentEmail' => $sentEmail) );
-		exit ();
+		echo json_encode( array ('sentEmail' => $sentEmail) );
+		$app->stop();
 	} else {
-		$app->render ( 401, array ('error' => true, msg => 'Email is required!') );
-		exit ();
+		$app->halt ( 401, json_encode( array ('error' => true, msg => 'Email is required!') ) );
 	}
 } );
 
