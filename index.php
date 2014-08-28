@@ -54,7 +54,7 @@ $app->post ( '/login', function () use($app) {
 	require ("password.php");
 	
 	if (password_verify ( $password, $user ['password'] )) {
-		$url = 'http://localhost:4985/openmoney_shadow/_session';
+		$url = 'https://localhost:4985/openmoney_shadow/_session';
 		// $url = 'http://localhost:4985/todos/_session';
 		$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
 		$json = json_encode ( $data );
@@ -66,7 +66,7 @@ $app->post ( '/login', function () use($app) {
 			$result = file_get_contents ( $url, false, $context );
 		} else {
 			// user exists in db but not in sync_gateway so create the user
-			$url = 'http://localhost:4985/openmoney_shadow/_user/' . $username;
+			$url = 'https://localhost:4985/openmoney_shadow/_user/' . $username;
 			// $url = 'http://localhost:4985/todos/_user/' . $username;
 			$data = array ('name' => $user ['username'], 'password' => $password);
 			$json = json_encode ( $data );
@@ -76,7 +76,7 @@ $app->post ( '/login', function () use($app) {
 			
 			$result = file_get_contents ( $url, false, $context );
 			
-			$url = 'http://localhost:4985/openmoney_shadow/_session';
+			$url = 'https://localhost:4985/openmoney_shadow/_session';
 			// $url = 'http://localhost:4985/todos/_session';
 			$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
 			$json = json_encode ( $data );
@@ -144,6 +144,7 @@ $app->post ( '/registration', function () use($app) {
 		$user ['username'] = $username;		
 		$user ['email'] = $username;
 		$user ['cost'] = $options ['cost'] = 10;
+		$user ['type'] = "users";
 		
 		$password_hash = password_hash($password , PASSWORD_BCRYPT, $options);
 		
@@ -172,7 +173,7 @@ $app->post ( '/registration', function () use($app) {
 		
 		//TODO: send email verification or write an email bot to look for new registrations
 		
-		$url = 'http://localhost:4985/openmoney_shadow/_session';
+		$url = 'https://localhost:4985/openmoney_shadow/_session';
 		//$url = 'http://localhost:4985/todos/_session';
 		$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
 		$json = json_encode ( $data );
@@ -184,7 +185,7 @@ $app->post ( '/registration', function () use($app) {
 			$result = file_get_contents ( $url, false, $context );
 		} else {
 			// user exists in db but not in sync_gateway so create the user
-			$url = 'http://localhost:4985/openmoney_shadow/_user/' . $username;
+			$url = 'https://localhost:4985/openmoney_shadow/_user/' . $username;
 			//$url = 'http://localhost:4985/todos/_user/' . $username;
 			$data = array ('name' => $user ['username'], 'password' => $password);
 			$json = json_encode ( $data );
@@ -194,7 +195,7 @@ $app->post ( '/registration', function () use($app) {
 			
 			$result = file_get_contents ( $url, false, $context );
 			
-			$url = 'http://localhost:4985/openmoney_shadow/_session';
+			$url = 'https://localhost:4985/openmoney_shadow/_session';
 			//$url = 'http://localhost:4985/todos/_session';
 			$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
 			$json = json_encode ( $data );
