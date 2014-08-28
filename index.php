@@ -10,7 +10,7 @@ $app = new \Slim\Slim ();
 $app->response->headers->set('Content-Type', 'application/json');
 
 $app->notFound(function () use ($app) {
-	$app->halt(404, json_encode( array( error => 'true', msg => 'Page Not Found' ) ) );
+	$app->halt(404, json_encode( array( 'error' => true, 'msg' => 'Page Not Found' ) ) );
 });
 
 //$app->view ( new \JsonApiView () );
