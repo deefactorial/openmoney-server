@@ -22,7 +22,9 @@ Create User example API:
 
 
 ```bash
-http POST http://cloud.openmoney.cc/registration username=deefactorial@gmail.com password=password
+http POST http://cloud.openmoney.cc/registration username=deefactorial+6@gmail.com password=password
+```
+```
 HTTP/1.1 200 OK
 Content-Length: 131
 Content-Type: application/json
@@ -42,8 +44,10 @@ X-Powered-By: PHP/5.3.10-1ubuntu3.13
 
 Login example API:
 
-```
+```bash
 http POST http://cloud.openmoney.cc/login username=deefactorial+6@gmail.com password=password
+```
+```
 HTTP/1.1 200 OK
 Content-Length: 131
 Content-Type: application/json
@@ -63,15 +67,18 @@ X-Powered-By: PHP/5.3.10-1ubuntu3.13
 
 Trading Name Example API:
 
-```
+```bash
 http PUT http://deefactorial+6@gmail.com:password@cloud.openmoney.cc:4984/openmoney_shadow/trading_name,deefactorial6 trading_name=deefactorial6 trading_name_space=cc currency=cc steward=deefactorial+6@gmail.com
+```
+```
 HTTP/1.1 201 Created
 Content-Length: 88
 Content-Type: application/json
 Date: Mon, 11 Aug 2014 19:30:42 GMT
 Etag: 1-3ae9a28cbf7d3ba7b4df103e1b4d9a53
 Server: Couchbase Sync Gateway/1.00
-
+```
+```javascript
 {
     "id": "trading_name,deefactorial6", 
     "ok": true, 
@@ -79,99 +86,125 @@ Server: Couchbase Sync Gateway/1.00
 }
 ```
 
-```
+```bash
 http --auth jane.victoria.bc.ca:cryptosaltedhash PUT http://localhost:4984/openmoney_shadow/trading_name,jane.victoria.bc.ca trading_name=jane trading_name_space=victoria.bc.ca currency=vi$ steward=jane.victoria.bc.ca
+```
+```
 HTTP/1.1 201 Created
 Content-Length: 94
 Content-Type: application/json
 Date: Thu, 05 Jun 2014 19:49:01 GMT
 Etag: 1-8781c0fee808e4d22f4f71d950ae3b08
 Server: Couchbase Sync Gateway/1.00
-
+```
+```javascript
 {
     "id": "trading_name,jane.victoria.bc.ca", 
     "ok": true, 
     "rev": "1-8781c0fee808e4d22f4f71d950ae3b08"
 }
+```
 
 Currency Creation API:
 
+```bash
 http PUT http://deefactorial+6@gmail.com:password@cloud.openmoney.cc:4984/openmoney_shadow/currency,barter$ type=currency currency=barter$ currency_network=currency_network,cc name='Barter Dollars' steward:='["deefactorial+6@gmail.com"]'
+```
+```
 HTTP/1.1 201 Created
 Content-Length: 78
 Content-Type: application/json
 Date: Mon, 11 Aug 2014 19:44:22 GMT
 Etag: 1-9071a2752079ac3e6eae48a8dcdb42c4
 Server: Couchbase Sync Gateway/1.00
-
+```
+```javascript
 {
     "id": "currency,barter$", 
     "ok": true, 
     "rev": "1-9071a2752079ac3e6eae48a8dcdb42c4"
 }
-
+```
 
 Trading Name Journal Entry Example API:
 
+```bash
 http PUT http://deefactorial+6@gmail.com:password@cloud.openmoney.cc:4984/openmoney_shadow/trading_name_journal,deefactorial6.cc,deefactorial.cc,2014-08-10T21:39:08.811Z amount=15.00 currency=cc description=message from=deefactorial6.cc to=deefactorial.cc type=trading_name_journal timestamp=2014-08-10T21:39:08.811Z
+```
+```
 HTTP/1.1 201 Created
 Content-Length: 140
 Content-Type: application/json
 Date: Tue, 12 Aug 2014 02:07:57 GMT
 Etag: 1-7035ca704eeee3940bcf2b2c535b6636
 Server: Couchbase Sync Gateway/1.00
+```
 
+```javascript
 {
     "id": "trading_name_journal,deefactorial6.cc,deefactorial.cc,2014-08-10T21:39:08.811Z", 
     "ok": true, 
     "rev": "1-7035ca704eeee3940bcf2b2c535b6636"
 }
-
+```
 
 Trading Name Space Creation Example API:
 
+```bash
 http --auth jane.victoria.bc.ca:cryptosaltedhash PUT http://localhost:4984/openmoney_shadow/trading_name_space,gabriola.bc.ca steward:='["jane.victoria.bc.ca"]' 
+```
+```
 HTTP/1.1 201 Created
 Content-Length: 95
 Content-Type: application/json
 Date: Thu, 05 Jun 2014 20:47:41 GMT
 Etag: 1-a0f097ae41598604be91ccd046911399
 Server: Couchbase Sync Gateway/1.00
-
+```
+```javascript
 {
     "id": "trading_name_space,gabriola.bc.ca", 
     "ok": true, 
     "rev": "1-a0f097ae41598604be91ccd046911399"
 }
+```
 
 Currency Space Creation Example API:
 
+```bash
 http --auth jane.victoria.bc.ca:cryptosaltedhash PUT http://localhost:4984/openmoney_shadow/currency_space,gabriola.bc.ca steward:='["jane.victoria.bc.ca"]' 
+```
+```
 HTTP/1.1 201 Created
 Content-Length: 91
 Content-Type: application/json
 Date: Thu, 05 Jun 2014 20:49:12 GMT
 Etag: 1-a0f097ae41598604be91ccd046911399
 Server: Couchbase Sync Gateway/1.00
-
+```
+```javascript
 {
     "id": "currency_space,gabriola.bc.ca", 
     "ok": true, 
     "rev": "1-a0f097ae41598604be91ccd046911399"
 }
+```
 
 
 GET a List of all documents available.
 
-
+```bash
 http --auth jane.victoria.bc.ca:cryptosaltedhash http://localhost:4984/openmoney_shadow/_all_docs
+```
+```
 HTTP/1.1 200 OK
 Content-Encoding: gzip
 Content-Length: 370
 Content-Type: application/json
 Date: Thu, 05 Jun 2014 20:50:38 GMT
 Server: Couchbase Sync Gateway/1.00
-
+```
+```javascript
 {
     "rows": [
         {
@@ -227,18 +260,23 @@ Server: Couchbase Sync Gateway/1.00
     "total_rows": 12, 
     "update_seq": 19
 }
+```
 
 
 GET Document ID Example API:
 
+```bash
 http --auth jane.victoria.bc.ca:cryptosaltedhash http://localhost:4984/openmoney_shadow/trading_name_journal,john.victoria.bc.ca,jane.victoria.bc.ca,1400965833
+```
+```
 HTTP/1.1 200 OK
 Content-Length: 391
 Content-Type: application/json
 Date: Thu, 05 Jun 2014 20:53:21 GMT
 Etag: 1-3bd3e6b5566eb740376ac3d019907fbe
 Server: Couchbase Sync Gateway/1.00
-
+```
+```javascript
 {
     "_id": "trading_name_journal,john.victoria.bc.ca,jane.victoria.bc.ca,1400965833", 
     "_rev": "1-3bd3e6b5566eb740376ac3d019907fbe", 
@@ -250,8 +288,7 @@ Server: Couchbase Sync Gateway/1.00
     "to": "jane.victoria.bc.ca", 
     "to_message": "cryptographically encoded message using jane.doe's public key"
 }
-
-
+```
 
 
 
