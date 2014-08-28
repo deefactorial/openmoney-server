@@ -21,7 +21,7 @@ Documentation is done using httpie found here: https://github.com/jakubroztocil/
 Create User example API:
 
 
-```
+```bash
 http POST http://cloud.openmoney.cc/registration username=deefactorial@gmail.com password=password
 HTTP/1.1 200 OK
 Content-Length: 131
@@ -31,7 +31,6 @@ Server: Apache/2.2.22 (Ubuntu)
 Set-Cookie: SyncGatewaySession=1babed8e140cb51f6cecb83679124c90772b4d42
 X-Powered-By: PHP/5.3.10-1ubuntu3.13
 ```
-
 ```javascript
 {
     "error": false, 
@@ -52,7 +51,8 @@ Date: Mon, 11 Aug 2014 19:18:41 GMT
 Server: Apache/2.2.22 (Ubuntu)
 Set-Cookie: SyncGatewaySession=e033315a7f1561944d38cba6b6ffeec611641073
 X-Powered-By: PHP/5.3.10-1ubuntu3.13
-
+```
+```javascript
 {
     "error": false, 
     "expires": "2014-08-12T12:18:41.425467857-07:00", 
