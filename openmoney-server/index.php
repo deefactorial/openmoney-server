@@ -5,6 +5,7 @@
 // var_dump($cb->get("a"));
 require 'vendor/autoload.php';
 
+
 $app = new \Slim\Slim ();
 
 $app->view ( new \JsonApiView () );
