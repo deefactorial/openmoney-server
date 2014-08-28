@@ -10,31 +10,14 @@ Couchbase Lite > couchbase lite server (httpd) > Couchbase Lite
 
 P2P Routing:
 
-Technologies:
--https://github.com/pankajkainthla/phonegap-plugins-all/tree/master/Android/ZeroConf
--https://github.com/jarnoh/cordova-dnssd
--http://www.xmpp.org/extensions/xep-0174.html
--https://en.wikipedia.org/wiki/XMPP#XMPP_as_an_extensible_Message_Oriented_Middleware_.28xMOM.29_platform
--https://github.com/legastero/stanza.io javascript websockets xmpp client
--uPnP
--https://en.wikipedia.org/wiki/UDP_hole_punching
--https://en.wikipedia.org/wiki/TCP_hole_punching
--https://en.wikipedia.org/wiki/Port_Control_Protocol
-
-One of:
--https://github.com/jopereira/neem
--UDP muticast to specific address and port.
-
-The request contains the public key of the user they wish to contact along with their ip, port and challenge encrypted using the public key. Another client listening to the request can respond to the request by estabilishing an SSL connection and responding to the challenge. If the challenge can be verified the two clients can sync databases.
-
-This makes the assumption that the two clients have traded before. IF they have not traded before and they still wish to trade a new user would have to be added to each of their databases with their public keys before they could negociate the connection. 
+Peer to Peer routing is done using NFC peer to peer
 
 Documentation is done using httpie found here: https://github.com/jakubroztocil/httpie
 
 Create User example API:
 
-request:
 
+```
 http POST http://couchbase.triskaideca.com/registration username=deefactorial+6@gmail.com password=password
 HTTP/1.1 200 OK
 Content-Length: 131
@@ -50,7 +33,7 @@ X-Powered-By: PHP/5.3.10-1ubuntu3.13
     "sessionID": "1babed8e140cb51f6cecb83679124c90772b4d42", 
     "status": 200
 }
-
+```
 
 Login example API:
 
