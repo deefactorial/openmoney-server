@@ -1,5 +1,8 @@
 Architecture:
-Couchbase Lite > Sync Gateway > Couchbase DB
+Couchbase Lite > Sync Gateway > Couchbase DB Server
+
+Required Frameworks:
+http://docs.slimframework.com/
 
 Authentication is negociated using the server side API.
 https://username:password@couchbase.triskaideca.com/login
