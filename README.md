@@ -1,5 +1,7 @@
-Architecture:
-Couchbase Lite > Sync Gateway > Couchbase DB Server
+**Architecture**:
+- Couchbase Lite 
+- Sync Gateway
+- Couchbase DB Server
 
 Required Frameworks:
 http://docs.slimframework.com/
@@ -48,7 +50,6 @@ Login example API:
 http POST http://cloud.openmoney.cc/login username=deefactorial+6@gmail.com password=password
 ```
 ```
-HTTP/1.1 200 OK
 Content-Length: 131
 Content-Type: application/json
 Date: Mon, 11 Aug 2014 19:18:41 GMT
@@ -289,9 +290,4 @@ Server: Couchbase Sync Gateway/1.00
     "to_message": "cryptographically encoded message using jane.doe's public key"
 }
 ```
-
-
-
-
-
 

@@ -16,7 +16,7 @@ $app->notFound(function () use ($app) {
 //$app->view ( new \JsonApiView () );
 //$app->add ( new \JsonApiMiddleware () );
 $app->get ( '/', function () use($app) {
-	echo json_encode( array ('message' => "Welcome the openmoney json API! go to http://cloud.openmoney.cc/README.md for more information.") );
+	echo json_encode( array ('message' => "Welcome the openmoney json API! go to https://cloud.openmoney.cc/README.md for more information.") );
 } );
 
 $app->post ( '/login', function () use($app) {
@@ -54,8 +54,8 @@ $app->post ( '/login', function () use($app) {
 	require ("password.php");
 	
 	if (password_verify ( $password, $user ['password'] )) {
-		$url = 'http://localhost:4985/openmoney_shadow/_session';
-		// $url = 'http://localhost:4985/todos/_session';
+		$url = 'https://localhost:4985/openmoney_shadow/_session';
+		// $url = 'https://localhost:4985/todos/_session';
 		$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
 		$json = json_encode ( $data );
 		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
@@ -66,8 +66,8 @@ $app->post ( '/login', function () use($app) {
 			$result = file_get_contents ( $url, false, $context );
 		} else {
 			// user exists in db but not in sync_gateway so create the user
-			$url = 'http://localhost:4985/openmoney_shadow/_user/' . $username;
-			// $url = 'http://localhost:4985/todos/_user/' . $username;
+			$url = 'https://localhost:4985/openmoney_shadow/_user/' . $username;
+			// $url = 'https://localhost:4985/todos/_user/' . $username;
 			$data = array ('name' => $user ['username'], 'password' => $password);
 			$json = json_encode ( $data );
 			$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
@@ -76,8 +76,8 @@ $app->post ( '/login', function () use($app) {
 			
 			$result = file_get_contents ( $url, false, $context );
 			
-			$url = 'http://localhost:4985/openmoney_shadow/_session';
-			// $url = 'http://localhost:4985/todos/_session';
+			$url = 'https://localhost:4985/openmoney_shadow/_session';
+			// $url = 'https://localhost:4985/todos/_session';
 			$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
 			$json = json_encode ( $data );
 			$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
@@ -176,8 +176,8 @@ $app->post ( '/registration', function () use($app) {
 		
 		//TODO: send email verification or write an email bot to look for new registrations
 		
-		$url = 'http://localhost:4985/openmoney_shadow/_session';
-		//$url = 'http://localhost:4985/todos/_session';
+		$url = 'https://localhost:4985/openmoney_shadow/_session';
+		//$url = 'https://localhost:4985/todos/_session';
 		$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
 		$json = json_encode ( $data );
 		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
@@ -188,8 +188,8 @@ $app->post ( '/registration', function () use($app) {
 			$result = file_get_contents ( $url, false, $context );
 		} else {
 			// user exists in db but not in sync_gateway so create the user
-			$url = 'http://localhost:4985/openmoney_shadow/_user/' . $username;
-			//$url = 'http://localhost:4985/todos/_user/' . $username;
+			$url = 'https://localhost:4985/openmoney_shadow/_user/' . $username;
+			//$url = 'https://localhost:4985/todos/_user/' . $username;
 			$data = array ('name' => $user ['username'], 'password' => $password);
 			$json = json_encode ( $data );
 			$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
@@ -198,8 +198,8 @@ $app->post ( '/registration', function () use($app) {
 			
 			$result = file_get_contents ( $url, false, $context );
 			
-			$url = 'http://localhost:4985/openmoney_shadow/_session';
-			//$url = 'http://localhost:4985/todos/_session';
+			$url = 'https://localhost:4985/openmoney_shadow/_session';
+			//$url = 'https://localhost:4985/todos/_session';
 			$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
 			$json = json_encode ( $data );
 			$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
@@ -293,7 +293,7 @@ $app->post ( '/lostpw', function () use($app) {
 		$user ['reset_token_key'] = $reset_key;
 		$cb->set ( "users," . $username, json_encode ( $user ) );
 		
-		$msg = "To Reset your password click on this link <a href='http://cloud.openmoney.cc/resetPassword.php?email=" . urlencode ( $user ['username'] ) . "&reset=" . urlencode ( $reset_hash ) . "'>Reset Password</a>";
+		$msg = "To Reset your password click on this link <a href='https://cloud.openmoney.cc/resetPassword.php?email=" . urlencode ( $user ['username'] ) . "&reset=" . urlencode ( $reset_hash ) . "'>Reset Password</a>";
 		$msg .= "<p>OpenMoney IT Team</p>";
 		$msg .= "If you did not initiate the lost password link request then ignore this and your password will remain the same.";
 		
