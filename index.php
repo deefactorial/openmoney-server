@@ -368,7 +368,7 @@ $app->post ( '/lookupTag', function () use($app) {
 			//, array('startkey' => $key, 'endkey' => $key)
 			// startkey : [ id, {} ], endkey : [ id ], descending : true, include_docs : true
 			
-			$result = $cb->view('dev_nfctag', 'taglookup', array('startkey' => array( $key ), 'endkey' => array( $key , '\uefff' ), 'limit' => 100 )  );
+			$result = $cb->view('dev_nfctag', 'taglookup', array('startkey' => $key , 'endkey' =>  $key . '\uefff' )  );
 			
 			echo json_encode( $result );
 			
