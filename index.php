@@ -365,12 +365,28 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			$cb->set( "_design/dev_nfctag/_view/taglookup", $taglookup_function );
 			
+			$tradingname_lookup_function = 
+				'function (doc, meta) {
+					if( doc.type == "trading_name" && doc.steward && doc.name && doc.currency) {
+						emit( [doc.steward, doc.currency, doc.name], { "name": doc.name, "currency": doc.currency } );					
+					}
+				}';
+			
+			$cb->set( "_design/dev_nfctag/_view/tradingnamelookup", $tradingname_lookup_function );
+			
 			//, array('startkey' => $key, 'endkey' => $key)
 			// startkey : [ id, {} ], endkey : [ id ], descending : true, include_docs : true
 			
 			$result = $cb->view('dev_nfctag', 'taglookup', array('startkey' => $key , 'endkey' =>  $key . '\uefff' )  );
 			
-			echo json_encode( $result );
+			foreach( $result['rows'] as $row ) {
+				//remove users, from id
+				$username = substr( $row['id'], 6, strlen( $row['id'] ) );
+				//do trading name lookup on 
+				$tradingname_result = $cb->view('dev_nfctag', 'tradingnamelookup', array('startkey' => array( $username ) , 'endkey' =>  array( $username . '\uefff' ) )  );
+				
+				echo json_encode( $tradingname_result );
+			}
 			
 			$app->stop ();
 		}
