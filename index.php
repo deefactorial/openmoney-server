@@ -374,7 +374,7 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			$designDoc =  json_decode( '{ "views": { "taglookup": { "map": "' . $taglookup_function . '.toString()" }, { "tradingnamelookup1" : { "map": "' . $tradingname_lookup_function . '.toString()" } } } ' );
 			
-			$cb->setDesignDoc( "_design/dev_nfctag", $designDoc );
+			$cb->setDesignDoc( "_design/dev_nfctag1", $designDoc );
 			
 			//, array('startkey' => $key, 'endkey' => $key)
 			// startkey : [ id, {} ], endkey : [ id ], descending : true, include_docs : true
