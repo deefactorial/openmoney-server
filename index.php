@@ -372,7 +372,7 @@ $app->post ( '/lookupTag', function () use($app) {
 					}
 				}';
 			
-			$designDoc = json_decode( '{ "views": { "taglookup": { "map": ' . $taglookup_function . '.toString() }, { "tradingnamelookup1" : { "map": ' . $tradingname_lookup_function . '.toString() } } } ' );
+			$designDoc =  '{ "views": { "taglookup": { "map": ' . $taglookup_function . '.toString() }, { "tradingnamelookup1" : { "map": ' . $tradingname_lookup_function . '.toString() } } } ' ;
 			
 			$cb->setDesignDoc( "_design/dev_nfctag", $designDoc );
 			
