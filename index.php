@@ -7,16 +7,16 @@ require 'vendor/autoload.php';
 
 $app = new \Slim\Slim ();
 
-$app->response->headers->set('Content-Type', 'application/json');
+$app->response->headers->set ( 'Content-Type', 'application/json' );
 
-$app->notFound(function () use ($app) {
-	$app->halt(404, json_encode( array( 'error' => true, 'msg' => 'Page Not Found' ) ) );
-});
+$app->notFound ( function () use($app) {
+	$app->halt ( 404, json_encode ( array ('error' => true, 'msg' => 'Page Not Found') ) );
+} );
 
-//$app->view ( new \JsonApiView () );
-//$app->add ( new \JsonApiMiddleware () );
+// $app->view ( new \JsonApiView () );
+// $app->add ( new \JsonApiMiddleware () );
 $app->get ( '/', function () use($app) {
-	echo json_encode( array ('message' => "Welcome the openmoney json API! go to https://cloud.openmoney.cc/README.md for more information.") );
+	echo json_encode ( array ('message' => "Welcome the openmoney json API! go to https://cloud.openmoney.cc/README.md for more information.") );
 } );
 
 $app->post ( '/login', function () use($app) {
@@ -35,7 +35,7 @@ $app->post ( '/login', function () use($app) {
 		$password = $post ['password'];
 		
 		if ($username == '' && $password == '') {
-			$app->halt( 401, json_encode( array( 'error' => true, 'msg' => 'Email and password are required !' ) ) );
+			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email and password are required !') ) );
 		}
 	} else {
 		if ($username == '' && $password == '') {
@@ -86,7 +86,7 @@ $app->post ( '/login', function () use($app) {
 			
 			$result = file_get_contents ( $url, false, $context );
 		}
-
+		
 		$json = json_decode ( $result, true );
 		
 		if (isset ( $json ['session_id'] )) {
@@ -94,14 +94,13 @@ $app->post ( '/login', function () use($app) {
 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
 			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires']);
 			
-			echo json_encode( $result );
-			$app->stop();
-			
+			echo json_encode ( $result );
+			$app->stop ();
 		} else {
-			$app->halt( 401, json_encode( array ('error' => true, 'msg' => 'The session could not be set!' ) ) );
+			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'The session could not be set!') ) );
 		}
 	} else {
-		$app->halt( 401, json_encode( array ('error' => true, 'msg' => 'Password did not match!') ) );
+		$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Password did not match!') ) );
 	}
 } );
 
@@ -121,7 +120,7 @@ $app->post ( '/registration', function () use($app) {
 		$password = $post ['password'];
 		
 		if ($username == '' && $password == '') {
-			$app->halt( 401,json_encode( array( 'error' => true, 'msg' => 'Email and password are required !') ) );
+			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email and password are required !') ) );
 		}
 	} else {
 		if ($username == '' && $password == '') {
@@ -130,7 +129,7 @@ $app->post ( '/registration', function () use($app) {
 		}
 	}
 	
-	$cb = new Couchbase( "127.0.0.1:8091", "openmoney", "", "openmoney" );
+	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 	
 	$user = $cb->get ( "users," . $username );
 	
@@ -139,45 +138,45 @@ $app->post ( '/registration', function () use($app) {
 	// TODO: cytpographically decode password using cryptographic algorithms specified in the $user ['cryptographic_algorithms'] array.
 	require ("password.php");
 	
-	if (!isset( $user ['password'] ) || $user ['password'] == '') {
+	if (! isset ( $user ['password'] ) || $user ['password'] == '') {
 		
-		$user ['username'] = $username;		
+		$user ['username'] = $username;
 		$user ['email'] = $username;
 		$user ['cost'] = $options ['cost'] = 10;
 		$user ['type'] = "users";
 		
-		$password_hash = password_hash($password , PASSWORD_BCRYPT, $options);
+		$password_hash = password_hash ( $password, PASSWORD_BCRYPT, $options );
 		
 		$user ['password'] = $password_hash;
-		$user ['password_encryption_algorithm'] = array( PASSWORD_BCRYPT );
+		$user ['password_encryption_algorithm'] = array (PASSWORD_BCRYPT);
 		
-		$cb->set( "users," . $username, json_encode( $user ) );
+		$cb->set ( "users," . $username, json_encode ( $user ) );
 		
-		$subusername = substr( $username, 0, strpos( $username, "@" ) );
-		$subusername = str_replace( ".", "", $subusername );
-		$subusername = preg_replace( "/[^a-zA-Z\d]*/", "" , $subusername );
+		$subusername = substr ( $username, 0, strpos ( $username, "@" ) );
+		$subusername = str_replace ( ".", "", $subusername );
+		$subusername = preg_replace ( "/[^a-zA-Z\d]*/", "", $subusername );
 		
 		$trading_name_space ['type'] = "trading_name_space";
 		$trading_name_space ['space'] = $subusername;
-		$trading_name_space ['steward'] = array( $username );
+		$trading_name_space ['steward'] = array ($username);
 		$trading_name_space ['trading_name_subspace'] = '';
 		$trading_name_space ['trading_space'] = $subusername;
 		
-		$cb->set( "trading_name_space," . $trading_name_space ['space'], json_encode( $trading_name_space ) );
+		$cb->set ( "trading_name_space," . $trading_name_space ['space'], json_encode ( $trading_name_space ) );
 		
 		$trading_name ['type'] = "trading_name";
-		$trading_name ['trading_name'] = $subusername ;
+		$trading_name ['trading_name'] = $subusername;
 		$trading_name ['name'] = $subusername;
 		$trading_name ['trading_name_space'] = "";
 		$trading_name ['currency'] = "cc";
-		$trading_name ['steward'] = array( $username );
+		$trading_name ['steward'] = array ($username);
 		
-		$cb->set( "trading_name," . $trading_name ['trading_name'] . "," . $trading_name ['currency'], json_encode( $trading_name ) );
+		$cb->set ( "trading_name," . $trading_name ['trading_name'] . "," . $trading_name ['currency'], json_encode ( $trading_name ) );
 		
-		//TODO: send email verification or write an email bot to look for new registrations
+		// TODO: send email verification or write an email bot to look for new registrations
 		
 		$url = 'https://localhost:4985/openmoney_shadow/_session';
-		//$url = 'https://localhost:4985/todos/_session';
+		// $url = 'https://localhost:4985/todos/_session';
 		$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
 		$json = json_encode ( $data );
 		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
@@ -189,7 +188,7 @@ $app->post ( '/registration', function () use($app) {
 		} else {
 			// user exists in db but not in sync_gateway so create the user
 			$url = 'https://localhost:4985/openmoney_shadow/_user/' . $username;
-			//$url = 'https://localhost:4985/todos/_user/' . $username;
+			// $url = 'https://localhost:4985/todos/_user/' . $username;
 			$data = array ('name' => $user ['username'], 'password' => $password);
 			$json = json_encode ( $data );
 			$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
@@ -199,7 +198,7 @@ $app->post ( '/registration', function () use($app) {
 			$result = file_get_contents ( $url, false, $context );
 			
 			$url = 'https://localhost:4985/openmoney_shadow/_session';
-			//$url = 'https://localhost:4985/todos/_session';
+			// $url = 'https://localhost:4985/todos/_session';
 			$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
 			$json = json_encode ( $data );
 			$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
@@ -212,19 +211,18 @@ $app->post ( '/registration', function () use($app) {
 		$json = json_decode ( $result, true );
 		
 		if (isset ( $json ['session_id'] )) {
-		
+			
 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
 			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires']);
 			
-			echo json_encode( $result );
+			echo json_encode ( $result );
 			
-			$app->stop();
+			$app->stop ();
 		} else {
-			$app->halt( 401, json_encode( array ('error' => true, 'msg' => 'The session could not be set!') ) );
-			
+			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'The session could not be set!') ) );
 		}
 	} else {
-		$app->halt( 401, json_encode( array ('error' => true, 'msg' => 'User already exists!') ) );
+		$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'User already exists!') ) );
 	}
 } );
 
@@ -233,10 +231,9 @@ $app->get ( '/logout', function () use($app) {
 	unset ( $_COOKIE ['SyncGatewaySession'] );
 	setcookie ( "SyncGatewaySession", '', time () - 3600, '/' );
 	
-	echo json_encode( array ('error' => false, 'msg' => 'you are now logged out') );
-	$app->stop();
+	echo json_encode ( array ('error' => false, 'msg' => 'you are now logged out') );
+	$app->stop ();
 } );
-
 
 $app->post ( '/lostpw', function () use($app) {
 	
@@ -272,7 +269,7 @@ $app->post ( '/lostpw', function () use($app) {
 		if (! isset ( $user ['username'] ) || $user ['username'] == '') {
 			// user is undefined
 			$responseCode = 404;
-			$app->halt ( $responseCode, json_encode( array ('error' => true, 'msg' => 'Email ' . $username . ' was not found !' . $user) ) );
+			$app->halt ( $responseCode, json_encode ( array ('error' => true, 'msg' => 'Email ' . $username . ' was not found !' . $user) ) );
 		}
 		
 		require ("password.php");
@@ -301,10 +298,79 @@ $app->post ( '/lostpw', function () use($app) {
 		$dear = $username;
 		
 		$sentEmail = email_letter ( "\"" . $dear . "\"<" . $username . ">", "noreply@openmoney.cc", $subject, $msg );
-		echo json_encode( array ('sentEmail' => $sentEmail) );
-		$app->stop();
+		echo json_encode ( array ('sentEmail' => $sentEmail) );
+		$app->stop ();
 	} else {
-		$app->halt ( 401, json_encode( array ('error' => true, msg => 'Email is required!') ) );
+		$app->halt ( 401, json_encode ( array ('error' => true, msg => 'Email is required!') ) );
+	}
+} );
+
+$app->post ( '/lookupTag', function () use($app) {
+	
+	$username = '';
+	function get_http_response_code($url) {
+		$headers = get_headers ( $url );
+		return substr ( $headers [0], 9, 3 );
+	}
+	
+	if (($username == '' && $password == '') && (! isset ( $_POST ['username'] ) || ! isset ( $_POST ['password'] ))) {
+		$post = json_decode ( file_get_contents ( 'php://input' ), true );
+		
+		$username = $post ['username'];
+		$password = $post ['password'];
+		
+		if ($username == '' && $password == '') {
+			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email and password are required !') ) );
+		}
+	} else {
+		if ($username == '' && $password == '') {
+			$username = $_POST ['username'];
+			$password = $_POST ['password'];
+		}
+	}
+	
+	if ($username != '') {
+		
+		$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
+		
+		$user = $cb->get ( "users," . $username );
+		
+		$user = json_decode ( $user, true );
+		
+		if (! isset ( $user ['username'] ) || $user ['username'] == '') {
+			// user is undefined
+			$responseCode = 404;
+			$app->halt ( $responseCode, json_encode ( array ('error' => true, 'msg' => 'Email ' . $username . ' was not found !' . $user) ) );
+		}
+		
+		require ("password.php");
+		
+
+		if (password_verify ( $password, $user ['password'] )) {
+			// user is verified
+			// do lookup on tag
+			
+			$taglookup_function = 
+				'function (doc, meta) {
+				  if( doc.type == "users" && doc.tags ) {
+				      doc.tags.forEach(function(tag) {
+				          emit(tag.hashTag, tag);
+				      });
+				  }
+				}';
+			
+			$cb->set( "_design/dev_nfctag/_view/taglookup", $taglookup_function );
+			
+			$key = $_POST['key'];
+			
+			$result = $cb->view('dev_nfctag', 'taglookup', array('startkey' => $key, 'endkey' => $key));
+			
+			echo json_encode( $result );
+			
+			$app->stop ();
+		}
+	} else {
+		$app->halt ( 401, json_encode ( array ('error' => true, msg => 'Email is required!') ) );
 	}
 } );
 
