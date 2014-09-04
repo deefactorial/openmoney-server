@@ -355,11 +355,13 @@ $app->post ( '/lookupTag', function () use($app) {
 			// do lookup on tag
 			
 			$taglookup_function =
-			'function (doc, meta) { if( doc.type == "users" && doc.tags ) { doc.tags.forEach(function(tag) { emit(tag.hashTag, tag); }); } }'; 
+			'function (doc, meta) { if( doc.type == "users" && doc.tags ) { doc.tags.forEach(function(tag) { emit(tag.hashTag, tag); } ); } }'; 
 			$tradingname_lookup_function = 
-			'function (doc, meta) { if( doc.type == "trading_name" && doc.steward && doc.name && doc.currency) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { "name": doc.name, "currency": doc.currency } ); } ) } }';
+			'function (doc, meta) { if( doc.type == "trading_name" && doc.steward && doc.name && doc.currency) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { "name": doc.name, "currency": doc.currency } ); } ); } }';
 			
 			$designDoc = json_encode( json_decode( '{ "views": { "taglookup": { "map": "' . $taglookup_function . '" }, { "tradingnamelookup1" : { "map": "' . $tradingname_lookup_function . '" } } }' ) );
+			
+			echo $designDoc;
 			
 			$cb->setDesignDoc( "dev_nfctag", $designDoc );
 			
