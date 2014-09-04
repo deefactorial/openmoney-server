@@ -381,12 +381,15 @@ $app->post ( '/lookupTag', function () use($app) {
 				
 				$options = array('startkey' => array( $username ) , 'endkey' =>  array( $username . '\uefff' , '\uefff', '\uefff' ) ) ;
 				
-				//$options = array();
-				
 				//do trading name lookup on 
 				$tradingname_result = $cb->view('dev_nfctag', 'tradingnamelookup1', $options );
 				
-				echo json_encode( $tradingname_result );
+				$tradingname_array = array();
+				foreach( $tradingname_result ['rows'] as $row) {
+					array_push($tradingname_array, $row['id']);
+				}
+				
+				echo json_encode( $tradingname_array );
 			}
 			
 			$app->stop ();
