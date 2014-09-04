@@ -355,9 +355,9 @@ $app->post ( '/lookupTag', function () use($app) {
 			// do lookup on tag
 			
 			$taglookup_function =
-			'function (doc, meta) { if( doc.type == "users" && doc.tags ) { doc.tags.forEach(function(tag) { emit(tag.hashTag, tag); } ); } }'; 
+			'function (doc, meta) { if( doc.type == \"users\" && doc.tags ) { doc.tags.forEach(function(tag) { emit(tag.hashTag, tag); } ); } }'; 
 			$tradingname_lookup_function = 
-			'function (doc, meta) { if( doc.type == "trading_name" && doc.steward && doc.name && doc.currency) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { "name": doc.name, "currency": doc.currency } ); } ); } }';
+			'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { \"name\": doc.name, \"currency\": doc.currency } ); } ); } }';
 			
 			$designDoc =  '{ "views": { "taglookup": { "map": "' . $taglookup_function . '" }, { "tradingnamelookup1" : { "map": "' . $tradingname_lookup_function . '" } } }' ;
 			
@@ -377,7 +377,7 @@ $app->post ( '/lookupTag', function () use($app) {
 				//remove users, from id
 				$username = substr( $row['id'], 6, strlen( $row['id'] ) );
 				
-				echo $username;
+				//echo $username;
 				
 				$options = array('startkey' => array( $username ) , 'endkey' =>  array( $username . '\uefff' , '\uefff', '\uefff' ) ) ;
 				
