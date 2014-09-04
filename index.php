@@ -372,11 +372,11 @@ $app->post ( '/lookupTag', function () use($app) {
 					}
 				}';
 			
-			$designDoc =  json_decode( '{ "views": { "taglookup": { "map": "' . $taglookup_function . '.toString()" }, { "tradingnamelookup1" : { "map": "' . $tradingname_lookup_function . '.toString()" } } } ' );
+			$designDoc =  json_decode( '{ "views": { "taglookup": { "map": "' . $taglookup_function . '" }, { "tradingnamelookup1" : { "map": "' . $tradingname_lookup_function . '" } } } ' );
 			
-			//$cb->setDesignDoc( "_design/dev_nfctag1", $designDoc );
+			$cb->setDesignDoc( "dev_nfctag", $designDoc );
 			
-			echo $cb->getDesignDoc( "dev_nfctag" );
+			//echo $cb->getDesignDoc( "dev_nfctag" );
 			
 			//, array('startkey' => $key, 'endkey' => $key)
 			// startkey : [ id, {} ], endkey : [ id ], descending : true, include_docs : true
