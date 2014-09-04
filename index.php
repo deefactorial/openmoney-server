@@ -354,8 +354,8 @@ $app->post ( '/lookupTag', function () use($app) {
 			// user is verified
 			// do lookup on tag
 			
-			$taglookup_function = 
-				'function (doc, meta) {
+			$taglookup_function =
+			'function (doc, meta) {
 				  if( doc.type == "users" && doc.tags ) {
 				      doc.tags.forEach(function(tag) {
 				          emit(tag.hashTag, tag);
@@ -363,18 +363,18 @@ $app->post ( '/lookupTag', function () use($app) {
 				  }
 				}';
 			
-			$cb->set( "_design/dev_nfctag/_view/taglookup", $taglookup_function );
-			
-			$tradingname_lookup_function = 
-				'function (doc, meta) {
+			$tradingname_lookup_function =
+			'function (doc, meta) {
 					if( doc.type == "trading_name" && doc.steward && doc.name && doc.currency) {
 						doc.steward.forEach(function( steward ) {
-							emit( [doc.steward, doc.currency, doc.name], { "name": doc.name, "currency": doc.currency } );
-						} )	
+							emit( [steward, doc.currency, doc.name], { "name": doc.name, "currency": doc.currency } );
+						} )
 					}
 				}';
 			
-			$cb->set( "_design/dev_nfctag/_view/tradingnamelookup1", $tradingname_lookup_function );
+			$designDoc = json_decode( '{ "views": { "taglookup": { "map": ' . $taglookup_function . '.toString() }, { "tradingnamelookup1" : { "map": ' . $tradingname_lookup_function . '.toString() } } } ' );
+			
+			$cb->setDesignDoc( "_design/dev_nfctag", $designDoc );
 			
 			//, array('startkey' => $key, 'endkey' => $key)
 			// startkey : [ id, {} ], endkey : [ id ], descending : true, include_docs : true
@@ -387,9 +387,9 @@ $app->post ( '/lookupTag', function () use($app) {
 				
 				echo $username;
 				
-				//$options = array('startkey' => array( $username ) , 'endkey' =>  array( $username . '\uefff' , '\uefff', '\uefff' ) ) ;
+				$options = array('startkey' => array( $username ) , 'endkey' =>  array( $username . '\uefff' , '\uefff', '\uefff' ) ) ;
 				
-				$options = array();
+				//$options = array();
 				
 				//do trading name lookup on 
 				$tradingname_result = $cb->view('dev_nfctag', 'tradingnamelookup1', $options );
