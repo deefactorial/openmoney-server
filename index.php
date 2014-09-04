@@ -361,9 +361,9 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			$designDoc =  '{ "views": { "taglookup": { "map": "' . $taglookup_function . '" }, "tradingnamelookup1" : { "map": "' . $tradingname_lookup_function . '" } } }' ;
 			
-			echo $designDoc;
+			//echo $designDoc;
 			
-			//$cb->setDesignDoc( "dev_nfctag", $designDoc );
+			$cb->setDesignDoc( "dev_nfctag", $designDoc );
 			
 			
 			//echo $cb->getDesignDoc( "dev_nfctag" );
