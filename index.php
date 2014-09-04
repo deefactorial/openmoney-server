@@ -363,7 +363,7 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			echo $designDoc;
 			
-			$cb->setDesignDoc( "dev_nfctag", $designDoc );
+			//$cb->setDesignDoc( "dev_nfctag", $designDoc );
 			
 			
 			//echo $cb->getDesignDoc( "dev_nfctag" );
