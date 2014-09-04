@@ -309,6 +309,7 @@ $app->post ( '/lookupTag', function () use($app) {
 	
 	$username = '';
 	$password = '';
+	$key = '';
 	function get_http_response_code($url) {
 		$headers = get_headers ( $url );
 		return substr ( $headers [0], 9, 3 );
@@ -319,14 +320,16 @@ $app->post ( '/lookupTag', function () use($app) {
 		
 		$username = $post ['username'];
 		$password = $post ['password'];
+		$key = $post ['key'];
 		
-		if ($username == '' && $password == '') {
-			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email and password are required !') ) );
+		if ($username == '' || $password == '' || $key) {
+			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email, password and key are required !') ) );
 		}
 	} else {
 		if ($username == '' && $password == '') {
 			$username = $_POST ['username'];
 			$password = $_POST ['password'];
+			$key = $_POST ['key'];
 		}
 	}
 	
@@ -361,8 +364,6 @@ $app->post ( '/lookupTag', function () use($app) {
 				}';
 			
 			$cb->set( "_design/dev_nfctag/_view/taglookup", $taglookup_function );
-			
-			$key = $_POST['key'];
 			
 			$result = $cb->view('dev_nfctag', 'taglookup', array('startkey' => $key, 'endkey' => $key));
 			
