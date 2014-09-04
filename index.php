@@ -376,7 +376,7 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			//$cb->setDesignDoc( "_design/dev_nfctag1", $designDoc );
 			
-			echo $cb->getDesignDoc( "_design/dev_nfctag" );
+			echo $cb->getDesignDoc( "dev_nfctag" );
 			
 			//, array('startkey' => $key, 'endkey' => $key)
 			// startkey : [ id, {} ], endkey : [ id ], descending : true, include_docs : true
