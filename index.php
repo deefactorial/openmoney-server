@@ -382,8 +382,15 @@ $app->post ( '/lookupTag', function () use($app) {
 			foreach( $result['rows'] as $row ) {
 				//remove users, from id
 				$username = substr( $row['id'], 6, strlen( $row['id'] ) );
+				
+				echo $username;
+				
+				//$options = array('startkey' => array( $username ) , 'endkey' =>  array( $username . '\uefff' , '\uefff', '\uefff' ) ) ;
+				
+				$options = array();
+				
 				//do trading name lookup on 
-				$tradingname_result = $cb->view('dev_nfctag', 'tradingnamelookup', array('startkey' => array( $username ) , 'endkey' =>  array( $username . '\uefff' , '\uefff', '\uefff' ) )  );
+				$tradingname_result = $cb->view('dev_nfctag', 'tradingnamelookup', $options );
 				
 				echo json_encode( $tradingname_result );
 			}
