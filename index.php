@@ -368,11 +368,13 @@ $app->post ( '/lookupTag', function () use($app) {
 			$tradingname_lookup_function = 
 				'function (doc, meta) {
 					if( doc.type == "trading_name" && doc.steward && doc.name && doc.currency) {
-						emit( [doc.steward, doc.currency, doc.name], { "name": doc.name, "currency": doc.currency } );					
+						doc.steward.forEach(function( steward ) {
+							emit( [doc.steward, doc.currency, doc.name], { "name": doc.name, "currency": doc.currency } );
+						} )	
 					}
 				}';
 			
-			$cb->set( "_design/dev_nfctag/_view/tradingnamelookup", $tradingname_lookup_function );
+			$cb->set( "_design/dev_nfctag/_view/tradingnamelookup1", $tradingname_lookup_function );
 			
 			//, array('startkey' => $key, 'endkey' => $key)
 			// startkey : [ id, {} ], endkey : [ id ], descending : true, include_docs : true
@@ -390,7 +392,7 @@ $app->post ( '/lookupTag', function () use($app) {
 				$options = array();
 				
 				//do trading name lookup on 
-				$tradingname_result = $cb->view('dev_nfctag', 'tradingnamelookup', $options );
+				$tradingname_result = $cb->view('dev_nfctag', 'tradingnamelookup1', $options );
 				
 				echo json_encode( $tradingname_result );
 			}
