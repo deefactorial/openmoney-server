@@ -322,7 +322,7 @@ $app->post ( '/lookupTag', function () use($app) {
 		$password = $post ['password'];
 		$key = $post ['key'];
 		
-		if ($username == '' || $password == '' || $key) {
+		if ($username == '' || $password == '' || $key == '') {
 			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email, password and key are required !') ) );
 		}
 	} else {
