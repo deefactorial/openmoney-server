@@ -386,7 +386,7 @@ $app->post ( '/lookupTag', function () use($app) {
 				
 				$tradingname_array = array();
 				foreach( $tradingname_result ['rows'] as $row) {
-					array_push($tradingname_array, $row['id']);
+					array_push($tradingname_array, $row);
 				}
 				
 				echo json_encode( $tradingname_array );
