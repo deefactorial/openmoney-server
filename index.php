@@ -349,56 +349,159 @@ $app->post ( '/lookupTag', function () use($app) {
 		
 		require ("password.php");
 		
-
 		if (password_verify ( $password, $user ['password'] )) {
 			// user is verified
 			// do lookup on tag
 			
-			$taglookup_function =
-			'function (doc, meta) { if( doc.type == \"users\" && doc.tags ) { doc.tags.forEach(function(tag) { emit(tag.hashTag, tag); } ); } }'; 
-			$tradingname_lookup_function = 
-			'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { \"name\": doc.name, \"currency\": doc.currency } ); } ); } }';
+			$taglookup_function = 'function (doc, meta) { if( doc.type == \"users\" && doc.tags ) { doc.tags.forEach(function(tag) { emit(tag.hashTag, tag); } ); } }';
+			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { \"name\": doc.name, \"currency\": doc.currency } ); } ); } }';
 			
-			$designDoc =  '{ "views": { "taglookup": { "map": "' . $taglookup_function . '" }, "tradingnamelookup1" : { "map": "' . $tradingname_lookup_function . '" } } }' ;
+			$designDoc = '{ "views": { "taglookup": { "map": "' . $taglookup_function . '" }, "tradingnamelookup1" : { "map": "' . $tradingname_lookup_function . '" } } }';
 			
-			//echo $designDoc;
+			// echo $designDoc;
 			
-			$cb->setDesignDoc( "dev_nfctag", $designDoc );
+			$cb->setDesignDoc ( "dev_nfctag", $designDoc );
 			
+			// echo $cb->getDesignDoc( "dev_nfctag" );
 			
-			//echo $cb->getDesignDoc( "dev_nfctag" );
-			
-			//, array('startkey' => $key, 'endkey' => $key)
+			// , array('startkey' => $key, 'endkey' => $key)
 			// startkey : [ id, {} ], endkey : [ id ], descending : true, include_docs : true
 			
-			$result = $cb->view('dev_nfctag', 'taglookup', array('startkey' => $key , 'endkey' =>  $key . '\uefff' )  );
+			$result = $cb->view ( 'dev_nfctag', 'taglookup', array ('startkey' => $key, 'endkey' => $key . '\uefff') );
 			
-			foreach( $result['rows'] as $row ) {
-				//remove users, from id
-				$username = substr( $row['id'], 6, strlen( $row['id'] ) );
+			foreach ( $result ['rows'] as $row ) {
+				// remove users, from id
+				$username = substr ( $row ['id'], 6, strlen ( $row ['id'] ) );
 				
-				//echo $username;
+				// echo $username;
 				
-				$options = array('startkey' => array( $username ) , 'endkey' =>  array( $username . '\uefff' , '\uefff', '\uefff' ) ) ;
+				$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
 				
-				//do trading name lookup on 
-				$tradingname_result = $cb->view('dev_nfctag', 'tradingnamelookup1', $options );
+				// do trading name lookup on
+				$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup1', $options );
 				
-				$tradingname_array = array();
-				foreach( $tradingname_result ['rows'] as $row) {
-					unset($object);
-					$object['id'] = $row['id'];
-					$object['value'] = $row['value'];
-					array_push($tradingname_array, $object);
+				$tradingname_array = array ();
+				foreach ( $tradingname_result ['rows'] as $row ) {
+					unset ( $object );
+					$object ['id'] = $row ['id'];
+					$object ['value'] = $row ['value'];
+					array_push ( $tradingname_array, $object );
 				}
 				
-				echo json_encode( $tradingname_array );
+				echo json_encode ( $tradingname_array );
 			}
 			
 			$app->stop ();
 		}
 	} else {
 		$app->halt ( 401, json_encode ( array ('error' => true, msg => 'Email is required!') ) );
+	}
+} );
+
+$app->post ( '/customerLookup', function () use($app) {
+	
+	$username = '';
+	$password = '';
+	function get_http_response_code($url) {
+		$headers = get_headers ( $url );
+		return substr ( $headers [0], 9, 3 );
+	}
+	
+	if (($username == '' && $password == '') && (! isset ( $_POST ['username'] ) || ! isset ( $_POST ['password'] ))) {
+		$post = json_decode ( file_get_contents ( 'php://input' ), true );
+		
+		$username = $post ['username'];
+		$password = $post ['password'];
+		
+		if ($username == '' && $password == '') {
+			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email and password are required !') ) );
+		}
+	} else {
+		if ($username == '' && $password == '') {
+			$username = $_POST ['username'];
+			$password = $_POST ['password'];
+		}
+	}
+	
+	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
+	
+	$user = $cb->get ( "users," . $username );
+	
+	$user = json_decode ( $user, true );
+	
+	// TODO: cytpographically decode password using cryptographic algorithms specified in the $user ['cryptographic_algorithms'] array.
+	require ("password.php");
+	
+	if (password_verify ( $password, $user ['password'] )) {
+		$url = 'https://localhost:4985/openmoney_shadow/_session';
+		// $url = 'https://localhost:4985/todos/_session';
+		$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
+		$json = json_encode ( $data );
+		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+		$context = stream_context_create ( $options );
+		$default_context = stream_context_set_default ( $options );
+		
+		if (get_http_response_code ( $url ) != "404") {
+			$result = file_get_contents ( $url, false, $context );
+		} else {
+			// user exists in db but not in sync_gateway so create the user
+			$url = 'https://localhost:4985/openmoney_shadow/_user/' . $username;
+			// $url = 'https://localhost:4985/todos/_user/' . $username;
+			$data = array ('name' => $user ['username'], 'password' => $password);
+			$json = json_encode ( $data );
+			$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+			$context = stream_context_create ( $options );
+			$default_context = stream_context_set_default ( $options );
+			
+			$result = file_get_contents ( $url, false, $context );
+			
+			$url = 'https://localhost:4985/openmoney_shadow/_session';
+			// $url = 'https://localhost:4985/todos/_session';
+			$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
+			$json = json_encode ( $data );
+			$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+			$context = stream_context_create ( $options );
+			$default_context = stream_context_set_default ( $options );
+			
+			$result = file_get_contents ( $url, false, $context );
+		}
+		
+		$json = json_decode ( $result, true );
+		
+		if (isset ( $json ['session_id'] )) {
+			
+			// setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
+			// $result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires']);
+			
+			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { \"name\": doc.name, \"currency\": doc.currency } ); } ); } }';
+			
+			$designDoc = '{ "views": { "tradingnamelookup" : { "map": "' . $tradingname_lookup_function . '" } } }';
+			
+			// echo $designDoc;
+			
+			$cb->setDesignDoc ( "dev_customer", $designDoc );
+			
+			$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
+			
+			// do trading name lookup on
+			$tradingname_result = $cb->view ( 'dev_customer', 'tradingnamelookup', $options );
+			
+			$tradingname_array = array ();
+			foreach ( $tradingname_result ['rows'] as $row ) {
+				unset ( $object );
+				$object ['id'] = $row ['id'];
+				$object ['value'] = $row ['value'];
+				array_push ( $tradingname_array, $object );
+			}
+			
+			echo json_encode ( $tradingname_array );
+			
+			$app->stop ();
+		} else {
+			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'The session could not be set!') ) );
+		}
+	} else {
+		$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Password did not match!') ) );
 	}
 } );
 
