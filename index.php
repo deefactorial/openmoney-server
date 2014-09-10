@@ -371,6 +371,8 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			$result = $cb->view ( 'dev_nfctag', 'taglookup', array ('startkey' => $key, 'endkey' => $key . '\uefff') );
 			
+			$tradingname_array = array ();
+			
 			foreach ( $result ['rows'] as $row ) {
 				// remove users, from id
 				$username = substr ( $row ['id'], 6, strlen ( $row ['id'] ) );
@@ -382,7 +384,7 @@ $app->post ( '/lookupTag', function () use($app) {
 				// do trading name lookup on
 				$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup1', $options );
 				
-				$tradingname_array = array ();
+				
 				foreach ( $tradingname_result ['rows'] as $row ) {
 					unset ( $object );
 					$object ['id'] = $row ['id'];
@@ -390,7 +392,7 @@ $app->post ( '/lookupTag', function () use($app) {
 					array_push ( $tradingname_array, $object );
 				}
 				
-				echo json_encode ( $tradingname_array );
+				
 			}
 			
 			$result = $cb->view ( 'dev_nfctag', 'beamlookup', array ('startkey' => $key, 'endkey' => $key . '\uefff') );
@@ -406,7 +408,7 @@ $app->post ( '/lookupTag', function () use($app) {
 				// do trading name lookup on
 				$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup1', $options );
 			
-				$tradingname_array = array ();
+				
 				foreach ( $tradingname_result ['rows'] as $row ) {
 					unset ( $object );
 					$object ['id'] = $row ['id'];
@@ -414,8 +416,10 @@ $app->post ( '/lookupTag', function () use($app) {
 					array_push ( $tradingname_array, $object );
 				}
 			
-				echo json_encode ( $tradingname_array );
+				
 			}
+			
+			echo json_encode ( $tradingname_array );
 			
 			$app->stop ();
 		}
