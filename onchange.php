@@ -9,7 +9,7 @@ $cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 	
 // $cb->setDesignDoc ( "dev_roles", $designDoc );
 	
-$options = array ('startkey' => array (), 'endkey' => array ( '\uefff'));
+$options = array ();
 	
 // do trading name lookup on
 $tradingnamejournal_result = $cb->view ( 'dev_roles', 'tradingnamejournallookup', $options );
