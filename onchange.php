@@ -1,7 +1,7 @@
 <?php 
 $cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 
-// $tradingNameJournal_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name_journal\" && doc.from && doc.to && doc.currency) { emit( \"trading_name,\" + doc.from + \",\" + doc.currency  ,  doc.from + \" \" + doc.currency); emit( \"trading_name,\" + doc.to + \",\" + doc.currency  ,  doc.to + \" \" + doc.currency); } }';
+// $tradingNameJournal_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name_journal\" && doc.from && doc.to && doc.currency) { emit( \"trading_name,\" + doc.from + \",\" + doc.currency  ,  doc.from + \"_\" + doc.currency); emit( \"trading_name,\" + doc.to + \",\" + doc.currency  ,  doc.to + \"_\" + doc.currency); } }';
 
 // $designDoc = '{ "views": { "tradingnamejournallookup" : { "map": "' . $tradingNameJournal_lookup_function . '" } } }';
 	
@@ -16,9 +16,9 @@ $tradingnamejournal_result = $cb->view ( 'dev_roles', 'tradingnamejournallookup'
 
 foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	
-	$url = 'https://localhost:4985/openmoney_shadow/_role/' . $journal_trading_name['key'];
+	$url = 'https://localhost:4985/openmoney_shadow/_role/' . $journal_trading_name['value'];
 	// $url = 'https://localhost:4985/todos/_user/' . $username;
-	$data = array ('name' => $journal_trading_name['key'] );
+	$data = array ('name' => $journal_trading_name['value'] );
 	$json = json_encode ( $data );
 	$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 	$context = stream_context_create ( $options );
