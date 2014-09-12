@@ -30,4 +30,6 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	//$cb->add( "_role/" + $journal_trading_name['id'], '{ "name": ' . $journal_trading_name['id'] . ' } ' );
 	
 }
+
+print_r( $tradingnamejournal_result );
 ?>
