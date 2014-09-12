@@ -16,7 +16,18 @@ $tradingnamejournal_result = $cb->view ( 'dev_roles', 'tradingnamejournallookup'
 
 foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	
-	$cb->add( "_role/" + $journal_trading_name['id'], '{ "name": ' . $journal_trading_name['id'] . ' } ' );
+	$url = 'https://localhost:4985/openmoney_shadow/_role/' . $journal_trading_name['id'];
+	// $url = 'https://localhost:4985/todos/_user/' . $username;
+	$data = array ('name' => $journal_trading_name['id'] );
+	$json = json_encode ( $data );
+	$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+	$context = stream_context_create ( $options );
+	$default_context = stream_context_set_default ( $options );
+		
+	$result = file_get_contents ( $url, false, $context );
+	
+	echo $result;
+	//$cb->add( "_role/" + $journal_trading_name['id'], '{ "name": ' . $journal_trading_name['id'] . ' } ' );
 	
 }
 ?>
