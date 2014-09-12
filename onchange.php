@@ -5,12 +5,7 @@ $user = $cb->get ( "trading_names," . $username );
 
 $user = json_decode ( $user, true );
 
-$tradingNameJournal_lookup_function = 'function (doc, meta) {
-  if( doc.type == \"trading_name_journal\" && doc.from && doc.to && doc.currency) {
- 	emit( \"trading_name,\" + doc.from + \",\" + doc.currency  ,  doc.from + \" \" + doc.currency)
-	emit( \"trading_name,\" + doc.to + \",\" + doc.currency  ,  doc.to + \" \" + doc.currency)
-  }
-}';
+$tradingNameJournal_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name_journal\" && doc.from && doc.to && doc.currency) { emit( \"trading_name,\" + doc.from + \",\" + doc.currency  ,  doc.from + \" \" + doc.currency) emit( \"trading_name,\" + doc.to + \",\" + doc.currency  ,  doc.to + \" \" + doc.currency) } }';
 	
 $designDoc = '{ "views": { "tradingnamejournallookup" : { "map": "' . $tradingNameJournal_lookup_function . '" } } }';
 	
