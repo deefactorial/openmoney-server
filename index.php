@@ -156,18 +156,17 @@ $app->post ( '/registration', function () use($app) {
 		//$subusername = str_replace ( ".", "", $subusername );
 		$subusername = preg_replace ( "/[^a-zA-Z\d]*/", "", $subusername );
 		
-		$trading_name_space ['type'] = "trading_name_space";
+		$trading_name_space ['type'] = "space";
 		$trading_name_space ['space'] = $subusername;
 		$trading_name_space ['steward'] = array ($username);
-		$trading_name_space ['trading_name_subspace'] = '';
-		$trading_name_space ['trading_space'] = $subusername;
+		$trading_name_space ['subspace'] = '';
 		
-		$cb->set ( "trading_name_space," . $trading_name_space ['space'], json_encode ( $trading_name_space ) );
+		$cb->set ( "space," . $trading_name_space ['space'], json_encode ( $trading_name_space ) );
 		
 		$trading_name ['type'] = "trading_name";
 		$trading_name ['trading_name'] = $subusername;
 		$trading_name ['name'] = $subusername;
-		$trading_name ['trading_name_space'] = "";
+		$trading_name ['space'] = "";
 		$trading_name ['currency'] = "cc";
 		$trading_name ['steward'] = array ($username);
 		
