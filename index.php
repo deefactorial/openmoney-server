@@ -151,8 +151,9 @@ $app->post ( '/registration', function () use($app) {
 		$user ['password_encryption_algorithm'] = array (PASSWORD_BCRYPT);
 		
 		$cb->set ( "users," . $username, json_encode ( $user ) );
-		
-		$subusername = substr ( $username, 0, strpos ( $username, "@" ) );
+		$subusername = $username;
+		if( strpos ( $username, "@" ) )
+			$subusername = substr ( $username, 0, strpos ( $username, "@" ) );
 		//$subusername = str_replace ( ".", "", $subusername );
 		$subusername = preg_replace ( "/[^a-zA-Z\d]*/", "", $subusername );
 		
