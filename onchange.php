@@ -43,14 +43,15 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	foreach($trading_name['steward'] as $steward) {
 		//check if username is email
 		if( strpos($steward,"@") > 0 ) {
-			$message = "<br/><br/>Email:" . $steward . 
-			"<br/>Payment Made:" . 
-			"<br/>From:" . $trading_name_journal['from'] . 
-			"<br/>To:" . $trading_name_journal['to'] . 
-			"<br/>Amount:" . $trading_name_journal['amount'] . " " . $trading_name_journal['currency'] . 
-			"<br/>Description:" . $trading_name_journal['description'] . 
-			"<br/>Timestamp:" . $trading_name_journal['timestamp'] . 
-			"<br/>";
+			$message = 
+			"<br/>Payment Made: " . 
+			"<br/>	From: " . $trading_name_journal['from'] . 
+			"<br/>	To: " . $trading_name_journal['to'] . 
+			"<br/>	Amount: " . $trading_name_journal['amount'] . " " . $trading_name_journal['currency'] . 
+			"<br/>	Description: " . $trading_name_journal['description'] . 
+			"<br/>	Timestamp: " . date( DATE_RFC2822, strtotime( $trading_name_journal['timestamp'] ) ). 
+			"<br/>" . 
+			"<br/> Thank you,<br/>openmoney";
 			
 			echo $message;
 				
