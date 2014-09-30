@@ -13,14 +13,14 @@ $cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 
 $tradingNameJournal_lookup_function = 'function (doc, meta) {if( doc.type == "trading_name_journal" && doc.from && doc.to && doc.currency && !doc.to_emailed){emit( "trading_name," + doc.to + "," + doc.currency,doc.to + "_" + doc.currency); }if( doc.type == "trading_name_journal" && doc.from && doc.to && doc.currency && !doc.from_emailed){emit( "trading_name," + doc.from + "," + doc.currency,doc.from + "_" + doc.currency);} }';
 
-$trading_name_function_name = "tradingnamejournallookup5";
+$trading_name_function_name = "tradingnamejournallookup6";
 
 $designDoc = '{ "views": {' . $trading_name_function_name . ': { "map": \'' . $tradingNameJournal_lookup_function . '\' } } }';
 	
 // echo $designDoc;
 $design_doc_name = "dev_roles";
 
-$cb->setDesignDoc ($design_doc_name,$designDoc);
+$cb->setDesignDoc ($design_doc_name,json_decode(json_encode($designDoc)));
 	
 $options = array ();
 	
