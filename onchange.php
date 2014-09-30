@@ -1,18 +1,34 @@
 <?php 
+
+require config.php;
+
+function email_letter($to, $from, $subject = 'no subject', $msg = 'no msg') {
+	$headers = "From: $from\r\n";
+	$headers .= "MIME-Version: 1.0\r\n";
+	$headers .= "Content-type: text/html; charset=iso-8859-1\r\n";
+	$headers .= 'X-Mailer: PHP/' . phpversion ();
+	return mail ( $to, $subject, $msg, $headers );
+}
+
 $cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 
-// $tradingNameJournal_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name_journal\" && doc.from && doc.to && doc.currency) { emit( \"trading_name,\" + doc.from + \",\" + doc.currency  ,  doc.from + \"_\" + doc.currency); emit( \"trading_name,\" + doc.to + \",\" + doc.currency  ,  doc.to + \"_\" + doc.currency); } }';
+$tradingNameJournal_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name_journal\" && doc.from && doc.to && doc.currency && !doc.emailed) { emit( \"trading_name,\" + doc.from + \",\" + doc.currency  ,  doc.from + \"_\" + doc.currency); emit( \"trading_name,\" + doc.to + \",\" + doc.currency  ,  doc.to + \"_\" + doc.currency); } }';
 
-// $designDoc = '{ "views": { "tradingnamejournallookup" : { "map": "' . $tradingNameJournal_lookup_function . '" } } }';
+$trading_name_function_name = "tradingnamejournallookup";
+
+$designDoc = '{ "views": { "' . $trading_name_function_name . '" : { "map": "' . $tradingNameJournal_lookup_function . '" } } }';
 	
-// // echo $designDoc;
-	
-// $cb->setDesignDoc ( "dev_roles", $designDoc );
+// echo $designDoc;
+$design_doc_name = "dev_roles";
+
+$cb->setDesignDoc ($design_doc_name , $designDoc );
 	
 $options = array ();
 	
 // do trading name lookup on
-$tradingnamejournal_result = $cb->view ( 'dev_roles', 'tradingnamejournallookup', $options );
+$tradingnamejournal_result = $cb->view ( $design_doc_name, $trading_name_function_name, $options );
+
+//print_r( $tradingnamejournal_result );
 
 foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	//echo "get " . $journal_trading_name['id'] . "<br/>";
@@ -26,8 +42,9 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	//echo $trading_name;
 	
 	foreach($trading_name['steward'] as $steward) {
-		if( strpos($steward,"@") > 0 )
-			echo "<br/><br/>Email:" . $steward . 
+		//check if username is email
+		if( strpos($steward,"@") > 0 ) {
+			$message = "<br/><br/>Email:" . $steward . 
 			"<br/>Payment Made:" . 
 			"<br/>From:" . $trading_name_journal['from'] . 
 			"<br/>To:" . $trading_name_journal['to'] . 
@@ -35,23 +52,20 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 			"<br/>Description:" . $trading_name_journal['description'] . 
 			"<br/>Timestamp:" . $trading_name_journal['timestamp'] . 
 			"<br/>";
+			
+			echo $message;
+				
+			if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
+				if($trading_name_journal['from'] == $trading_name['trading_name']) {
+					$trading_name_journal['from_emailed'] = true;
+				} else if ($trading_name_journal['to'] == $trading_name['trading_name']) {
+					$trading_name_journal['to_emailed'] = true;
+				}
+				$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+			}
+		}
 	} 
-	
-	
-// 	$url = 'https://localhost:4985/openmoney_shadow/' . $journal_trading_name['id'];
-// 	// $url = 'https://localhost:4985/todos/_user/' . $username;
-// 	$data = array ('name' => $journal_trading_name['value'] );
-// 	$json = json_encode ( $data );
-// 	$options = array ('http' => array ('method' => 'GET', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-// 	$context = stream_context_create ( $options );
-// 	$default_context = stream_context_set_default ( $options );
-		
-// 	$result = file_get_contents ( $url, false, $context );
-	
-// 	echo $result;
-	//$cb->add( "_role/" + $journal_trading_name['id'], '{ "name": ' . $journal_trading_name['id'] . ' } ' );
-	
 }
 
-print_r( $tradingnamejournal_result );
+
 ?>
