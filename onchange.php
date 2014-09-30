@@ -19,12 +19,12 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
 	
 	$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
-	print_r($trading_name);
+	//print_r($trading_name);
 	
 	//echo $trading_name;
 	
 	foreach($trading_name['steward'] as $steward) {
-		echo "<br/>Email:" . $steward . " Payment Made:" . " From:" . $trading_name_journal['from'] . " To:" . $trading_name_journal['to'] . "<br/>";
+		echo "<br/>Email:" . $steward . " Payment Made:" . " From:" . $trading_name_journal['from'] . " To:" . $trading_name_journal['to'] . " Amount:" . $trading_name_journal['amount'] . " in " . $trading_name_journal['currency'] . "<br/>";
 	} 
 	
 // 	$url = 'https://localhost:4985/openmoney_shadow/' . $journal_trading_name['id'];
