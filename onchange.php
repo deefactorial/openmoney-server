@@ -1,6 +1,6 @@
 <?php 
 
-require config.php;
+require "config.php";
 
 function email_letter($to, $from, $subject = 'no subject', $msg = 'no msg') {
 	$headers = "From: $from\r\n";
