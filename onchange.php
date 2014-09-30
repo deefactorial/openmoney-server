@@ -26,7 +26,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	//echo $trading_name;
 	
 	foreach($trading_name['steward'] as $steward) {
-		echo "<br/>Email:" . $steward . " Payment Made:" . " From:" . $trading_name_journal['from'] . " To:" . $trading_name_journal['to'] . " Amount:" . $trading_name_journal['amount'] . " in " . $trading_name_journal['currency'] . "<br/>";
+		echo "<br/>Email:" . $steward . " Payment Made:" . " From:" . $trading_name_journal['from'] . " To:" . $trading_name_journal['to'] . " Amount:" . $trading_name_journal['amount'] . " " . $trading_name_journal['currency'] . " Description:" . $trading_name_journal['description'] . "<br/>";
 	} 
 	
 // 	$url = 'https://localhost:4985/openmoney_shadow/' . $journal_trading_name['id'];
