@@ -53,7 +53,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 			"<br/>" . 
 			"<br/>Thank you,<br/>openmoney<br/>";
 			
-			echo $message;
+			echo str_replace("<br/>","\n",$message);
 				
 			if($trading_name_journal['from'] == $trading_name['trading_name'] && !$trading_name_journal['from_emailed']) {
 				if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
