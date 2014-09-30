@@ -159,8 +159,8 @@ $app->post ( '/registration', function () use($app) {
 		
 		$trading_name_space ['type'] = "space";
 		$trading_name_space ['space'] = $subusername;
-		$trading_name_space ['steward'] = array ($username);
 		$trading_name_space ['subspace'] = '';
+		$trading_name_space ['steward'] = array ($username);
 		
 		$cb->set ( "space," . $trading_name_space ['space'], json_encode ( $trading_name_space ) );
 		
