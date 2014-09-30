@@ -249,6 +249,3 @@ if (!defined('PASSWORD_BCRYPT')) {
 		return $status === 0;
 	}
 }
-
-
-
