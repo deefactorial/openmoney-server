@@ -15,7 +15,7 @@ $options = array ();
 $tradingnamejournal_result = $cb->view ( 'dev_roles', 'tradingnamejournallookup', $options );
 
 foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
-	//echo "get " . $journal_trading_name['key'] . "<br/>";
+	echo "get " . $journal_trading_name['key'] . "<br/>";
 	$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
 	print_r($trading_name);
 	
