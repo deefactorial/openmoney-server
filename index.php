@@ -161,6 +161,7 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name_space ['space'] = $subusername;
 		$trading_name_space ['subspace'] = '';
 		$trading_name_space ['steward'] = array ($username);
+		$trading_name_space ['created'] = microtime();
 		
 		$cb->set ( "space," . $trading_name_space ['space'], json_encode ( $trading_name_space ) );
 		
@@ -170,6 +171,7 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name ['space'] = "";
 		$trading_name ['currency'] = "cc";
 		$trading_name ['steward'] = array ($username);
+		$trading_name ['created'] = microtime();
 		
 		$cb->set ( "trading_name," . $trading_name ['trading_name'] . "," . $trading_name ['currency'], json_encode ( $trading_name ) );
 		
