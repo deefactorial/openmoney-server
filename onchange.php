@@ -13,7 +13,7 @@ $cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 
 $tradingNameJournal_lookup_function = 'function (doc, meta) {if( doc.type == "trading_name_journal" && doc.from && doc.to && doc.currency && !doc.to_emailed){emit( "trading_name," + doc.to + "," + doc.currency,doc.to + "_" + doc.currency); }if( doc.type == "trading_name_journal" && doc.from && doc.to && doc.currency && !doc.from_emailed){emit( "trading_name," + doc.from + "," + doc.currency,doc.from + "_" + doc.currency);} }';
 
-$trading_name_function_name = "tradingnamejournallookup4";
+$trading_name_function_name = "tradingnamejournallookup5";
 
 $designDoc = '{ "views": {' . $trading_name_function_name . ': { "map": \'' . $tradingNameJournal_lookup_function . '\' } } }';
 	
