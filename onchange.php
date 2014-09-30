@@ -15,7 +15,7 @@ $tradingNameJournal_lookup_function = 'function (doc, meta) {if( doc.type == "tr
 
 $trading_name_function_name = "tradingnamejournallookup6";
 
-$designDoc = '{ "views": {' . $trading_name_function_name . ': { "map": \'' . $tradingNameJournal_lookup_function . '\' } } }';
+$designDoc = '{ "views": { "' . $trading_name_function_name . '" : { "map": \'' . $tradingNameJournal_lookup_function . '\' } } }';
 	
 // echo $designDoc;
 $design_doc_name = "dev_roles";
