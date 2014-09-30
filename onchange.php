@@ -16,10 +16,10 @@ $tradingnamejournal_result = $cb->view ( 'dev_roles', 'tradingnamejournallookup'
 
 foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	//echo "get " . $journal_trading_name['key'] . "<br/>";
-	$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ) );
+	$trading_name = json_decode( $cb->get ( $journal_trading_name['key'], true ) );
 	print_r($trading_name);
 	
-	print_r($trading_name['steward']);
+	//echo $trading_name;
 	
 	foreach($trading_name['steward'] as $steward) {
 		echo "Email:" . $steward . "<br/>";
