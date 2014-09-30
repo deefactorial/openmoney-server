@@ -19,6 +19,8 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ) );
 	print_r($trading_name);
 	
+	print_r($trading_name['steward']);
+	
 	foreach($trading_name['steward'] as $steward) {
 		echo "Email:" . $steward . "<br/>";
 	} 
