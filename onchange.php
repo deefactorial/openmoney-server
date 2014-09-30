@@ -63,13 +63,20 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 			
 			echo $message;
 				
-			if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
-				if($trading_name_journal['from'] == $trading_name['trading_name']) {
+			if($trading_name_journal['from'] == $trading_name['trading_name'] && !$trading_name_journal['from_emailed']) {
+				if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
+					
 					$trading_name_journal['from_emailed'] = true;
-				} else if ($trading_name_journal['to'] == $trading_name['trading_name']) {
-					$trading_name_journal['to_emailed'] = true;
+					
+					$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 				}
-				$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+			} else if ($trading_name_journal['to'] == $trading_name['trading_name'] && !$trading_name_journal['to_emailed']) {
+				if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
+					
+					$trading_name_journal['to_emailed'] = true;
+					
+					$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+				}
 			}
 		}
 	} 
