@@ -12,9 +12,9 @@ function email_letter($to, $from, $subject = 'no subject', $msg = 'no msg') {
 
 $cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 
-$tradingNameJournal_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name_journal\" && doc.from && doc.to && doc.currency && !doc.emailed) { emit( \"trading_name,\" + doc.from + \",\" + doc.currency  ,  doc.from + \"_\" + doc.currency); emit( \"trading_name,\" + doc.to + \",\" + doc.currency  ,  doc.to + \"_\" + doc.currency); } }';
+$tradingNameJournal_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name_journal\" && doc.from && doc.to && doc.currency && ( !doc.from_emailed || !doc.to_emailed ) ) { emit( \"trading_name,\" + doc.from + \",\" + doc.currency  ,  doc.from + \"_\" + doc.currency); emit( \"trading_name,\" + doc.to + \",\" + doc.currency  ,  doc.to + \"_\" + doc.currency); } }';
 
-$trading_name_function_name = "tradingnamejournallookup";
+$trading_name_function_name = "tradingnamejournallookup1";
 
 $designDoc = '{ "views": { "' . $trading_name_function_name . '" : { "map": "' . $tradingNameJournal_lookup_function . '" } } }';
 	
