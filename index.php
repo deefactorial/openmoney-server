@@ -149,6 +149,7 @@ $app->post ( '/registration', function () use($app) {
 		
 		$user ['password'] = $password_hash;
 		$user ['password_encryption_algorithm'] = array (PASSWORD_BCRYPT);
+		$user ['created'] = microtime();
 		
 		$cb->set ( "users," . $username, json_encode ( $user ) );
 		$subusername = $username;
