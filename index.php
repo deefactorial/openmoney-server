@@ -149,7 +149,7 @@ $app->post ( '/registration', function () use($app) {
 		
 		$user ['password'] = $password_hash;
 		$user ['password_encryption_algorithm'] = array (PASSWORD_BCRYPT);
-		$user ['created'] = round(microtime(true) * 1000);
+		$user ['created'] = intval( round(microtime(true) * 1000) );
 		
 		$cb->set ( "users," . $username, json_encode ( $user ) );
 		$subusername = $username;
@@ -162,7 +162,7 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name_space ['space'] = $subusername;
 		$trading_name_space ['subspace'] = '';
 		$trading_name_space ['steward'] = array ($username);
-		$trading_name_space ['created'] = round(microtime(true) * 1000);
+		$trading_name_space ['created'] = intval( round(microtime(true) * 1000) );
 		
 		$cb->set ( "space," . $trading_name_space ['space'], json_encode ( $trading_name_space ) );
 		
@@ -172,7 +172,7 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name ['space'] = "";
 		$trading_name ['currency'] = "cc";
 		$trading_name ['steward'] = array ($username);
-		$trading_name ['created'] = round(microtime(true) * 1000);
+		$trading_name ['created'] = intval( round(microtime(true) * 1000) );
 		
 		$cb->set ( "trading_name," . $trading_name ['trading_name'] . "," . $trading_name ['currency'], json_encode ( $trading_name ) );
 		
