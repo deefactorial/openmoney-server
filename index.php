@@ -334,24 +334,24 @@ $app->post ( '/lostpw', function () use($app) {
 		
 		if (! isset ( $user ['username'] ) || $user ['username'] == '') {
 			
-			if( $username != ''  ) {
-			
-				$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
-				$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
-				$cb->setDesignDoc ( "dev_profile", $designDoc );
-				$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
-					
-				// do trading name lookup on
-				$profile_result = $cb->view ( 'dev_profile', 'profileLookup', $options );
 			
 			
-				foreach ( $profile_result ['rows'] as $row ) {
-					$user = $cb->get ( "users," . $row['value'] );
-				}
+			$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
+			$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
+			$cb->setDesignDoc ( "dev_profile", $designDoc );
+			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
 				
-				$user = json_decode ( $user, true );
-			
+			// do trading name lookup on
+			$profile_result = $cb->view ( 'dev_profile', 'profileLookup', $options );
+		
+		
+			foreach ( $profile_result ['rows'] as $row ) {
+				$user = $cb->get ( "users," . $row['value'] );
 			}
+			
+			$user = json_decode ( $user, true );
+			
+			
 			
 			
 			if (! isset ( $user ['username'] ) || $user ['username'] == '') {

@@ -14,6 +14,23 @@ $user = $cb->get ( "users," . $email );
 
 $user = json_decode ( $user, true );
 
+if (! isset ( $user ['username'] ) || $user ['username'] == '') {
+	$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
+	$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
+	$cb->setDesignDoc ( "dev_profile", $designDoc );
+	$options = array ('startkey' => $email, 'endkey' => $email . '\uefff');
+	
+	// do trading name lookup on
+	$profile_result = $cb->view ( 'dev_profile', 'profileLookup', $options );
+	
+	
+	foreach ( $profile_result ['rows'] as $row ) {
+		$user = $cb->get ( "users," . $row['value'] );
+	}
+		
+	$user = json_decode ( $user, true );
+}
+
 $reset_key = (String) $user['reset_token_key'];
 $reset_hash = urldecode($_GET['reset']);
 $reset_hash = str_replace(" ","+",$reset_hash);//plus sign gets replaced with a space
