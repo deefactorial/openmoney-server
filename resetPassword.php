@@ -1,4 +1,5 @@
 <?php
+ 
 require_once('config.php');
 require_once('password.php');
 
@@ -139,5 +140,6 @@ if (password_verify( $reset_key, $reset_hash) ) {
 	</body>
 	</html>
 	<?
-}
+} 
+
 ?>
