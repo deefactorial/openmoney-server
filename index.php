@@ -383,7 +383,7 @@ $app->post ( '/lostpw', function () use($app) {
 		$msg .= "<p>OpenMoney IT Team</p>";
 		$msg .= "If you did not initiate the lost password link request then ignore this and your password will remain the same.";
 		
-		$subject = "openmoney: lost password reset REQUESTED for " + $user ['username'];
+		$subject = "openmoney: lost password reset REQUESTED for " . $user ['username'];
 		$dear = $user ['username'];
 		
 		$sentEmail = email_letter ( "\"" . $dear . "\"<" . $user ['email'] . ">", "noreply@openmoney.cc", $subject, $msg );
