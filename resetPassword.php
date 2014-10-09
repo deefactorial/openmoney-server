@@ -15,6 +15,7 @@ $user = $cb->get ( "users," . $email );
 $user = json_decode ( $user, true );
 
 if (! isset ( $user ['username'] ) || $user ['username'] == '') {
+	
 	$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
 	$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
 	$cb->setDesignDoc ( "dev_profile", $designDoc );
@@ -141,3 +142,4 @@ if (password_verify( $reset_key, $reset_hash) ) {
 	<?
 
 }
+?>
