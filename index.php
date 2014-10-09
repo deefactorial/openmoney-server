@@ -29,21 +29,27 @@ $app->post ( '/login', function () use($app) {
 		return substr ( $headers [0], 9, 3 );
 	}
 	
-	if (($username == '' && $password == '') && (! isset ( $_POST ['username'] ) || ! isset ( $_POST ['password'] ))) {
+	if (($username == '' && $password == '' && $email == '') && (! isset ( $_POST ['username'] ) || ! isset ( $_POST ['password'] ) || ! isset ( $_POST ['email'] ))) {
 		$post = json_decode ( file_get_contents ( 'php://input' ), true );
 		
-		$username = $post ['username'];
-		$password = $post ['password'];
-		$email = $post ['email'];
+		if (isset($post ['username']))
+			$username = $post ['username'];
+		if (isset($post ['password']))
+			$password = $post ['password'];
+		if (isset($post ['email']))
+			$email = $post ['email'];
 		
-		if ($username == '' && $password == '') {
+		if (($username != '' || $email != '') && $password == '') {
 			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email or Username and password are required !') ) );
 		}
 	} else {
-		if ($username == '' && $password == '') {
-			$username = $_POST ['username'];
-			$password = $_POST ['password'];
-			$email = $_POST ['email'];
+		if ($username == '' && $password == '' && $email == '') {
+			if( isset( $_POST ['username']) )
+				$username = $_POST ['username'];
+			if( isset( $_POST ['password']) )
+				$password = $_POST ['password'];
+			if( isset( $_POST ['email']) )
+				$email = $_POST ['email'];
 		}
 	}
 	
@@ -51,7 +57,7 @@ $app->post ( '/login', function () use($app) {
 	
 	$user = $cb->get ( "users," . $username );
 	
-	if( $email != null && ! isset( $user ['password'] ) ) {
+	if( $email != '' && ! isset( $user ['password'] ) ) {
 		
 		$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
 		$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
