@@ -222,6 +222,7 @@ $app->post ( '/registration', function () use($app) {
 		$profile ['notification'] = true;
 		$profile ['mode'] = false;
 		$profile ['theme'] = true;
+		$profile ['created'] = intval( round(microtime(true) * 1000) );
 		
 		$cb->set ( "profile," . $username , json_encode ( $profile ) );
 		
