@@ -167,7 +167,7 @@ $app->post ( '/registration', function () use($app) {
 	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 	$user = $cb->get ( "users," . $username );
 	
-	if( $email != null && ! isset( $user ['password'] ) ) {
+	if( $email != null && $user ['password'] == '') {
 		
 		$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
 		$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
