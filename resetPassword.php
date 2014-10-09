@@ -97,7 +97,7 @@ if (password_verify( $reset_key, $reset_hash) ) {
 			</div>
 		</div>
 	</form>
-	<? 
+	<?php
 	if ( isset( $_GET['error'] ) ) { 
 	?>
 	<div style="text-align: center">
@@ -105,13 +105,13 @@ if (password_verify( $reset_key, $reset_hash) ) {
 			<?=$_GET['error']?>
 		</div>
 	</div>
-	<? 
+	<?php
 	}
 	?>
 	</body>
 	</html>
 	
-	<?
+	<?php
 	
 } else {
 	function email_letter($to,$from,$subject='no subject',$msg='no msg') {
@@ -144,7 +144,7 @@ if (password_verify( $reset_key, $reset_hash) ) {
 	</div>
 	</body>
 	</html>
-	<?
+	<?php
 } 
 
 ?>
