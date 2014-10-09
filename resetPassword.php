@@ -139,6 +139,5 @@ if (password_verify( $reset_key, $reset_hash) ) {
 	</body>
 	</html>
 	<?
-
 }
 ?>
