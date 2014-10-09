@@ -38,7 +38,7 @@ $reset_hash = str_replace(" ","+",$reset_hash);//plus sign gets replaced with a 
 
 if (password_verify( $reset_key, $reset_hash) ) {
 	//hash match show password reset form.
-	?>
+	 ?> 
 	<html>
 	<head>
 		<script type="text/javascript">
@@ -97,15 +97,20 @@ if (password_verify( $reset_key, $reset_hash) ) {
 			</div>
 		</div>
 	</form>
-	<? if (isset($_GET['error'])) { ?>
+	<? 
+	if ( isset( $_GET['error'] ) ) { 
+	?>
 	<div style="text-align: center">
 		<div style="display: inline-block;font-family:arial,sans-serif;color:#660000;">
 			<?=$_GET['error']?>
 		</div>
 	</div>
-	<? } ?>
+	<? 
+	}
+	?>
 	</body>
 	</html>
+	
 	<?
 	
 } else {
