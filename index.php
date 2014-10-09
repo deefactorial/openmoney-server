@@ -134,18 +134,18 @@ $app->post ( '/registration', function () use($app) {
 		return substr ( $headers [0], 9, 3 );
 	}
 	
-	if (($username == '' && $password == '') && (! isset ( $_POST ['username'] ) || ! isset ( $_POST ['password'] ))) {
+	if (($username == '' && $password == '' && $email == '') && (! isset ( $_POST ['username'] ) || ! isset ( $_POST ['password'] ) || ! isset ( $_POST ['email'] ))) {
 		$post = json_decode ( file_get_contents ( 'php://input' ), true );
 		
 		$username = $post ['username'];
 		$password = $post ['password'];
 		$email = $post ['email'];
 		
-		if ($username == '' && $password == '') {
-			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email and password are required !') ) );
+		if (($username != '' || $email != '') && $password == '') {
+			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email or Username and password are required !') ) );
 		}
 	} else {
-		if ($username == '' && $password == '') {
+		if ($username == '' && $password == '' && $email == '') {
 			$username = $_POST ['username'];
 			$password = $_POST ['password'];
 			$email = $_POST ['email'];
