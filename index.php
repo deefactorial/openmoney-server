@@ -112,17 +112,17 @@ $app->post ( '/login', function () use($app) {
 			
 			$result = file_get_contents ( $url, false, $context );
 		}
+	
 		
-		$result['username'] = $user ['username'];
-		$result['email'] = $email;
+
 		
 		$json = json_decode ( $result, true );
 		
 		if (isset ( $json ['session_id'] )) {
 			
 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
-			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires']);
-			
+			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => $user ['username'], 'email' => $email);
+
 			echo json_encode ( $result );
 			$app->stop ();
 		} else {
