@@ -113,6 +113,9 @@ $app->post ( '/login', function () use($app) {
 			$result = file_get_contents ( $url, false, $context );
 		}
 		
+		$result['username'] = $user ['username'];
+		$result['email'] = $email;
+		
 		$json = json_decode ( $result, true );
 		
 		if (isset ( $json ['session_id'] )) {
