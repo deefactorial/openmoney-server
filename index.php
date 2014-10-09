@@ -70,11 +70,11 @@ $app->post ( '/login', function () use($app) {
 		// do trading name lookup on
 		$profile_result = $cb->view ( 'dev_profile', 'profileLookup', $options );
 	
-		if( count( $profile_result ['rows'] ) > 0 ) {
-			foreach ( $profile_result ['rows'] as $row ) {
-				$user = $cb->get ( "users," . $row['value'] );
-			}
+		
+		foreach ( $profile_result ['rows'] as $row ) {
+			$user = $cb->get ( "users," . $row['value'] );
 		}
+		
 	}
 	
 	$user = json_decode ( $user, true );
@@ -315,7 +315,7 @@ $app->post ( '/lostpw', function () use($app) {
 		if (isset ( $post ['username'] )) {
 			$username = $post ['username'];
 		} else {
-			$app->render ( 401, array ('error' => true, 'msg' => 'Username required!') );
+			$app->render ( 401, array ('error' => true, 'msg' => 'Username or Email required!') );
 			exit ();
 		}
 	} else {
@@ -333,9 +333,32 @@ $app->post ( '/lostpw', function () use($app) {
 		$user = json_decode ( $user, true );
 		
 		if (! isset ( $user ['username'] ) || $user ['username'] == '') {
-			// user is undefined
-			$responseCode = 404;
-			$app->halt ( $responseCode, json_encode ( array ('error' => true, 'msg' => 'Email ' . $username . ' was not found !' . $user) ) );
+			
+			if( $username != ''  ) {
+			
+				$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
+				$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
+				$cb->setDesignDoc ( "dev_profile", $designDoc );
+				$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+					
+				// do trading name lookup on
+				$profile_result = $cb->view ( 'dev_profile', 'profileLookup', $options );
+			
+			
+				foreach ( $profile_result ['rows'] as $row ) {
+					$user = $cb->get ( "users," . $row['value'] );
+				}
+				
+				$user = json_decode ( $user, true );
+			
+			}
+			
+			
+			if (! isset ( $user ['username'] ) || $user ['username'] == '') {
+				// user is undefined
+				$responseCode = 404;
+				$app->halt ( $responseCode, json_encode ( array ('error' => true, 'msg' => 'Email ' . $username . ' was not found !' . $user) ) );
+			}
 		}
 		
 		require ("password.php");
