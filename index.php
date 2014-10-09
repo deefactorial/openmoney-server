@@ -23,6 +23,7 @@ $app->post ( '/login', function () use($app) {
 	
 	$username = '';
 	$password = '';
+	$email = '';
 	function get_http_response_code($url) {
 		$headers = get_headers ( $url );
 		return substr ( $headers [0], 9, 3 );
@@ -33,14 +34,16 @@ $app->post ( '/login', function () use($app) {
 		
 		$username = $post ['username'];
 		$password = $post ['password'];
+		$email = $post ['email'];
 		
 		if ($username == '' && $password == '') {
-			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email and password are required !') ) );
+			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email or Username and password are required !') ) );
 		}
 	} else {
 		if ($username == '' && $password == '') {
 			$username = $_POST ['username'];
 			$password = $_POST ['password'];
+			$email = $_POST ['email'];
 		}
 	}
 	
@@ -48,18 +51,16 @@ $app->post ( '/login', function () use($app) {
 	
 	$user = $cb->get ( "users," . $username );
 	
-	if ($user == null) {
+	if( $email != null && ! isset( $user ['password'] ) ) {
+		
 		$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
-			
 		$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
-			
 		$cb->setDesignDoc ( "dev_profile", $designDoc );
-			
-		$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+		$options = array ('startkey' => $email, 'endkey' => $email . '\uefff');
 			
 		// do trading name lookup on
 		$profile_result = $cb->view ( 'dev_profile', 'profileLookup', $options );
-		
+	
 		if( sizeof( $profile_result ['rows'] ) > 0 ) {
 			foreach ( $profile_result ['rows'] as $row ) {
 				$user = $cb->get ( "users," . $row['value'] );
@@ -152,17 +153,14 @@ $app->post ( '/registration', function () use($app) {
 	}
 	
 	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
-	
 	$user = $cb->get ( "users," . $username );
 	
-	if ($user == null) {
+	if( $email != null && ! isset( $user ['password'] ) ) {
+		
 		$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
-			
 		$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
-			
 		$cb->setDesignDoc ( "dev_profile", $designDoc );
-			
-		$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+		$options = array ('startkey' => $email, 'endkey' => $email . '\uefff');
 			
 		// do trading name lookup on
 		$profile_result = $cb->view ( 'dev_profile', 'profileLookup', $options );
