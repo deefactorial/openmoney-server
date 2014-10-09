@@ -377,16 +377,16 @@ $app->post ( '/lostpw', function () use($app) {
 		// update key on user table, then verify in resetPassword.php
 		
 		$user ['reset_token_key'] = $reset_key;
-		$cb->set ( "users," . $username, json_encode ( $user ) );
+		$cb->set ( "users," . $user ['username'], json_encode ( $user ) );
 		
 		$msg = "To Reset your password click on this link <a href='https://cloud.openmoney.cc/resetPassword.php?email=" . urlencode ( $user ['username'] ) . "&reset=" . urlencode ( $reset_hash ) . "'>Reset Password</a>";
 		$msg .= "<p>OpenMoney IT Team</p>";
 		$msg .= "If you did not initiate the lost password link request then ignore this and your password will remain the same.";
 		
-		$subject = "openmoney: lost password reset REQUESTED for $username ";
-		$dear = $username;
+		$subject = "openmoney: lost password reset REQUESTED for " + $user ['name'];
+		$dear = $user ['name'];
 		
-		$sentEmail = email_letter ( "\"" . $dear . "\"<" . $username . ">", "noreply@openmoney.cc", $subject, $msg );
+		$sentEmail = email_letter ( "\"" . $dear . "\"<" . $user ['name'] . ">", "noreply@openmoney.cc", $subject, $msg );
 		echo json_encode ( array ('sentEmail' => $sentEmail) );
 		$app->stop ();
 	} else {
