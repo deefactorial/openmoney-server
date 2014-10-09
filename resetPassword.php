@@ -24,7 +24,6 @@ if (! isset ( $user ['username'] ) || $user ['username'] == '') {
 	// do trading name lookup on
 	$profile_result = $cb->view ( 'dev_profile', 'profileLookup', $options );
 	
-	
 	foreach ( $profile_result ['rows'] as $row ) {
 		$user = $cb->get ( "users," . $row['value'] );
 	}
@@ -117,7 +116,7 @@ if (password_verify( $reset_key, $reset_hash) ) {
 		$headers .= 'X-Mailer: PHP/' . phpversion();
 		return mail($to, $subject, $msg, $headers);
 	}
-	$debug = true;
+	$debug = false;
 	if($debug) {
 		$subject = "Could Not Verify Link on $CFG->url";
 		$msg =  "Supplied Username: $username ~ System username: " . $user['user_name'] . " <br/>";
