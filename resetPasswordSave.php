@@ -24,7 +24,7 @@ if( isset ($user ['username']) ){
 		
 		$cb->set( "users," . $email, json_encode( $user ) );
 		
-		header("Location: ./webclient/index.html");
+		header("Location: http://www.openmoney.cc");
 		exit();
 	} else {
 		$error = urlencode("Could not verify link!");
