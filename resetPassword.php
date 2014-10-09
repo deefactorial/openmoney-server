@@ -122,7 +122,7 @@ if (password_verify( $reset_key, $reset_hash) ) {
 		$headers .= 'X-Mailer: PHP/' . phpversion();
 		return mail($to, $subject, $msg, $headers);
 	}
-	$debug = false;
+	$debug = true;
 	if($debug) {
 		$subject = "Could Not Verify Link on $CFG->url";
 		$msg =  "Supplied Username: $username ~ System username: " . $user['user_name'] . " <br/>";
