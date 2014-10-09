@@ -60,8 +60,10 @@ $app->post ( '/login', function () use($app) {
 		// do trading name lookup on
 		$profile_result = $cb->view ( 'dev_profile', 'profileLookup', $options );
 		
-		if( sizeof( $profile_result ) > 0 ) {
-			$user = $cb->get ( "users," . $profile_result['value'] );
+		if( sizeof( $profile_result ['rows'] ) > 0 ) {
+			foreach ( $profile_result ['rows'] as $row ) {
+				$user = $cb->get ( "users," . $row['value'] );
+			}
 		}
 	}
 	
@@ -165,8 +167,10 @@ $app->post ( '/registration', function () use($app) {
 		// do trading name lookup on
 		$profile_result = $cb->view ( 'dev_profile', 'profileLookup', $options );
 	
-		if( sizeof( $profile_result ) > 0 ) {
-			$user = $cb->get ( "users," . $profile_result['value'] );
+		if( sizeof( $profile_result ['rows'] ) > 0 ) {
+			foreach ( $profile_result ['rows'] as $row ) {
+				$user = $cb->get ( "users," . $row['value'] );
+			}
 		}
 	}
 	
