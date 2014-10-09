@@ -48,6 +48,23 @@ $app->post ( '/login', function () use($app) {
 	
 	$user = $cb->get ( "users," . $username );
 	
+	if ($user == null) {
+		$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
+			
+		$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
+			
+		$cb->setDesignDoc ( "dev_profile", $designDoc );
+			
+		$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+			
+		// do trading name lookup on
+		$profile_result = $cb->view ( 'dev_profile', 'profileLookup', $options );
+		
+		if( sizeof( $profile_result ) > 0 ) {
+			$user = $cb->get ( "users," . $profile_result['value'] );
+		}
+	}
+	
 	$user = json_decode ( $user, true );
 	
 	// TODO: cytpographically decode password using cryptographic algorithms specified in the $user ['cryptographic_algorithms'] array.
@@ -108,6 +125,7 @@ $app->post ( '/registration', function () use($app) {
 	
 	$username = '';
 	$password = '';
+	$email = '';
 	function get_http_response_code($url) {
 		$headers = get_headers ( $url );
 		return substr ( $headers [0], 9, 3 );
@@ -118,6 +136,7 @@ $app->post ( '/registration', function () use($app) {
 		
 		$username = $post ['username'];
 		$password = $post ['password'];
+		$email = $post ['email'];
 		
 		if ($username == '' && $password == '') {
 			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email and password are required !') ) );
@@ -126,12 +145,30 @@ $app->post ( '/registration', function () use($app) {
 		if ($username == '' && $password == '') {
 			$username = $_POST ['username'];
 			$password = $_POST ['password'];
+			$email = $_POST ['email'];
 		}
 	}
 	
 	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 	
 	$user = $cb->get ( "users," . $username );
+	
+	if ($user == null) {
+		$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
+			
+		$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
+			
+		$cb->setDesignDoc ( "dev_profile", $designDoc );
+			
+		$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+			
+		// do trading name lookup on
+		$profile_result = $cb->view ( 'dev_profile', 'profileLookup', $options );
+	
+		if( sizeof( $profile_result ) > 0 ) {
+			$user = $cb->get ( "users," . $profile_result['value'] );
+		}
+	}
 	
 	$user = json_decode ( $user, true );
 	
@@ -141,7 +178,7 @@ $app->post ( '/registration', function () use($app) {
 	if (! isset ( $user ['password'] ) || $user ['password'] == '') {
 		
 		$user ['username'] = $username;
-		$user ['email'] = $username;
+		$user ['email'] = $email;
 		$user ['cost'] = $options ['cost'] = 10;
 		$user ['type'] = "users";
 		
@@ -175,6 +212,14 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name ['created'] = intval( round(microtime(true) * 1000) );
 		
 		$cb->set ( "trading_name," . $trading_name ['trading_name'] . "," . $trading_name ['currency'], json_encode ( $trading_name ) );
+		
+		$profile ['type'] = "profile";
+		$profile ['email'] = $email;
+		$profile ['notification'] = true;
+		$profile ['mode'] = false;
+		$profile ['theme'] = true;
+		
+		$cb->set ( "profile," . $username , json_encode ( $profile ) );
 		
 		// TODO: send email verification or write an email bot to look for new registrations
 		
