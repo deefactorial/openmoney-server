@@ -57,7 +57,7 @@ $app->post ( '/login', function () use($app) {
 	
 	$user = $cb->get ( "users," . $username );
 	
-	if( $email != '' && ! isset( $user ['password'] ) ) {
+	if( $email != '' && $user ['password'] == '') {
 		
 		$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
 		$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
