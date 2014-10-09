@@ -57,7 +57,10 @@ $app->post ( '/login', function () use($app) {
 	
 	$user = $cb->get ( "users," . $username );
 	
-	if( $email != '' && $user ['password'] == '') {
+	// TODO: cytpographically decode password using cryptographic algorithms specified in the $user ['cryptographic_algorithms'] array.
+	require ("password.php");
+	
+	if( $email != '' && ! password_verify ( $password, $user ['password'] ) ) {
 		
 		$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
 		$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
@@ -75,9 +78,6 @@ $app->post ( '/login', function () use($app) {
 	}
 	
 	$user = json_decode ( $user, true );
-	
-	// TODO: cytpographically decode password using cryptographic algorithms specified in the $user ['cryptographic_algorithms'] array.
-	require ("password.php");
 	
 	if (password_verify ( $password, $user ['password'] )) {
 		$url = 'https://localhost:4985/openmoney_shadow/_session';
