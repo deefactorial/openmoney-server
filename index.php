@@ -171,6 +171,7 @@ $app->post ( '/registration', function () use($app) {
 	
 	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 	$user = $cb->get ( "users," . $username );
+	$user = json_decode ( $user, true );
 	
 	if( $email != null && $user ['password'] == '') {
 		
@@ -185,11 +186,12 @@ $app->post ( '/registration', function () use($app) {
 
 		foreach ( $profile_result ['rows'] as $row ) {
 			$user = $cb->get ( "users," . $row['value'] );
+			$user = json_decode ( $user, true );
 		}
 		
 	}
 	
-	$user = json_decode ( $user, true );
+	
 	
 	// TODO: cytpographically decode password using cryptographic algorithms specified in the $user ['cryptographic_algorithms'] array.
 	require ("password.php");
