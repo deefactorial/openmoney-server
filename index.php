@@ -56,6 +56,7 @@ $app->post ( '/login', function () use($app) {
 	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 	
 	$user = $cb->get ( "users," . $username );
+	$user = json_decode ( $user, true );
 	
 	// TODO: cytpographically decode password using cryptographic algorithms specified in the $user ['cryptographic_algorithms'] array.
 	require ("password.php");
@@ -73,11 +74,12 @@ $app->post ( '/login', function () use($app) {
 		
 		foreach ( $profile_result ['rows'] as $row ) {
 			$user = $cb->get ( "users," . $row['value'] );
+			$user = json_decode ( $user, true );
 		}
 		
 	}
 	
-	$user = json_decode ( $user, true );
+	
 	
 	if (password_verify ( $password, $user ['password'] )) {
 		$url = 'https://localhost:4985/openmoney_shadow/_session';
