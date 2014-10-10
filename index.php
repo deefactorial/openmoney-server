@@ -235,6 +235,7 @@ $app->post ( '/registration', function () use($app) {
 		$cb->set ( "trading_name," . $trading_name ['trading_name'] . "," . $trading_name ['currency'], json_encode ( $trading_name ) );
 		
 		$profile ['type'] = "profile";
+		$profile ['username'] = $username;
 		$profile ['email'] = $email;
 		$profile ['notification'] = true;
 		$profile ['mode'] = false;
