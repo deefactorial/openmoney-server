@@ -125,10 +125,11 @@ $tradingname_result = $cb->view ( $design_doc_name, $trading_name_function_name,
 //print_r( $tradingname_result );
 foreach ( $tradingname_result ['rows'] as $trading_name ) {
 	
-	print_r($trading_name);
+	//print_r($trading_name);
 	//init
-	$trading_name = $trading_name ['key'];
 	$currency = $trading_name['value'];
+	$trading_name = $trading_name ['key'];
+	
 	
 	//do a lookup
 	$trading_name_array = $cb->get ( "trading_name," . $trading_name . "," . $currency );
@@ -262,8 +263,8 @@ $spaces = $cb->view( $design_doc_name, $space_function_name, $options );
 foreach ( $spaces ['rows'] as $space ) {
 
 	//init
-	$space = $currency ['key'];
 	$space_stewards = $currency ['value'];
+	$space = $currency ['key'];
 	$space = $cb->get ( "space," . $space );
 	$space = json_decode( $space , true );
 
@@ -290,19 +291,19 @@ foreach ( $spaces ['rows'] as $space ) {
 		//lookup space stewards and notify them.
 		$options = array('startkey' => $space['subspace'], 'endkey' => $space['subspace'] . '\uefff');
 		$spaces = $cb->view( $design_doc_name, $space_function_name, $options );
-		foreach ( $spaces ['rows'] as $space ) {
-			foreach( $space ['value'] as $space_steward ) {
+		foreach ( $spaces ['rows'] as $subspace ) {
+			foreach( $subspace ['value'] as $subspace_steward ) {
 				//if the user is the same don't email them.
-				if (! in_array($space_steward, $space_stewards ) ) {
-					if( strpos($space_steward,"@") !== false ) {
-						if( email_letter($space_steward, $CFG->system_email, 'New Space Created', $message) ) {
+				if (! in_array($subspace_steward, $space_stewards ) ) {
+					if( strpos($subspace_steward,"@") !== false ) {
+						if( email_letter($subspace_steward, $CFG->system_email, 'New Space Created', $message) ) {
 							echo str_replace("<br/>","\n",$message);
 							$space['notified'] = true;
 							$cb->set ( "space," . $space['space'], json_encode ( $space ) );
 						}
 					} else {
 						//username not an email check if they have a profile with an email.
-						$options = array('startkey' => $space_steward, 'endkey' => $space_steward . '\uefff');
+						$options = array('startkey' => $subspace_steward, 'endkey' => $subspace_steward . '\uefff');
 						$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
 						foreach ( $profiles ['rows'] as $profile ) {
 							if (isset( $profile ['value'] ) ) {
