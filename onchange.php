@@ -19,7 +19,7 @@ $tradingName_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name\"
 
 $trading_name_function_name = "tradingname";
 
-$profile_lookup_function = 'function(doc,meta){if(doc.type==\"profile\"&&doc.username&&doc.email){emit(doc.username,doc.email);}}';
+$profile_lookup_function = 'function(doc,meta){if(doc.type==\"profile\"&&doc.username&&doc.email&&doc.notification){if(doc.notification){emit(doc.username,doc.email);}}}';
 
 $profile_function_name = "profile";
 
