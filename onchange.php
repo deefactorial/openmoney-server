@@ -161,7 +161,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 		$currencies = $cb->view( $design_doc_name, $currency_function_name, $options );
 		foreach ( $currencies ['rows'] as $currency_array ) {
 			foreach( $currency_array ['value'] as $currency_steward ) {
-				if (! in_array( $currency_steward, $stewards ) ) {
+				if (! in_array( $currency_steward, $trading_name_array['steward'] ) ) {
 					if( strpos($currency_steward,"@") !== false ) {
 						if( email_letter($currency_steward, $CFG->system_email, 'New Trading Name Created', $message) ) {
 							echo str_replace("<br/>","\n",$message);
@@ -263,8 +263,8 @@ $spaces = $cb->view( $design_doc_name, $space_function_name, $options );
 foreach ( $spaces ['rows'] as $space ) {
 
 	//init
-	$space_stewards = $currency ['value'];
-	$space = $currency ['key'];
+	$space_stewards = $space ['value'];
+	$space = $space ['key'];
 	$space = $cb->get ( "space," . $space );
 	$space = json_decode( $space , true );
 
