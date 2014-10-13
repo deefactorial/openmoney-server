@@ -15,7 +15,7 @@ $tradingNameJournal_lookup_function = 'function(doc,meta){if(doc.type==\"trading
 
 $trading_name_journal_function_name = "tradingnamejournal";
 
-$tradingName_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name\"&&doc.space&&doc.name&&doc.currency&&doc.steward&&!doc.spaceStewardsNotified){emit(doc.name,doc.currency);}}';
+$tradingName_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name\"&&doc.name&&doc.currency&&doc.steward&&!doc.spaceStewardsNotified){emit(doc.name,doc.currency);}}';
 
 $trading_name_function_name = "tradingname";
 
