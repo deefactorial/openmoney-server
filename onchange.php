@@ -84,8 +84,9 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 			
 			$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
 			
-			print_r ($profiles);
+			
 			foreach ( $profiles ['rows'] as $profile ) {
+				print_r ($profiles);
 				if (isset( $profile ['value'] ) ) {
 					if($trading_name_journal['from'] == $trading_name['trading_name'] && !isset($trading_name_journal['from_emailed'])) {
 						if( email_letter($profile['value'], $CFG->system_email, 'New Payment', $message) ) {
