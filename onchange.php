@@ -102,6 +102,8 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 						}
 					}
+				} else {
+					echo "profile email is not set";
 				}
 			}
 		}
