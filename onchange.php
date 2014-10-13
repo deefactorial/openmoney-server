@@ -15,7 +15,7 @@ $tradingNameJournal_lookup_function = 'function(doc,meta){if(doc.type==\"trading
 
 $trading_name_journal_function_name = "tradingnamejournal";
 
-$tradingName_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name\"&&doc.name&&doc.currency&&doc.steward&&!doc.spaceStewardsNotified){emit(doc.name,doc.currency);}}';
+$tradingName_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name\"&&doc.name&&doc.currency&&doc.steward&&!doc.notified){emit(doc.name,doc.currency);}}';
 
 $trading_name_function_name = "tradingname";
 
@@ -23,7 +23,7 @@ $profile_lookup_function = 'function(doc,meta){if(doc.type==\"profile\"&&doc.use
 
 $profile_function_name = "profile";
 
-$space_lookup_function = 'function(doc,meta){if(doc.type==\"space\"&&doc.steward&&doc.space){emit(doc.space,doc.steward);}}';
+$space_lookup_function = 'function(doc,meta){if(doc.type==\"space\"&&doc.steward&&typeof doc.space != \"undefined\"){emit(doc.space,doc.steward);}}';
 
 $space_function_name = "space";
 
