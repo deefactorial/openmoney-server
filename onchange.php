@@ -59,7 +59,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 		echo str_replace("<br/>","\n",$message);
 		
 		//check if username is email
-		if( strpos($steward,"@") > 0 ) {
+		if( strpos($steward,"@") !== false ) {
 
 				
 			if($trading_name_journal['from'] == $trading_name['trading_name'] && !$trading_name_journal['from_emailed']) {
@@ -84,20 +84,23 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 			
 			$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
 			
+			print_r ($profiles);
 			foreach ( $profiles ['rows'] as $profile ) {
-				if($trading_name_journal['from'] == $trading_name['trading_name'] && !$trading_name_journal['from_emailed']) {
-					if( email_letter($profile['email'], $CFG->system_email, 'New Payment', $message) ) {
-							
-						$trading_name_journal['from_emailed'] = true;
-							
-						$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
-					}
-				} else if ($trading_name_journal['to'] == $trading_name['trading_name'] && !$trading_name_journal['to_emailed']) {
-					if( email_letter($profile['email'], $CFG->system_email, 'New Payment', $message) ) {
-							
-						$trading_name_journal['to_emailed'] = true;
-							
-						$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+				if (isset( $profile ['email'] ) ) {
+					if($trading_name_journal['from'] == $trading_name['trading_name'] && !isset($trading_name_journal['from_emailed'])) {
+						if( email_letter($profile['email'], $CFG->system_email, 'New Payment', $message) ) {
+								
+							$trading_name_journal['from_emailed'] = true;
+								
+							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+						}
+					} else if ($trading_name_journal['to'] == $trading_name['trading_name'] && !isset($trading_name_journal['to_emailed'])) {
+						if( email_letter($profile['email'], $CFG->system_email, 'New Payment', $message) ) {
+								
+							$trading_name_journal['to_emailed'] = true;
+								
+							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+						}
 					}
 				}
 			}
