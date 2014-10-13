@@ -125,6 +125,7 @@ $tradingname_result = $cb->view ( $design_doc_name, $trading_name_function_name,
 //print_r( $tradingname_result );
 foreach ( $tradingname_result ['rows'] as $trading_name ) {
 	
+	print_r($trading_name);
 	//init
 	$trading_name = $trading_name ['key'];
 	$currency = $trading_name['value'];
