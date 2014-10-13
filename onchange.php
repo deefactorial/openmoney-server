@@ -87,6 +87,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 			
 			foreach ( $profiles ['rows'] as $profile ) {
 				print_r ($profiles);
+				echo "email:" + $profile ['value'];
 				if (isset( $profile ['value'] ) ) {
 					if($trading_name_journal['from'] == $trading_name['trading_name'] && !isset($trading_name_journal['from_emailed'])) {
 						if( email_letter($profile['value'], $CFG->system_email, 'New Payment', $message) ) {
