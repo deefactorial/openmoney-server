@@ -50,9 +50,9 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 		"<br/>Payment Made: " .
 		"<br/>From: " . $trading_name_journal['from'] .
 		"<br/>To: " . $trading_name_journal['to'] .
-		"<br/>Amount: " . $trading_name_journal['amount'] . " " . $trading_name_journal['currency'] .
-		"<br/>Description: " . $trading_name_journal['description'] .
-		"<br/>Timestamp: " . date( DATE_RFC2822, strtotime( $trading_name_journal['timestamp'] ) ).
+		"<br/>Amount: " . $trading_name_journal['amount'] . " " . $trading_name_journal['currency'] ;
+		isset($trading_name_journal['description']) ? $message .= "<br/>Description: " .  $trading_name_journal['description'] : $message .= ''; ;
+		$message .=	"<br/>Timestamp: " . date( DATE_RFC2822, strtotime( $trading_name_journal['timestamp'] ) ).
 		"<br/>" .
 		"<br/>Thank you,<br/>openmoney<br/>";
 			
@@ -86,16 +86,16 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 			
 			print_r ($profiles);
 			foreach ( $profiles ['rows'] as $profile ) {
-				if (isset( $profile ['email'] ) ) {
+				if (isset( $profile ['value'] ) ) {
 					if($trading_name_journal['from'] == $trading_name['trading_name'] && !isset($trading_name_journal['from_emailed'])) {
-						if( email_letter($profile['email'], $CFG->system_email, 'New Payment', $message) ) {
+						if( email_letter($profile['value'], $CFG->system_email, 'New Payment', $message) ) {
 								
 							$trading_name_journal['from_emailed'] = true;
 								
 							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 						}
 					} else if ($trading_name_journal['to'] == $trading_name['trading_name'] && !isset($trading_name_journal['to_emailed'])) {
-						if( email_letter($profile['email'], $CFG->system_email, 'New Payment', $message) ) {
+						if( email_letter($profile['value'], $CFG->system_email, 'New Payment', $message) ) {
 								
 							$trading_name_journal['to_emailed'] = true;
 								
