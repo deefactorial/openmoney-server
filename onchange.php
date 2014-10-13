@@ -23,7 +23,7 @@ $profile_lookup_function = 'function(doc,meta){if(doc.type==\"profile\"&&doc.use
 
 $profile_function_name = "profile";
 
-$designDoc = '{"views":{"' . $trading_name_journal_function_name . '":{"map":"' . $tradingNameJournal_lookup_function . '"}},"' . $trading_name_function_name . '":{"map":"' . $tradingName_lookup_function . '"},"' . $profile_function_name . '":{"map":"' . $profile_lookup_function . '"}}';
+$designDoc = '{"views":{"' . $trading_name_journal_function_name . '":{"map":"' . $tradingNameJournal_lookup_function . '"},"' . $trading_name_function_name . '":{"map":"' . $tradingName_lookup_function . '"},"' . $profile_function_name . '":{"map":"' . $profile_lookup_function . '"}}}';
 	
 // echo $designDoc;
 $design_doc_name = "dev_changes";
