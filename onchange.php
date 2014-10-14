@@ -49,7 +49,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
 	//print_r($trading_name_journal);
 	
-	$currency = json_decode( $cb->get( $trading_name_journal['currency'] ) );
+	$currency = json_decode( $cb->get( $trading_name_journal['currency'] ) , true );
 	
 	if( isset( $currency['enabled'] ) && $currency['enabled'] === false && $trading_name_journal['timestamp'] > $currency['enabled_at']) {
 		$trading_name_journal['verified'] = false;
@@ -57,7 +57,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 		$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
 		$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 	} else {
-		$space = json_decode( $cb->get("space," . $currency['space'] ) );
+		$space = json_decode( $cb->get("space," . $currency['space'] ), true );
 		if( isset( $space['enabled'] ) && $space['enabled'] === false && $trading_name_journal['timestamp'] > $space['enabled_at']) {
 			$trading_name_journal['verified'] = false;
 			$trading_name_journal['verified_reason'] = "Currency space is disabled!";
@@ -73,7 +73,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 				$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
 				$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 			} else {
-				$space = json_decode( $cb->get("space," . $trading_name_from['space'] ) );
+				$space = json_decode( $cb->get("space," . $trading_name_from['space'] ) , true);
 				if( isset( $space['enabled'] ) && $space['enabled'] === false && $trading_name_journal['timestamp'] > $space['enabled_at']) {
 					$trading_name_journal['verified'] = false;
 					$trading_name_journal['verified_reason'] = "From trading name space is disabled!";
@@ -88,7 +88,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 						$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
 						$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 					} else {
-						$space = json_decode( $cb->get("space," . $trading_name_to['space'] ) );
+						$space = json_decode( $cb->get("space," . $trading_name_to['space'] ) , true);
 						if( isset( $space['enabled'] ) && $space['enabled'] === false && $trading_name_journal['timestamp'] > $space['enabled_at']) {
 							$trading_name_journal['verified'] = false;
 							$trading_name_journal['verified_reason'] = "From trading name space is disabled!";
