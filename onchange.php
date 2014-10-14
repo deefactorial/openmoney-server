@@ -48,7 +48,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	//echo "get " . $journal_trading_name['id'] . "<br/>";
 	$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
 	//print_r($trading_name_journal);
-	$currency = json_decode( $cb->get( "currency," + $trading_name_journal['currency'] ) , true );
+	$currency = json_decode( $cb->get( "currency," . $trading_name_journal['currency'] ) , true );
 	if( isset( $currency['enabled'] ) && $currency['enabled'] === false && $trading_name_journal['timestamp'] > $currency['enabled_at']) {
 		$trading_name_journal['verified'] = false;
 		$trading_name_journal['verified_reason'] = "Currency is disabled!";
