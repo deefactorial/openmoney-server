@@ -42,7 +42,7 @@ if( $trading_name != null && $currency != null) {
 	if( isset( $trading_name ['key'] ) && $auth != null ) {
 		require ("password.php");
 		
-		if( password_verify ( $auth, $trading_name ['key'] ) ) {
+		if( password_verify ( $trading_name ['key'], $auth ) ) {
 			$trading_name['enabled'] = true;
 			$cb->set ( "trading_name," . $trading_name['name'] . "," . $trading_name['currency'], json_encode ( $trading_name ) );
 			echo "Trading Name " . $trading_name['name'] . " in currency " . $trading_name['currency'] . " is enabled.";
