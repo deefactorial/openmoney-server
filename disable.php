@@ -14,21 +14,25 @@ $cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 $trading_name = null;
 if( isset( $_GET['trading_name'] ) ) {
 	$trading_name = urldecode( $_GET['trading_name'] );
+	$trading_name = str_replace(" ","+",$trading_name);//plus sign gets replaced with a space
 }
 
 $currency = null;
 if( isset( $_GET['currency'] ) ) {
 	$currency = urldecode( $_GET['currency'] );
+	$currency = str_replace(" ","+",$currency);//plus sign gets replaced with a space
 }
 
 $space = null;
 if( isset( $_GET['space'] ) ) {
 	$space = urldecode( $_GET['space'] );
+	$space = str_replace(" ","+",$space);//plus sign gets replaced with a space
 }
 
 $auth = null;
 if( isset( $_GET['auth'] ) ) {
 	$auth = urldecode( $_GET['auth'] );
+	$auth = str_replace(" ","+",$auth);//plus sign gets replaced with a space
 }
 
 if( $trading_name != null && $currency != null) {
