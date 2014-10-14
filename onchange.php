@@ -53,6 +53,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	//print_r($trading_name);
 	
 	//echo $trading_name;
+	if( isset( $trading_name['steward'] ) )
 	foreach($trading_name['steward'] as $steward) {
 		$message =
 		"<br/>Payment Made: " .
