@@ -49,72 +49,132 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
 	//print_r($trading_name_journal);
 	
-	$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
-	//print_r($trading_name);
+	$currency = json_decode( $cb->get( $trading_name_journal['currency'] ) );
 	
-	//echo $trading_name;
-	if( isset( $trading_name['steward'] ) )
-	foreach($trading_name['steward'] as $steward) {
-		$message =
-		"<br/>Payment Made: " .
-		"<br/>From: " . $trading_name_journal['from'] .
-		"<br/>To: " . $trading_name_journal['to'] .
-		"<br/>Amount: " . $trading_name_journal['amount'] . " " . $trading_name_journal['currency'] ;
-		isset($trading_name_journal['description']) ? $message .= "<br/>Description: " .  $trading_name_journal['description'] : $message .= ''; ;
-		$message .=	"<br/>Timestamp: " . date( DATE_RFC2822, strtotime( $trading_name_journal['timestamp'] ) ).
-		"<br/>" .
-		"<br/>Thank you,<br/>openmoney<br/>";
-			
-		
-		
-		//check if username is email
-		if( strpos($steward,"@") !== false ) {
-				
-			if($trading_name_journal['from'] == $trading_name['trading_name'] && !$trading_name_journal['from_emailed']) {
-				if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
-					echo str_replace("<br/>","\n",$message);
-					$trading_name_journal['from_emailed'] = true;
-					
-					$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
-				}
-			} else if ($trading_name_journal['to'] == $trading_name['trading_name'] && !$trading_name_journal['to_emailed']) {
-				if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
-					echo str_replace("<br/>","\n",$message);
-					$trading_name_journal['to_emailed'] = true;
-					
-					$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
-				}
-			}
-			
+	if( isset( $currency['enabled'] ) && $currency['enabled'] === false && $trading_name_journal['timestamp'] > $currency['enabled_at']) {
+		$trading_name_journal['verified'] = false;
+		$trading_name_journal['verified_reason'] = "Currency is disabled!";
+		$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
+		$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+	} else {
+		$space = json_decode( $cb->get("space," . $currency['space'] ) );
+		if( isset( $space['enabled'] ) && $space['enabled'] === false && $trading_name_journal['timestamp'] > $space['enabled_at']) {
+			$trading_name_journal['verified'] = false;
+			$trading_name_journal['verified_reason'] = "Currency space is disabled!";
+			$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
+			$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 		} else {
-			//username not an email check if they have a profile with an email.
-			$options = array('startkey' => $steward, 'endkey' => $steward . '\uefff');
-			$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
-			foreach ( $profiles ['rows'] as $profile ) {
-				//print_r ($profiles);
-				//echo "email:" . $profile ['value'] . "\n";
-				if (isset( $profile ['value'] ) ) {
-					if($trading_name_journal['from'] == $trading_name['trading_name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
-						if( email_letter($profile['value'], $CFG->system_email, 'New Payment', $message) ) {
-							echo str_replace("<br/>","\n",$message);
-							$trading_name_journal['from_emailed'] = true;
-								
+			
+			$trading_name_from = json_decode( $cb->get ( "trading_name," . $trading_name_journal['from'] . "," . $trading_name_journal['currency'] ), true);
+			
+			if( isset( $trading_name_from['enabled'] ) && $trading_name_from['enabled'] === false && $trading_name_journal['timestamp'] > $trading_name_from['enabled_at']) {
+				$trading_name_journal['verified'] = false;
+				$trading_name_journal['verified_reason'] = "From trading name is disabled!";
+				$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
+				$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+			} else {
+				$space = json_decode( $cb->get("space," . $trading_name_from['space'] ) );
+				if( isset( $space['enabled'] ) && $space['enabled'] === false && $trading_name_journal['timestamp'] > $space['enabled_at']) {
+					$trading_name_journal['verified'] = false;
+					$trading_name_journal['verified_reason'] = "From trading name space is disabled!";
+					$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
+					$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+				} else {
+				
+					$trading_name_to = json_decode( $cb->get ( "trading_name," . $trading_name_journal['to'] . "," . $trading_name_journal['currency'] ), true);
+					if( isset( $trading_name_to['enabled'] ) && $trading_name_to['enabled'] === false && $trading_name_journal['timestamp'] > $trading_name_to['enabled_at']) {
+						$trading_name_journal['verified'] = false;
+						$trading_name_journal['verified_reason'] = "To trading name is disabled!";
+						$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
+						$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+					} else {
+						$space = json_decode( $cb->get("space," . $trading_name_to['space'] ) );
+						if( isset( $space['enabled'] ) && $space['enabled'] === false && $trading_name_journal['timestamp'] > $space['enabled_at']) {
+							$trading_name_journal['verified'] = false;
+							$trading_name_journal['verified_reason'] = "From trading name space is disabled!";
+							$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
 							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
-						}
-					} else if ($trading_name_journal['to'] == $trading_name['trading_name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
-						if( email_letter($profile['value'], $CFG->system_email, 'New Payment', $message) ) {
-							echo str_replace("<br/>","\n",$message);
-							$trading_name_journal['to_emailed'] = true;
-								
+						} else {
+							
+							$trading_name_journal['verified'] = true;
+							$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
 							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 						}
 					}
-				} else {
-					echo "profile email is not set";
 				}
 			}
 		}
-	} 
+	}
+	
+	if ($trading_name_journal['verified']) {
+		$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
+		
+		//print_r($trading_name);
+		
+		//echo $trading_name;
+		if( isset( $trading_name['steward'] ) )
+		foreach($trading_name['steward'] as $steward) {
+			$message =
+			"<br/>Payment Made: " .
+			"<br/>From: " . $trading_name_journal['from'] .
+			"<br/>To: " . $trading_name_journal['to'] .
+			"<br/>Amount: " . $trading_name_journal['amount'] . " " . $trading_name_journal['currency'] ;
+			isset($trading_name_journal['description']) ? $message .= "<br/>Description: " .  $trading_name_journal['description'] : $message .= ''; ;
+			$message .=	"<br/>Timestamp: " . date( DATE_RFC2822, strtotime( $trading_name_journal['timestamp'] ) ).
+			"<br/>" .
+			"<br/>Thank you,<br/>openmoney<br/>";
+				
+			
+			
+			//check if username is email
+			if( strpos($steward,"@") !== false ) {
+					
+				if($trading_name_journal['from'] == $trading_name['trading_name'] && !$trading_name_journal['from_emailed']) {
+					if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
+						echo str_replace("<br/>","\n",$message);
+						$trading_name_journal['from_emailed'] = true;
+						
+						$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+					}
+				} else if ($trading_name_journal['to'] == $trading_name['trading_name'] && !$trading_name_journal['to_emailed']) {
+					if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
+						echo str_replace("<br/>","\n",$message);
+						$trading_name_journal['to_emailed'] = true;
+						
+						$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+					}
+				}
+				
+			} else {
+				//username not an email check if they have a profile with an email.
+				$options = array('startkey' => $steward, 'endkey' => $steward . '\uefff');
+				$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
+				foreach ( $profiles ['rows'] as $profile ) {
+					//print_r ($profiles);
+					//echo "email:" . $profile ['value'] . "\n";
+					if (isset( $profile ['value'] ) ) {
+						if($trading_name_journal['from'] == $trading_name['trading_name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
+							if( email_letter($profile['value'], $CFG->system_email, 'New Payment', $message) ) {
+								echo str_replace("<br/>","\n",$message);
+								$trading_name_journal['from_emailed'] = true;
+									
+								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+							}
+						} else if ($trading_name_journal['to'] == $trading_name['trading_name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
+							if( email_letter($profile['value'], $CFG->system_email, 'New Payment', $message) ) {
+								echo str_replace("<br/>","\n",$message);
+								$trading_name_journal['to_emailed'] = true;
+									
+								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+							}
+						}
+					} else {
+						echo "profile email is not set";
+					}
+				}
+			}
+		} 
+	}
 }
 
 

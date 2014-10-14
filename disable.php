@@ -43,7 +43,8 @@ if( $trading_name != null && $currency != null) {
 		require ("password.php");
 		
 		if( password_verify (  $trading_name ['key'], $auth ) ) {
-			$trading_name['enabled'] = false;
+			$trading_name ['enabled'] = false;
+			$trading_name ['enabled_at'] = intval( round(microtime(true) * 1000) );
 			$cb->set ( "trading_name," . $trading_name['name'] . "," . $trading_name['currency'], json_encode ( $trading_name ) );
 			echo "Trading Name " . $trading_name['name'] . " in currency " . $trading_name['currency'] . " is disabled.";
 		} else {
@@ -60,7 +61,8 @@ if( $trading_name != null && $currency != null) {
 		require ("password.php");
 	
 		if( password_verify ( $currency ['key'], $auth ) ) {
-			$currency['enabled'] = false;
+			$currency ['enabled'] = false;
+			$currency ['enabled_at'] = intval( round(microtime(true) * 1000) );
 			$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
 			echo "Currency " . $currency['currency'] . " is disabled.";
 		} else {
@@ -77,7 +79,8 @@ if( $trading_name != null && $currency != null) {
 		require ("password.php");
 	
 		if( password_verify ( $space ['key'], $auth ) ) {
-			$space['enabled'] = false;
+			$space ['enabled'] = false;
+			$space ['enabled_at'] = intval( round(microtime(true) * 1000) );
 			$cb->set ( "space," . $space['space'], json_encode ( $space ) );
 			echo "Space " . $space['space'] . " is disabled.";
 		} else {
