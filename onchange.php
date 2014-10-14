@@ -222,27 +222,25 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 		$currencies = $cb->view( $design_doc_name, $currency_function_name, $options );
 		foreach ( $currencies ['rows'] as $currency_array ) {
 			foreach( $currency_array ['value'] as $currency_steward ) {
-				if (! in_array( $currency_steward, $trading_name_array['steward'] ) ) {
-					if( strpos($currency_steward,"@") !== false ) {
-						if( email_letter($currency_steward, $CFG->system_email, 'New Trading Name Created', $message) ) {
-							echo str_replace("<br/>","\n",$message);
-							$trading_name_array['notified'] = true;
-							$cb->set ( "trading_name," . $trading_name . "," . $currency, json_encode ( $trading_name_array ) );
-						}
-					} else {
-						//username not an email check if they have a profile with an email.
-						$options = array('startkey' => $currency_steward, 'endkey' => $currency_steward . '\uefff');
-						$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
-						foreach ( $profiles ['rows'] as $profile ) {
-							if (isset( $profile ['value'] ) ) {
-								if( email_letter($profile ['value'], $CFG->system_email, 'New Trading Name Created', $message) ) {
-									echo str_replace("<br/>","\n",$message);
-									$trading_name_array['notified'] = true;
-									$cb->set ( "trading_name," . $trading_name . "," . $currency, json_encode ( $trading_name_array ) );
-								}
-							} else {
-								echo "profile email is not set";
+				if( strpos($currency_steward,"@") !== false ) {
+					if( email_letter($currency_steward, $CFG->system_email, 'New Trading Name Created', $message) ) {
+						echo str_replace("<br/>","\n",$message);
+						$trading_name_array['notified'] = true;
+						$cb->set ( "trading_name," . $trading_name . "," . $currency, json_encode ( $trading_name_array ) );
+					}
+				} else {
+					//username not an email check if they have a profile with an email.
+					$options = array('startkey' => $currency_steward, 'endkey' => $currency_steward . '\uefff');
+					$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
+					foreach ( $profiles ['rows'] as $profile ) {
+						if (isset( $profile ['value'] ) ) {
+							if( email_letter($profile ['value'], $CFG->system_email, 'New Trading Name Created', $message) ) {
+								echo str_replace("<br/>","\n",$message);
+								$trading_name_array['notified'] = true;
+								$cb->set ( "trading_name," . $trading_name . "," . $currency, json_encode ( $trading_name_array ) );
 							}
+						} else {
+							echo "profile email is not set";
 						}
 					}
 				}
@@ -288,28 +286,25 @@ foreach ( $currencies ['rows'] as $currency ) {
 		$spaces = $cb->view( $design_doc_name, $space_function_name, $options );
 		foreach ( $spaces ['rows'] as $space ) {
 			foreach( $space ['value'] as $space_steward ) {
-				//if the user is the same don't email them.
-				if (! in_array($space_steward, $currency_stewards ) ) {
-					if( strpos($space_steward,"@") !== false ) {
-						if( email_letter($space_steward, $CFG->system_email, 'New Currency Created', $message) ) {
-							echo str_replace("<br/>","\n",$message);
-							$currency['notified'] = true;
-							$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
-						}
-					} else {
-						//username not an email check if they have a profile with an email.
-						$options = array('startkey' => $space_steward, 'endkey' => $space_steward . '\uefff');
-						$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
-						foreach ( $profiles ['rows'] as $profile ) {
-							if (isset( $profile ['value'] ) ) {
-								if( email_letter($profile ['value'], $CFG->system_email, 'New Currency Created', $message) ) {
-									echo str_replace("<br/>","\n",$message);
-									$currency['notified'] = true;
-									$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
-								}
-							} else {
-								echo "profile email is not set";
+				if( strpos($space_steward,"@") !== false ) {
+					if( email_letter($space_steward, $CFG->system_email, 'New Currency Created', $message) ) {
+						echo str_replace("<br/>","\n",$message);
+						$currency['notified'] = true;
+						$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
+					}
+				} else {
+					//username not an email check if they have a profile with an email.
+					$options = array('startkey' => $space_steward, 'endkey' => $space_steward . '\uefff');
+					$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
+					foreach ( $profiles ['rows'] as $profile ) {
+						if (isset( $profile ['value'] ) ) {
+							if( email_letter($profile ['value'], $CFG->system_email, 'New Currency Created', $message) ) {
+								echo str_replace("<br/>","\n",$message);
+								$currency['notified'] = true;
+								$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
 							}
+						} else {
+							echo "profile email is not set";
 						}
 					}
 				}
@@ -354,28 +349,25 @@ foreach ( $spaces ['rows'] as $space ) {
 		$spaces = $cb->view( $design_doc_name, $space_function_name, $options );
 		foreach ( $spaces ['rows'] as $subspace ) {
 			foreach( $subspace ['value'] as $subspace_steward ) {
-				//if the user is the same don't email them.
-				if (! in_array($subspace_steward, $space_stewards ) ) {
-					if( strpos($subspace_steward,"@") !== false ) {
-						if( email_letter($subspace_steward, $CFG->system_email, 'New Space Created', $message) ) {
-							echo str_replace("<br/>","\n",$message);
-							$space['notified'] = true;
-							$cb->set ( "space," . $space['space'], json_encode ( $space ) );
-						}
-					} else {
-						//username not an email check if they have a profile with an email.
-						$options = array('startkey' => $subspace_steward, 'endkey' => $subspace_steward . '\uefff');
-						$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
-						foreach ( $profiles ['rows'] as $profile ) {
-							if (isset( $profile ['value'] ) ) {
-								if( email_letter($profile ['value'], $CFG->system_email, 'New Space Created', $message) ) {
-									echo str_replace("<br/>","\n",$message);
-									$space['notified'] = true;
-									$cb->set ( "space," . $space['space'], json_encode ( $space ) );
-								}
-							} else {
-								echo "profile email is not set";
+				if( strpos($subspace_steward,"@") !== false ) {
+					if( email_letter($subspace_steward, $CFG->system_email, 'New Space Created', $message) ) {
+						echo str_replace("<br/>","\n",$message);
+						$space['notified'] = true;
+						$cb->set ( "space," . $space['space'], json_encode ( $space ) );
+					}
+				} else {
+					//username not an email check if they have a profile with an email.
+					$options = array('startkey' => $subspace_steward, 'endkey' => $subspace_steward . '\uefff');
+					$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
+					foreach ( $profiles ['rows'] as $profile ) {
+						if (isset( $profile ['value'] ) ) {
+							if( email_letter($profile ['value'], $CFG->system_email, 'New Space Created', $message) ) {
+								echo str_replace("<br/>","\n",$message);
+								$space['notified'] = true;
+								$cb->set ( "space," . $space['space'], json_encode ( $space ) );
 							}
+						} else {
+							echo "profile email is not set";
 						}
 					}
 				}
