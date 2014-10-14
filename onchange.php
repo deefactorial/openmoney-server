@@ -123,14 +123,14 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 			//check if username is email
 			if( strpos($steward,"@") !== false ) {
 					
-				if($trading_name_journal['from'] == $trading_name['trading_name'] && !$trading_name_journal['from_emailed']) {
+				if($trading_name_journal['from'] == $trading_name['trading_name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
 					if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
 						echo str_replace("<br/>","\n",$message);
 						$trading_name_journal['from_emailed'] = true;
 						
 						$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 					}
-				} else if ($trading_name_journal['to'] == $trading_name['trading_name'] && !$trading_name_journal['to_emailed']) {
+				} else if ($trading_name_journal['to'] == $trading_name['trading_name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
 					if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
 						echo str_replace("<br/>","\n",$message);
 						$trading_name_journal['to_emailed'] = true;
