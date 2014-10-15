@@ -229,7 +229,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 					$options = array('startkey' => $currency_steward, 'endkey' => $currency_steward . '\uefff');
 					$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
 					foreach ( $profiles ['rows'] as $profile ) {
-						if (isset( $profile ['value'] ) ) {
+						if (isset( $profile ['value'] ) && $profile ['value'] != '') {
 							if( email_letter($profile ['value'], $CFG->system_email, 'New Trading Name Created', $message) ) {
 								echo str_replace("<br/>","\n",$message);
 								$trading_name_array['notified'] = true;
@@ -293,7 +293,7 @@ foreach ( $currencies ['rows'] as $currency ) {
 					$options = array('startkey' => $space_steward, 'endkey' => $space_steward . '\uefff');
 					$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
 					foreach ( $profiles ['rows'] as $profile ) {
-						if (isset( $profile ['value'] ) ) {
+						if (isset( $profile ['value'] ) && $profile ['value'] != '') {
 							if( email_letter($profile ['value'], $CFG->system_email, 'New Currency Created', $message) ) {
 								echo str_replace("<br/>","\n",$message);
 								$currency['notified'] = true;
@@ -356,7 +356,7 @@ foreach ( $spaces ['rows'] as $space ) {
 					$options = array('startkey' => $subspace_steward, 'endkey' => $subspace_steward . '\uefff');
 					$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
 					foreach ( $profiles ['rows'] as $profile ) {
-						if (isset( $profile ['value'] ) ) {
+						if (isset( $profile ['value'] ) && $profile ['value'] != '' ) {
 							if( email_letter($profile ['value'], $CFG->system_email, 'New Space Created', $message) ) {
 								echo str_replace("<br/>","\n",$message);
 								$space['notified'] = true;

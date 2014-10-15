@@ -463,7 +463,7 @@ $app->post ( '/lookupTag', function () use($app) {
 			// , array('startkey' => $key, 'endkey' => $key)
 			// startkey : [ id, {} ], endkey : [ id ], descending : true, include_docs : true
 			
-			$result = $cb->view ( 'dev_nfctag', 'taglookup', array ('startkey' => $key, 'endkey' => $key . '\uefff') );
+			$result = $cb->view ( 'dev_nfctag', 'taglookup', array ('startkey' => $key, 'endkey' => $key . '\uefff', 'stale' => false) );
 			
 			$tradingname_array = array ();
 			
