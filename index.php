@@ -489,7 +489,7 @@ $app->post ( '/lookupTag', function () use($app) {
 				
 			}
 			
-			$result = $cb->view ( 'dev_nfctag', 'beamlookup', array ('startkey' => $key, 'endkey' => $key . '\uefff') );
+			$result = $cb->view ( 'dev_nfctag', 'beamlookup', array ('startkey' => $key, 'endkey' => $key . '\uefff', 'stale' => false) );
 			
 			foreach ( $result ['rows'] as $row ) {
 				// remove users, from id
