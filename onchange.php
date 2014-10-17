@@ -192,14 +192,19 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 	$trading_name_array = $cb->get ( "trading_name," . $trading_name . "," . $currency );
 	$trading_name_array = json_decode ( $trading_name_array, true );
 	if(!isset($trading_name_array['notified'])) {
-		
-		//generate the key and hash
-		$key = strtotime ( "now" ) * rand ();
-		$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
-		
-		//store the key
-		$trading_name_array['key'] = $key;
-		$cb->set ( "trading_name," . $trading_name . "," . $currency, json_encode ( $trading_name_array ) );
+				
+		if (!isset($trading_name_array['key'])) {	
+			//generate the key and hash
+			$key = strtotime ( "now" ) * rand ();
+			$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
+			
+			//store the key
+			$trading_name_array['key'] = $key;
+			$cb->set ( "trading_name," . $trading_name . "," . $currency, json_encode ( $trading_name_array ) );
+		} else {
+			$key = $trading_name_array['key'];
+			$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
+		}
 		
 		//generate the message
 		$message =
@@ -258,13 +263,20 @@ foreach ( $currencies ['rows'] as $currency ) {
 	
 	if(!isset($currency['notified'])) {
 		
-		//generate the key and hash
-		$key = strtotime ( "now" ) * rand ();
-		$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
 		
-		//store the key
-		$currency['key'] = $key;
-		$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
+		if( !isset($currency['key'])) {
+			//generate the key and hash
+			$key = strtotime ( "now" ) * rand ();
+			$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
+			
+			//store the key
+			$currency['key'] = $key;
+			$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
+		
+		} else {
+			$key = $currency['key'];
+			$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
+		}
 
 		//generate the message
 		$message =
@@ -322,14 +334,19 @@ foreach ( $spaces ['rows'] as $space ) {
 
 	if(!isset($space['notified'])) {
 
-		//generate the key and hash
-		$key = strtotime ( "now" ) * rand ();
-		$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
+		if( !isset( $space['key'] ) ) {
+			//generate the key and hash
+			$key = strtotime ( "now" ) * rand ();
+			$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
+	
+			//store the key
+			$space['key'] = $key;
+			$cb->set ( "space," . $space['space'], json_encode ( $space ) );
 
-		//store the key
-		$space['key'] = $key;
-		$cb->set ( "space," . $space['space'], json_encode ( $space ) );
-
+		} else {
+			$key = $space['key'];
+			$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
+		}
 		//generate the message
 		$message =
 		"<br/>Space Created: " .
