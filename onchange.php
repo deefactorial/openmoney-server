@@ -116,7 +116,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 			"<br/>To: " . $trading_name_journal['to'] .
 			"<br/>Amount: " . $trading_name_journal['amount'] . " " . $trading_name_journal['currency'] ;
 			isset($trading_name_journal['description']) ? $message .= "<br/>Description: " .  $trading_name_journal['description'] : $message .= ''; ;
-			$message .=	"<br/>Timestamp: " . date( DATE_RFC2822, strtotime( $trading_name_journal['timestamp'] ) ).
+			$message .=	"<br/>Timestamp: " . date( DATE_RFC2822, intval( round( $trading_name_journal['timestamp'] / 1000 ) ) ).
 			"<br/>" .
 			"<br/>Thank you,<br/>openmoney<br/>";
 				
