@@ -460,6 +460,8 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			$result = $cb->view ( 'dev_nfctag', 'beamlookup2', array ('startkey' => $key, 'endkey' => $key . '\uefff', 'stale' => false) );
 			
+			$trading_names_array = array();
+			
 			foreach ( $result ['rows'] as $row ) {
 				// remove users, from id
 // 				$username = $row ['value'];
@@ -481,9 +483,13 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 				$trading_names = $row ['value'];
 				
-				echo json_encode ( $trading_names );
-				
+				//copy all trading names to a global array
+				foreach($trading_names as $trading_name) {
+					array_push ( $trading_names_array, $trading_name );
+				}
 			}
+			//output array
+			echo json_encode ( $trading_names_array );
 			
 			$app->stop ();
 		}
