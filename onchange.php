@@ -98,7 +98,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 							} else {
 								if (isset( $trading_name_from['capacity'] ) ) {
 									$trading_name_from['capacity'] -= $trading_name_journal['amount'];
-									$cb->set ($trading_name_from['_id'] , json_encode ( $trading_name_from ) );
+									$cb->set ("trading_name," . $trading_name_journal['from'] . "," . $trading_name_journal['currency'] , json_encode ( $trading_name_from ) );
 								}
 								$trading_name_journal['verified'] = true;
 								$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
