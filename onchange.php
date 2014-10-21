@@ -69,6 +69,11 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 					$trading_name_journal['verified_reason'] = "From trading name is disabled!";
 					$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
 					$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+				} else if ( isset( $trading_name_from['capacity']) && $trading_name_from['capacity'] < $trading_name_journal['amount']) {
+					$trading_name_journal['verified'] = false;
+					$trading_name_journal['verified_reason'] = "From trading name doesn't have enough capacity!";
+					$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
+					$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 				} else {
 					$space = json_decode( $cb->get("space," . $trading_name_from['space'] ) , true);
 					if( isset( $space['enabled'] ) && $space['enabled'] === false && $trading_name_journal['timestamp'] > $space['enabled_at']) {
@@ -91,6 +96,10 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 								$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
 								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 							} else {
+								if (isset( $trading_name_from['capacity'] ) ) {
+									$trading_name_from['capacity'] -= $trading_name_journal['amount'];
+									$cb->set ($trading_name_from['id'] , json_encode ( $trading_name_from ) );
+								}
 								$trading_name_journal['verified'] = true;
 								$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
 								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );

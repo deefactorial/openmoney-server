@@ -447,73 +447,43 @@ $app->post ( '/lookupTag', function () use($app) {
 			// user is verified
 			// do lookup on tag
 			
-			$beamlookup_function = 'function (doc, meta) { if( doc.type == \"beamtag\" ) { emit(doc.hashTag, doc.username); } }';
+			$beamlookup_function = 'function (doc, meta) { if( doc.type == \"beamtag\" ) { emit(doc.hashTag, doc.trading_names); } }';
 			
-			$taglookup_function = 'function (doc, meta) { if( doc.type == \"users\" && doc.tags ) { doc.tags.forEach(function(tag) { emit(tag.hashTag, tag); } ); } }';
 			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { \"name\": doc.name, \"currency\": doc.currency } ); } ); } }';
 			
-			$designDoc = '{ "views": { "taglookup": { "map": "' . $taglookup_function . '" }, "tradingnamelookup1" : { "map": "' . $tradingname_lookup_function . '" }, "beamlookup": { "map": "' . $beamlookup_function . '" } } }';
+			$designDoc = '{ "views": { "tradingnamelookup1" : { "map": "' . $tradingname_lookup_function . '" }, "beamlookup": { "map": "' . $beamlookup_function . '" } } }';
 			
 			// echo $designDoc;
 			
 			$cb->setDesignDoc ( "dev_nfctag", $designDoc );
 			
-			// echo $cb->getDesignDoc( "dev_nfctag" );
-			
-			// , array('startkey' => $key, 'endkey' => $key)
-			// startkey : [ id, {} ], endkey : [ id ], descending : true, include_docs : true
-			
-			$result = $cb->view ( 'dev_nfctag', 'taglookup', array ('startkey' => $key, 'endkey' => $key . '\uefff', 'stale' => false) );
-			
-			$tradingname_array = array ();
-			
-			foreach ( $result ['rows'] as $row ) {
-				// remove users, from id
-				$username = substr ( $row ['id'], 6, strlen ( $row ['id'] ) );
-				
-				// echo $username;
-				
-				$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
-				
-				// do trading name lookup on
-				$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup1', $options );
-				
-				
-				foreach ( $tradingname_result ['rows'] as $row ) {
-					unset ( $object );
-					$object ['id'] = $row ['id'];
-					$object ['value'] = $row ['value'];
-					array_push ( $tradingname_array, $object );
-				}
-				
-				
-			}
 			
 			$result = $cb->view ( 'dev_nfctag', 'beamlookup', array ('startkey' => $key, 'endkey' => $key . '\uefff', 'stale' => false) );
 			
 			foreach ( $result ['rows'] as $row ) {
 				// remove users, from id
-				$username = $row ['value'];
+// 				$username = $row ['value'];
 			
-				// echo $username;
+// 				// echo $username;
 			
-				$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
+// 				$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
 			
-				// do trading name lookup on
-				$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup1', $options );
+// 				// do trading name lookup on
+// 				$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup1', $options );
 			
 				
-				foreach ( $tradingname_result ['rows'] as $row ) {
-					unset ( $object );
-					$object ['id'] = $row ['id'];
-					$object ['value'] = $row ['value'];
-					array_push ( $tradingname_array, $object );
-				}
+// 				foreach ( $tradingname_result ['rows'] as $row ) {
+// 					unset ( $object );
+// 					$object ['id'] = $row ['id'];
+// 					$object ['value'] = $row ['value'];
+// 					array_push ( $tradingname_array, $object );
+// 				}
 			
+				$trading_names = $row ['value'];
+				
+				echo json_encode ( $trading_names );
 				
 			}
-			
-			echo json_encode ( $tradingname_array );
 			
 			$app->stop ();
 		}
