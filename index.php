@@ -451,14 +451,14 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { \"name\": doc.name, \"currency\": doc.currency } ); } ); } }';
 			
-			$designDoc = '{ "views": { "tradingnamelookup1" : { "map": "' . $tradingname_lookup_function . '" }, "beamlookup": { "map": "' . $beamlookup_function . '" } } }';
+			$designDoc = '{ "views": { "tradingnamelookup1" : { "map": "' . $tradingname_lookup_function . '" }, "beamlookup2": { "map": "' . $beamlookup_function . '" } } }';
 			
 			// echo $designDoc;
 			
 			$cb->setDesignDoc ( "dev_nfctag", $designDoc );
 			
 			
-			$result = $cb->view ( 'dev_nfctag', 'beamlookup', array ('startkey' => $key, 'endkey' => $key . '\uefff', 'stale' => false) );
+			$result = $cb->view ( 'dev_nfctag', 'beamlookup2', array ('startkey' => $key, 'endkey' => $key . '\uefff', 'stale' => false) );
 			
 			foreach ( $result ['rows'] as $row ) {
 				// remove users, from id
