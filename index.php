@@ -447,7 +447,7 @@ $app->post ( '/lookupTag', function () use($app) {
 			// user is verified
 			// do lookup on tag
 			
-			$beamlookup_function = 'function (doc, meta) { if( doc.type == \"beamtag\" ) { emit(doc.hashTag, doc.trading_names); } }';
+			$beamlookup_function = 'function (doc, meta) { if( doc.type == \"beamtag\" ) { if(typeof doc.archived == \"undefined\" || doc.archived === false) { emit(doc.hashTag, doc.trading_names); } } }';
 			
 			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { \"name\": doc.name, \"currency\": doc.currency } ); } ); } }';
 			
