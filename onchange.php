@@ -272,8 +272,9 @@ foreach ( $currencies ['rows'] as $currency ) {
 	
 	if(!isset($currency['notified'])) {
 		
+		$taken = false;
 		if( !isset( $currency['taken'] ) ) {
-			$taken = false;
+			
 			//check if the currency is taken by another space or trading name
 			// do trading name lookup
 			$options = array ('startkey' => $currency['currency'], 'endkey' => $currency['currency'] . '\uefff');
@@ -325,58 +326,63 @@ foreach ( $currencies ['rows'] as $currency ) {
 				$cb->delete ( "currency," . $currency['currency'] );
 			}
 			
-		}
-		
-		
-		if( !isset($currency['key'] ) ) {
-			//generate the key and hash
-			$key = strtotime ( "now" ) * rand ();
-			$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
-			
-			//store the key
-			$currency['key'] = $key;
-			$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
-		
 		} else {
-			$key = $currency['key'];
-			$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
+			$taken = $currency['taken'];
 		}
-
-		//generate the message
-		$message =
-		"<br/>Currency Created: " .
-		"<br/>Currency: " . $currency['currency'] .
-		"<br/>Description: " . $currency['name'] .
-		"<br/>".
-		"<br/><a href='https://cloud.openmoney.cc/enable.php?&currency=" . urlencode($currency['currency']) . "&auth=" . urlencode($hash) . "'>Click here to enable this currency</a>".
-		"<br/><a href='https://cloud.openmoney.cc/disable.php?&currency=" . urlencode($currency['currency']) . "&auth=" . urlencode($hash) . "'>Click here to disable this currency</a>".
-		"<br/>".
-		"<br/>Thank you,<br/>openmoney<br/>";
-
-		//lookup space stewards and notify them.
-		$options = array('startkey' => $currency['space'], 'endkey' => $currency['space'] . '\uefff');
-		$spaces = $cb->view( $design_doc_name, $space_function_name, $options );
-		foreach ( $spaces ['rows'] as $space ) {
-			foreach( $space ['value'] as $space_steward ) {
-				if( strpos($space_steward,"@") !== false ) {
-					if( email_letter($space_steward, $CFG->system_email, 'New Currency Created', $message) ) {
-						echo str_replace("<br/>","\n",$message);
-						$currency['notified'] = true;
-						$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
-					}
-				} else {
-					//username not an email check if they have a profile with an email.
-					$options = array('startkey' => $space_steward, 'endkey' => $space_steward . '\uefff');
-					$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
-					foreach ( $profiles ['rows'] as $profile ) {
-						if (isset( $profile ['value'] ) && $profile ['value'] != '') {
-							if( email_letter($profile ['value'], $CFG->system_email, 'New Currency Created', $message) ) {
-								echo str_replace("<br/>","\n",$message);
-								$currency['notified'] = true;
-								$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
+		
+		if ($taken) {
+			
+			
+			if( !isset($currency['key'] ) ) {
+				//generate the key and hash
+				$key = strtotime ( "now" ) * rand ();
+				$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
+				
+				//store the key
+				$currency['key'] = $key;
+				$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
+			
+			} else {
+				$key = $currency['key'];
+				$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
+			}
+	
+			//generate the message
+			$message =
+			"<br/>Currency Created: " .
+			"<br/>Currency: " . $currency['currency'] .
+			"<br/>Description: " . $currency['name'] .
+			"<br/>".
+			"<br/><a href='https://cloud.openmoney.cc/enable.php?&currency=" . urlencode($currency['currency']) . "&auth=" . urlencode($hash) . "'>Click here to enable this currency</a>".
+			"<br/><a href='https://cloud.openmoney.cc/disable.php?&currency=" . urlencode($currency['currency']) . "&auth=" . urlencode($hash) . "'>Click here to disable this currency</a>".
+			"<br/>".
+			"<br/>Thank you,<br/>openmoney<br/>";
+	
+			//lookup space stewards and notify them.
+			$options = array('startkey' => $currency['space'], 'endkey' => $currency['space'] . '\uefff');
+			$spaces = $cb->view( $design_doc_name, $space_function_name, $options );
+			foreach ( $spaces ['rows'] as $space ) {
+				foreach( $space ['value'] as $space_steward ) {
+					if( strpos($space_steward,"@") !== false ) {
+						if( email_letter($space_steward, $CFG->system_email, 'New Currency Created', $message) ) {
+							echo str_replace("<br/>","\n",$message);
+							$currency['notified'] = true;
+							$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
+						}
+					} else {
+						//username not an email check if they have a profile with an email.
+						$options = array('startkey' => $space_steward, 'endkey' => $space_steward . '\uefff');
+						$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
+						foreach ( $profiles ['rows'] as $profile ) {
+							if (isset( $profile ['value'] ) && $profile ['value'] != '') {
+								if( email_letter($profile ['value'], $CFG->system_email, 'New Currency Created', $message) ) {
+									echo str_replace("<br/>","\n",$message);
+									$currency['notified'] = true;
+									$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
+								}
+							} else {
+								echo "profile email is not set";
 							}
-						} else {
-							echo "profile email is not set";
 						}
 					}
 				}
