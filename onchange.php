@@ -272,8 +272,62 @@ foreach ( $currencies ['rows'] as $currency ) {
 	
 	if(!isset($currency['notified'])) {
 		
+		if( !isset( $currency['taken'] ) ) {
+			$taken = false;
+			//check if the currency is taken by another space or trading name
+			// do trading name lookup
+			$options = array ('startkey' => $currency_name, 'endkey' => $currency_name . '\uefff');
+			$tradingname_result = $cb->view ( $design_doc_name, $trading_name_function_name, $options );
+			
+			//print_r( $tradingname_result );
+			if( isset($tradingname_result ['rows']) ) {
+				foreach ( $tradingname_result ['rows'] as $trading_name ) {
+					$currency = $trading_name['value'];
+					$trading_name = $trading_name ['key'];
+					//do a lookup
+					$trading_name_array = $cb->get ( "trading_name," . $trading_name . "," . $currency );
+					$trading_name_array = json_decode ( $trading_name_array, true );
+					$inarray = false;
+					
+					foreach($trading_name_array['steward'] as $steward) {
+						if(in_array($steward, $currency['steward'])) {
+							$inarray = true;
+						}
+					}
+					if(!$inarray) {
+						$taken = true;
+					}
+				}
+			}
+			
+			if (!$taken) {
+				//if if the currency is taken in a space
+				$space_array = json_decode ( $cb->get ( "space," . $currency_name), true );
+				$inarray = false;
+				if( isset( $space_array ['steward'] ) ) {
+					foreach( $space_array ['steward'] as $steward) {
+						if( in_array( $steward, $currency['steward'] ) ) {
+							$inarray = true;
+						}
+					}
+				}
+				if(!$inarray) {
+					$taken  = false;
+				}
+			}
+			
+			if (!$taken) {
+				$currency['taken'] = $taken;
+				$currency['taken_at'] = intval( round(microtime(true) * 1000) );
+				$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
+			} else {
+				$cb->delete ( "currency," . $currency['currency'] );
+			}
+			
+		}
 		
-		if( !isset($currency['key'])) {
+		
+		if( !isset($currency['key'] ) ) {
 			//generate the key and hash
 			$key = strtotime ( "now" ) * rand ();
 			$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
