@@ -270,68 +270,69 @@ foreach ( $currencies ['rows'] as $currency ) {
 	$currency = $cb->get ( "currency," . $currency_name );
 	$currency = json_decode( $currency , true );
 	
-	if(!isset($currency['notified'])) {
-		
-		$taken = false;
-		if( !isset( $currency['taken'] ) ) {
+	
+	$taken = false;
+	if( !isset( $currency['taken'] ) ) {
 			
-			//check if the currency is taken by another space or trading name
-			// do trading name lookup
-			$options = array ('startkey' => $currency['currency'], 'endkey' => $currency['currency'] . '\uefff');
-			$tradingname_result = $cb->view ( $design_doc_name, $trading_name_function_name, $options );
+		//check if the currency is taken by another space or trading name
+		// do trading name lookup
+		$options = array ('startkey' => $currency['currency'], 'endkey' => $currency['currency'] . '\uefff');
+		$tradingname_result = $cb->view ( $design_doc_name, $trading_name_function_name, $options );
 			
-			//print_r( $tradingname_result );
-			if( isset($tradingname_result ['rows']) ) {
-				foreach ( $tradingname_result ['rows'] as $trading_name ) {
-					$currency = $trading_name['value'];
-					$trading_name = $trading_name ['key'];
-					//do a lookup
-					$trading_name_array = $cb->get ( "trading_name," . $trading_name . "," . $currency );
-					$trading_name_array = json_decode ( $trading_name_array, true );
-					$inarray = false;
-					foreach($trading_name_array['steward'] as $steward) {
-						if(in_array($steward, $currency['steward'])) {
-							$inarray = true;
-						}
-					}
-					if(!$inarray) {
-						$taken = true;
+		//print_r( $tradingname_result );
+		if( isset($tradingname_result ['rows']) ) {
+			foreach ( $tradingname_result ['rows'] as $trading_name ) {
+				$currency = $trading_name['value'];
+				$trading_name = $trading_name ['key'];
+				//do a lookup
+				$trading_name_array = $cb->get ( "trading_name," . $trading_name . "," . $currency );
+				$trading_name_array = json_decode ( $trading_name_array, true );
+				$inarray = false;
+				foreach($trading_name_array['steward'] as $steward) {
+					if(in_array($steward, $currency['steward'])) {
+						$inarray = true;
 					}
 				}
-			}
-			
-			if (!$taken) {
-				//if if the currency is taken in a space
-				$space_array = json_decode ( $cb->get ( "space," . $currency['currency']), true );
-				
-				if( isset( $space_array ['steward'] ) ) {
-					$inarray = false;
-					foreach( $space_array ['steward'] as $steward) {
-						if( in_array( $steward, $currency['steward'] ) ) {
-							$inarray = true;
-						}
-					}
-					if(!$inarray) {
-						$taken  = true;
-					}
+				if(!$inarray) {
+					$taken = true;
 				}
-
 			}
-			
-			if (!$taken) {
-				$currency['taken'] = $taken;
-				$currency['taken_at'] = intval( round(microtime(true) * 1000) );
-				$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
-			} else {
-				$cb->delete ( "currency," . $currency['currency'] );
-			}
-			
-		} else {
-			$taken = $currency['taken'];
 		}
-		
-		if ($taken) {
 			
+		if (!$taken) {
+			//if if the currency is taken in a space
+			$space_array = json_decode ( $cb->get ( "space," . $currency['currency']), true );
+	
+			if( isset( $space_array ['steward'] ) ) {
+				$inarray = false;
+				foreach( $space_array ['steward'] as $steward) {
+					if( in_array( $steward, $currency['steward'] ) ) {
+						$inarray = true;
+					}
+				}
+				if(!$inarray) {
+					$taken  = true;
+				}
+			}
+	
+		}
+			
+		if (!$taken) {
+			$currency['taken'] = $taken;
+			$currency['taken_at'] = intval( round(microtime(true) * 1000) );
+			$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
+		} else {
+			$cb->delete ( "currency," . $currency['currency'] );
+		}
+			
+	} else {
+		$taken = $currency['taken'];
+	}
+	
+	if ($taken) {
+	
+	
+		if(!isset($currency['notified'])) {
 			
 			if( !isset($currency['key'] ) ) {
 				//generate the key and hash
