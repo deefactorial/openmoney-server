@@ -276,7 +276,7 @@ foreach ( $currencies ['rows'] as $currency ) {
 			$taken = false;
 			//check if the currency is taken by another space or trading name
 			// do trading name lookup
-			$options = array ('startkey' => $currency_name, 'endkey' => $currency_name . '\uefff');
+			$options = array ('startkey' => $currency['currency'], 'endkey' => $currency['currency'] . '\uefff');
 			$tradingname_result = $cb->view ( $design_doc_name, $trading_name_function_name, $options );
 			
 			//print_r( $tradingname_result );
@@ -288,7 +288,6 @@ foreach ( $currencies ['rows'] as $currency ) {
 					$trading_name_array = $cb->get ( "trading_name," . $trading_name . "," . $currency );
 					$trading_name_array = json_decode ( $trading_name_array, true );
 					$inarray = false;
-					
 					foreach($trading_name_array['steward'] as $steward) {
 						if(in_array($steward, $currency['steward'])) {
 							$inarray = true;
@@ -302,18 +301,20 @@ foreach ( $currencies ['rows'] as $currency ) {
 			
 			if (!$taken) {
 				//if if the currency is taken in a space
-				$space_array = json_decode ( $cb->get ( "space," . $currency_name), true );
-				$inarray = false;
+				$space_array = json_decode ( $cb->get ( "space," . $currency['currency']), true );
+				
 				if( isset( $space_array ['steward'] ) ) {
+					$inarray = false;
 					foreach( $space_array ['steward'] as $steward) {
 						if( in_array( $steward, $currency['steward'] ) ) {
 							$inarray = true;
 						}
 					}
+					if(!$inarray) {
+						$taken  = true;
+					}
 				}
-				if(!$inarray) {
-					$taken  = false;
-				}
+
 			}
 			
 			if (!$taken) {
