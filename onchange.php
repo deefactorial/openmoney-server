@@ -329,7 +329,7 @@ foreach ( $currencies ['rows'] as $currency ) {
 		$taken = $currency['taken'];
 	}
 	
-	if ($taken) {
+	if (!$taken) {
 	
 	
 		if(!isset($currency['notified'])) {
