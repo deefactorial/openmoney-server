@@ -282,10 +282,10 @@ foreach ( $currencies ['rows'] as $currency ) {
 		//print_r( $tradingname_result );
 		if( isset($tradingname_result ['rows']) ) {
 			foreach ( $tradingname_result ['rows'] as $trading_name ) {
-				$currency = $trading_name['value'];
+				$this_currency = $trading_name['value'];
 				$trading_name = $trading_name ['key'];
 				//do a lookup
-				$trading_name_array = $cb->get ( "trading_name," . $trading_name . "," . $currency );
+				$trading_name_array = $cb->get ( "trading_name," . $trading_name . "," . $this_currency );
 				$trading_name_array = json_decode ( $trading_name_array, true );
 				$inarray = false;
 				foreach($trading_name_array['steward'] as $steward) {
@@ -402,56 +402,118 @@ foreach ( $spaces ['rows'] as $space ) {
 	$space = $space ['key'];
 	$space = $cb->get ( "space," . $space );
 	$space = json_decode( $space , true );
-
-	if(!isset($space['notified'])) {
-
-		if( !isset( $space['key'] ) ) {
-			//generate the key and hash
-			$key = strtotime ( "now" ) * rand ();
-			$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
 	
-			//store the key
-			$space['key'] = $key;
-			$cb->set ( "space," . $space['space'], json_encode ( $space ) );
-
-		} else {
-			$key = $space['key'];
-			$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
-		}
-		//generate the message
-		$message =
-		"<br/>Space Created: " .
-		"<br/>Space: " . $space['space'] .
-		"<br/>".
-		"<br/><a href='https://cloud.openmoney.cc/enable.php?&space=" . urlencode($space['space']) . "&auth=" . urlencode($hash) . "'>Click here to enable this space</a>".
-		"<br/><a href='https://cloud.openmoney.cc/disable.php?&space=" . urlencode($space['space']) . "&auth=" . urlencode($hash) . "'>Click here to disable this space</a>".
-		"<br/>".
-		"<br/>Thank you,<br/>openmoney<br/>";
-
-		//lookup space stewards and notify them.
-		$options = array('startkey' => $space['subspace'], 'endkey' => $space['subspace'] . '\uefff');
-		$spaces = $cb->view( $design_doc_name, $space_function_name, $options );
-		foreach ( $spaces ['rows'] as $subspace ) {
-			foreach( $subspace ['value'] as $subspace_steward ) {
-				if( strpos($subspace_steward,"@") !== false ) {
-					if( email_letter($subspace_steward, $CFG->system_email, 'New Space Created', $message) ) {
-						echo str_replace("<br/>","\n",$message);
-						$space['notified'] = true;
-						$cb->set ( "space," . $space['space'], json_encode ( $space ) );
+	
+	$taken = false;
+	if( !isset( $space['taken'] ) ) {
+			
+		//check if the currency is taken by another space or trading name
+		// do trading name lookup
+		$options = array ('startkey' => $space['space'], 'endkey' => $space['space'] . '\uefff');
+		$tradingname_result = $cb->view ( $design_doc_name, $trading_name_function_name, $options );
+			
+		//print_r( $tradingname_result );
+		if( isset($tradingname_result ['rows']) ) {
+			foreach ( $tradingname_result ['rows'] as $trading_name ) {
+				$this_currency = $trading_name['value'];
+				$trading_name = $trading_name ['key'];
+				//do a lookup
+				$trading_name_array = $cb->get ( "trading_name," . $trading_name . "," . $this_currency );
+				$trading_name_array = json_decode ( $trading_name_array, true );
+				$inarray = false;
+				foreach($trading_name_array['steward'] as $steward) {
+					if(in_array($steward, $space['steward'])) {
+						$inarray = true;
 					}
-				} else {
-					//username not an email check if they have a profile with an email.
-					$options = array('startkey' => $subspace_steward, 'endkey' => $subspace_steward . '\uefff');
-					$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
-					foreach ( $profiles ['rows'] as $profile ) {
-						if (isset( $profile ['value'] ) && $profile ['value'] != '' ) {
-							if( email_letter($profile ['value'], $CFG->system_email, 'New Space Created', $message) ) {
-								echo str_replace("<br/>","\n",$message);
-								$space['notified'] = true;
-								$cb->set ( "space," . $space['space'], json_encode ( $space ) );
+				}
+				if(!$inarray) {
+					$taken = true;
+				}
+			}
+		}
+			
+		if (!$taken) {
+			// if the space is taken in a currency
+			$currency_array = json_decode ( $cb->get ( "currency," . $space['space']), true );
+	
+			if( isset( $currency_array ['steward'] ) ) {
+				$inarray = false;
+				foreach( $currency_array ['steward'] as $steward) {
+					if( in_array( $steward, $space['steward'] ) ) {
+						$inarray = true;
+					}
+				}
+				if(!$inarray) {
+					$taken  = true;
+				}
+			}
+	
+		}
+			
+		if (!$taken) {
+			$space['taken'] = $taken;
+			$space['taken_at'] = intval( round(microtime(true) * 1000) );
+			$cb->set ( "space," . $space['space'], json_encode ( $space ) );
+		} else {
+			$cb->delete ( "space," . $space['space'] );
+		}
+			
+	} else {
+		$taken = $currency['taken'];
+	}
+	
+	if (!$taken) {
+	
+		if(!isset($space['notified'])) {
+	
+			if( !isset( $space['key'] ) ) {
+				//generate the key and hash
+				$key = strtotime ( "now" ) * rand ();
+				$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
+		
+				//store the key
+				$space['key'] = $key;
+				$cb->set ( "space," . $space['space'], json_encode ( $space ) );
+	
+			} else {
+				$key = $space['key'];
+				$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
+			}
+			//generate the message
+			$message =
+			"<br/>Space Created: " .
+			"<br/>Space: " . $space['space'] .
+			"<br/>".
+			"<br/><a href='https://cloud.openmoney.cc/enable.php?&space=" . urlencode($space['space']) . "&auth=" . urlencode($hash) . "'>Click here to enable this space</a>".
+			"<br/><a href='https://cloud.openmoney.cc/disable.php?&space=" . urlencode($space['space']) . "&auth=" . urlencode($hash) . "'>Click here to disable this space</a>".
+			"<br/>".
+			"<br/>Thank you,<br/>openmoney<br/>";
+	
+			//lookup space stewards and notify them.
+			$options = array('startkey' => $space['subspace'], 'endkey' => $space['subspace'] . '\uefff');
+			$spaces = $cb->view( $design_doc_name, $space_function_name, $options );
+			foreach ( $spaces ['rows'] as $subspace ) {
+				foreach( $subspace ['value'] as $subspace_steward ) {
+					if( strpos($subspace_steward,"@") !== false ) {
+						if( email_letter($subspace_steward, $CFG->system_email, 'New Space Created', $message) ) {
+							echo str_replace("<br/>","\n",$message);
+							$space['notified'] = true;
+							$cb->set ( "space," . $space['space'], json_encode ( $space ) );
+						}
+					} else {
+						//username not an email check if they have a profile with an email.
+						$options = array('startkey' => $subspace_steward, 'endkey' => $subspace_steward . '\uefff');
+						$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
+						foreach ( $profiles ['rows'] as $profile ) {
+							if (isset( $profile ['value'] ) && $profile ['value'] != '' ) {
+								if( email_letter($profile ['value'], $CFG->system_email, 'New Space Created', $message) ) {
+									echo str_replace("<br/>","\n",$message);
+									$space['notified'] = true;
+									$cb->set ( "space," . $space['space'], json_encode ( $space ) );
+								}
+							} else {
+								echo "profile email is not set";
 							}
-						} else {
-							echo "profile email is not set";
 						}
 					}
 				}
