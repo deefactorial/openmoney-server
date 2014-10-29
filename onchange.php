@@ -298,8 +298,8 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 			//generate the message
 			$message =
 			"<br/>Trading Name Created: " .
-			"<br/>Trading Name: " . $trading_name .
-			"<br/>Currency: " . $currency .
+			"<br/>Trading Name: " . $trading_name_array['trading_name'] .
+			"<br/>Currency: " . $trading_name_array['currency'] .
 			"<br/>".
 			"<br/><a href='https://cloud.openmoney.cc/enable.php?trading_name=" . urlencode($trading_name_array['trading_name']) . "&currency=" . urlencode($trading_name_array['currency']) . "&auth=" . urlencode($hash) . "'>Click here to enable this account to trade</a>".
 			"<br/><a href='https://cloud.openmoney.cc/disable.php?trading_name=" . urlencode($trading_name_array['trading_name']) . "&currency=" . urlencode($trading_name_array['currency']) . "&auth=" . urlencode($hash) . "'>Click here to disable this account from trading</a>".
