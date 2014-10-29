@@ -214,9 +214,9 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 		if( isset($tradingname_result ['rows']) ) {
 			foreach ( $tradingname_result ['rows'] as $trading_name ) {
 				$this_currency = $trading_name['value'];
-				$trading_name = $trading_name ['key'];
+				$this_trading_name = $trading_name ['key'];
 				//do a lookup
-				$trading_array = $cb->get ( "trading_name," . $trading_name . "," . $this_currency );
+				$trading_array = $cb->get ( "trading_name," . $this_trading_name . "," . $this_currency );
 				$trading_array = json_decode ( $trading_array, true );
 				$inarray = false;
 				foreach($trading_array['steward'] as $steward) {
@@ -289,7 +289,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 				
 				//store the key
 				$trading_name_array['key'] = $key;
-				$cb->set ( "trading_name," . $trading_name . "," . $currency, json_encode ( $trading_name_array ) );
+				$cb->set ( "trading_name," . $trading_name_array['trading_name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
 			} else {
 				$key = $trading_name_array['key'];
 				$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
@@ -301,14 +301,14 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 			"<br/>Trading Name: " . $trading_name .
 			"<br/>Currency: " . $currency .
 			"<br/>".
-			"<br/><a href='https://cloud.openmoney.cc/enable.php?trading_name=" . urlencode($trading_name) . "&currency=" . urlencode($currency) . "&auth=" . urlencode($hash) . "'>Click here to enable this account to trade</a>".
-			"<br/><a href='https://cloud.openmoney.cc/disable.php?trading_name=" . urlencode($trading_name) . "&currency=" . urlencode($currency) . "&auth=" . urlencode($hash) . "'>Click here to disable this account from trading</a>".
+			"<br/><a href='https://cloud.openmoney.cc/enable.php?trading_name=" . urlencode($trading_name_array['trading_name']) . "&currency=" . urlencode($trading_name_array['currency']) . "&auth=" . urlencode($hash) . "'>Click here to enable this account to trade</a>".
+			"<br/><a href='https://cloud.openmoney.cc/disable.php?trading_name=" . urlencode($trading_name_array['trading_name']) . "&currency=" . urlencode($trading_name_array['currency']) . "&auth=" . urlencode($hash) . "'>Click here to disable this account from trading</a>".
 			"<br/>".
 			"<br/>Thank you,<br/>openmoney<br/>";
 			
 			
 			//lookup currency stewards and notify them.
-			$options = array('startkey' => $currency, 'endkey' => $currency . '\uefff');
+			$options = array('startkey' => $trading_name_array['currency'], 'endkey' => $trading_name_array['currency'] . '\uefff');
 			$currencies = $cb->view( $design_doc_name, $currency_function_name, $options );
 			foreach ( $currencies ['rows'] as $currency_array ) {
 				foreach( $currency_array ['value'] as $currency_steward ) {
@@ -316,7 +316,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 						if( email_letter($currency_steward, $CFG->system_email, 'New Trading Name Created', $message) ) {
 							echo str_replace("<br/>","\n",$message);
 							$trading_name_array['notified'] = true;
-							$cb->set ( "trading_name," . $trading_name . "," . $currency, json_encode ( $trading_name_array ) );
+							$cb->set ( "trading_name," . $trading_name_array['trading_name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
 						}
 					} else {
 						//username not an email check if they have a profile with an email.
@@ -327,7 +327,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 								if( email_letter($profile ['value'], $CFG->system_email, 'New Trading Name Created', $message) ) {
 									echo str_replace("<br/>","\n",$message);
 									$trading_name_array['notified'] = true;
-									$cb->set ( "trading_name," . $trading_name . "," . $currency, json_encode ( $trading_name_array ) );
+									$cb->set ( "trading_name," . $trading_name_array['trading_name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
 								}
 							} else {
 								echo "profile email is not set";
