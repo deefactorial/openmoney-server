@@ -218,9 +218,11 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 				$trading_array = $cb->get ( "trading_name," . $this_trading_name . "," . $this_currency );
 				$trading_array = json_decode ( $trading_array, true );
 				$inarray = false;
-				foreach($trading_array['steward'] as $steward) {
-					if(in_array($steward, $trading_name_array['steward'])) {
-						$inarray = true;
+				if (isset($trading_array['steward'])) {
+					foreach($trading_array['steward'] as $steward) {
+						if(in_array($steward, $trading_name_array['steward'])) {
+							$inarray = true;
+						}
 					}
 				}
 				if(!$inarray) {
