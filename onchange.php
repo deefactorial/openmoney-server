@@ -15,7 +15,7 @@ $tradingNameJournal_lookup_function = 'function(doc,meta){if(doc.type==\"trading
 
 $trading_name_journal_function_name = "tradingnamejournal";
 
-$tradingName_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name\"&&doc.name&&doc.currency&&doc.steward&&!doc.notified){emit(doc.name,doc.currency);}}';
+$tradingName_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name\"&&doc.name&&doc.currency&&doc.steward){emit(doc.name,doc.currency);}}';
 
 $trading_name_function_name = "tradingname";
 
@@ -195,7 +195,6 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 	//init
 	$currency = $trading_name['value'];
 	$trading_name = $trading_name ['key'];
-	
 	
 	//do a lookup
 	$trading_name_array = $cb->get ( "trading_name," . $trading_name . "," . $currency );
@@ -415,7 +414,7 @@ foreach ( $currencies ['rows'] as $currency ) {
 	
 		if(!isset($currency['notified'])) {
 			
-			if( !isset($currency['key'] ) ) {
+			if( !isset( $currency['key'] ) ) {
 				//generate the key and hash
 				$key = strtotime ( "now" ) * rand ();
 				$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
