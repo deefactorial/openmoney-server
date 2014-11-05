@@ -127,7 +127,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 			$trading_name_array['taken_at'] = intval( round(microtime(true) * 1000) );
 			$cb->set ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
 		} else {
-			echo "Deleted Trading name:" . $trading_name_array['name'] . "," . $trading_name_array['currency'];
+			echo "Deleted Trading name:" . $trading_name_array['name'] . "," . $trading_name_array['currency'] . "\n";
 			$cb->delete ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'] );
 		}
 			
