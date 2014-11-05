@@ -37,6 +37,167 @@ $designDoc = '{"views":{"' . $trading_name_journal_function_name . '":{"map":"' 
 $design_doc_name = "dev_changes";
 
 $cb->setDesignDoc ($design_doc_name,json_decode(json_encode($designDoc)));
+
+
+// do trading name lookup
+$options = array ();
+$tradingname_result = $cb->view ( $design_doc_name, $trading_name_function_name, $options );
+
+//print_r( $tradingname_result );
+foreach ( $tradingname_result ['rows'] as $trading_name ) {
+
+	//print_r($trading_name);
+	//init
+	$currency = $trading_name['value'];
+	$trading_name = $trading_name ['key'];
+
+	//do a lookup
+	$trading_name_array = $cb->get ( "trading_name," . $trading_name . "," . $currency );
+	$trading_name_array = json_decode ( $trading_name_array, true );
+
+
+	$taken = false;
+	if( !isset( $trading_name_array['taken'] ) ) {
+			
+		//check if the currency is taken by another space or trading name
+		// do trading name lookup
+		$options = array ('startkey' => $trading_name_array['name'], 'endkey' => $trading_name_array['name'] . '\uefff');
+		$tradingname_other_result = $cb->view ( $design_doc_name, $trading_name_function_name, $options );
+			
+		//print_r( $tradingname_result );
+		if( isset($tradingname_other_result ['rows']) ) {
+			foreach ( $tradingname_other_result ['rows'] as $trading_name ) {
+				$this_currency = $trading_name['value'];
+				$this_trading_name = $trading_name ['key'];
+				//do a lookup
+				$trading_array = $cb->get ( "trading_name," . $this_trading_name . "," . $this_currency );
+				$trading_array = json_decode ( $trading_array, true );
+				$inarray = false;
+				if (isset($trading_array['steward'])) {
+					foreach($trading_array['steward'] as $steward) {
+						if(in_array($steward, $trading_name_array['steward'])) {
+							$inarray = true;
+						}
+					}
+				}
+				if(!$inarray) {
+					$taken = true;
+				}
+			}
+		}
+			
+		if (!$taken) {
+			// if the space is taken in a currency
+			$currency_array = json_decode ( $cb->get ( "currency," . $trading_name_array['name']), true );
+
+			if( isset( $currency_array ['steward'] ) ) {
+				$inarray = false;
+				foreach( $currency_array ['steward'] as $steward) {
+					if( in_array( $steward, $trading_name_array['steward'] ) ) {
+						$inarray = true;
+					}
+				}
+				if(!$inarray) {
+					$taken  = true;
+				}
+			}
+
+		}
+
+		if (!$taken) {
+			// if the space is taken in a currency
+			$space_array = json_decode ( $cb->get ( "space," . $trading_name_array['name']), true );
+
+			if( isset( $space_array ['steward'] ) ) {
+				$inarray = false;
+				foreach( $space_array ['steward'] as $steward) {
+					if( in_array( $steward, $trading_name_array['steward'] ) ) {
+						$inarray = true;
+					}
+				}
+				if(!$inarray) {
+					$taken  = true;
+				}
+			}
+
+		}
+			
+		if (!$taken) {
+			$trading_name_array['taken'] = $taken;
+			$trading_name_array['taken_at'] = intval( round(microtime(true) * 1000) );
+			$cb->set ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
+		} else {
+			echo "Deleted Trading name:" . $trading_name_array['name'] . "," . $trading_name_array['currency'];
+			$cb->delete ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'] );
+		}
+			
+	} else {
+		$taken = $trading_name_array['taken'];
+	}
+
+	if (!$taken) {
+
+		if(!isset($trading_name_array['notified'])) {
+				
+			if (!isset($trading_name_array['key'])) {
+				//generate the key and hash
+				$key = strtotime ( "now" ) * rand ();
+				$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
+
+				//store the key
+				$trading_name_array['key'] = $key;
+				$cb->set ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
+			} else {
+				$key = $trading_name_array['key'];
+				$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
+			}
+				
+			//generate the message
+			$message =
+			"<br/>Trading Name Created: " .
+			"<br/>Trading Name: " . $trading_name_array['name'] .
+			"<br/>Currency: " . $trading_name_array['currency'] .
+			"<br/>".
+			"<br/><a href='https://cloud.openmoney.cc/enable.php?trading_name=" . urlencode($trading_name_array['name']) . "&currency=" . urlencode($trading_name_array['currency']) . "&auth=" . urlencode($hash) . "'>Click here to enable this account to trade</a>".
+			"<br/><a href='https://cloud.openmoney.cc/disable.php?trading_name=" . urlencode($trading_name_array['name']) . "&currency=" . urlencode($trading_name_array['currency']) . "&auth=" . urlencode($hash) . "'>Click here to disable this account from trading</a>".
+			"<br/>".
+			"<br/>Thank you,<br/>openmoney<br/>";
+				
+				
+			//lookup currency stewards and notify them.
+			$options = array('startkey' => $trading_name_array['currency'], 'endkey' => $trading_name_array['currency'] . '\uefff');
+			$currencies = $cb->view( $design_doc_name, $currency_function_name, $options );
+			foreach ( $currencies ['rows'] as $currency_array ) {
+				foreach( $currency_array ['value'] as $currency_steward ) {
+					if( strpos($currency_steward,"@") !== false ) {
+						if( email_letter($currency_steward, $CFG->system_email, 'New Trading Name Created', $message) ) {
+							echo str_replace("<br/>","\n",$message);
+							$trading_name_array['notified'] = true;
+							$cb->set ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
+						}
+					} else {
+						//username not an email check if they have a profile with an email.
+						$options = array('startkey' => $currency_steward, 'endkey' => $currency_steward . '\uefff');
+						$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
+						foreach ( $profiles ['rows'] as $profile ) {
+							if (isset( $profile ['value'] ) && $profile ['value'] != '') {
+								if( email_letter($profile ['value'], $CFG->system_email, 'New Trading Name Created', $message) ) {
+									echo str_replace("<br/>","\n",$message);
+									$trading_name_array['notified'] = true;
+									$cb->set ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
+								}
+							} else {
+								echo "profile email is not set";
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
 	
 $options = array ();
 	
@@ -183,164 +344,6 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 }
 
 
-
-// do trading name lookup
-$options = array ();
-$tradingname_result = $cb->view ( $design_doc_name, $trading_name_function_name, $options );
-
-//print_r( $tradingname_result );
-foreach ( $tradingname_result ['rows'] as $trading_name ) {
-	
-	//print_r($trading_name);
-	//init
-	$currency = $trading_name['value'];
-	$trading_name = $trading_name ['key'];
-	
-	//do a lookup
-	$trading_name_array = $cb->get ( "trading_name," . $trading_name . "," . $currency );
-	$trading_name_array = json_decode ( $trading_name_array, true );
-	
-	
-	$taken = false;
-	if( !isset( $trading_name_array['taken'] ) ) {
-			
-		//check if the currency is taken by another space or trading name
-		// do trading name lookup
-		$options = array ('startkey' => $trading_name_array['name'], 'endkey' => $trading_name_array['name'] . '\uefff');
-		$tradingname_other_result = $cb->view ( $design_doc_name, $trading_name_function_name, $options );
-			
-		//print_r( $tradingname_result );
-		if( isset($tradingname_other_result ['rows']) ) {
-			foreach ( $tradingname_other_result ['rows'] as $trading_name ) {
-				$this_currency = $trading_name['value'];
-				$this_trading_name = $trading_name ['key'];
-				//do a lookup
-				$trading_array = $cb->get ( "trading_name," . $this_trading_name . "," . $this_currency );
-				$trading_array = json_decode ( $trading_array, true );
-				$inarray = false;
-				if (isset($trading_array['steward'])) {
-					foreach($trading_array['steward'] as $steward) {
-						if(in_array($steward, $trading_name_array['steward'])) {
-							$inarray = true;
-						}
-					}
-				}
-				if(!$inarray) {
-					$taken = true;
-				}
-			}
-		}
-			
-		if (!$taken) {
-			// if the space is taken in a currency
-			$currency_array = json_decode ( $cb->get ( "currency," . $trading_name_array['name']), true );
-	
-			if( isset( $currency_array ['steward'] ) ) {
-				$inarray = false;
-				foreach( $currency_array ['steward'] as $steward) {
-					if( in_array( $steward, $trading_name_array['steward'] ) ) {
-						$inarray = true;
-					}
-				}
-				if(!$inarray) {
-					$taken  = true;
-				}
-			}
-	
-		}
-		
-		if (!$taken) {
-			// if the space is taken in a currency
-			$space_array = json_decode ( $cb->get ( "space," . $trading_name_array['name']), true );
-		
-			if( isset( $space_array ['steward'] ) ) {
-				$inarray = false;
-				foreach( $space_array ['steward'] as $steward) {
-					if( in_array( $steward, $trading_name_array['steward'] ) ) {
-						$inarray = true;
-					}
-				}
-				if(!$inarray) {
-					$taken  = true;
-				}
-			}
-		
-		}
-			
-		if (!$taken) {
-			$trading_name_array['taken'] = $taken;
-			$trading_name_array['taken_at'] = intval( round(microtime(true) * 1000) );
-			$cb->set ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
-		} else {
-			echo "Deleted Trading name:" . $trading_name_array['name'] . "," . $trading_name_array['currency'];
-			$cb->delete ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'] );
-		}
-			
-	} else {
-		$taken = $trading_name_array['taken'];
-	}
-	
-	if (!$taken) {
-		
-		if(!isset($trading_name_array['notified'])) {
-					
-			if (!isset($trading_name_array['key'])) {	
-				//generate the key and hash
-				$key = strtotime ( "now" ) * rand ();
-				$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
-				
-				//store the key
-				$trading_name_array['key'] = $key;
-				$cb->set ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
-			} else {
-				$key = $trading_name_array['key'];
-				$hash = password_hash ( ( string ) $key, PASSWORD_BCRYPT );
-			}
-			
-			//generate the message
-			$message =
-			"<br/>Trading Name Created: " .
-			"<br/>Trading Name: " . $trading_name_array['name'] .
-			"<br/>Currency: " . $trading_name_array['currency'] .
-			"<br/>".
-			"<br/><a href='https://cloud.openmoney.cc/enable.php?trading_name=" . urlencode($trading_name_array['name']) . "&currency=" . urlencode($trading_name_array['currency']) . "&auth=" . urlencode($hash) . "'>Click here to enable this account to trade</a>".
-			"<br/><a href='https://cloud.openmoney.cc/disable.php?trading_name=" . urlencode($trading_name_array['name']) . "&currency=" . urlencode($trading_name_array['currency']) . "&auth=" . urlencode($hash) . "'>Click here to disable this account from trading</a>".
-			"<br/>".
-			"<br/>Thank you,<br/>openmoney<br/>";
-			
-			
-			//lookup currency stewards and notify them.
-			$options = array('startkey' => $trading_name_array['currency'], 'endkey' => $trading_name_array['currency'] . '\uefff');
-			$currencies = $cb->view( $design_doc_name, $currency_function_name, $options );
-			foreach ( $currencies ['rows'] as $currency_array ) {
-				foreach( $currency_array ['value'] as $currency_steward ) {
-					if( strpos($currency_steward,"@") !== false ) {
-						if( email_letter($currency_steward, $CFG->system_email, 'New Trading Name Created', $message) ) {
-							echo str_replace("<br/>","\n",$message);
-							$trading_name_array['notified'] = true;
-							$cb->set ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
-						}
-					} else {
-						//username not an email check if they have a profile with an email.
-						$options = array('startkey' => $currency_steward, 'endkey' => $currency_steward . '\uefff');
-						$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
-						foreach ( $profiles ['rows'] as $profile ) {
-							if (isset( $profile ['value'] ) && $profile ['value'] != '') {
-								if( email_letter($profile ['value'], $CFG->system_email, 'New Trading Name Created', $message) ) {
-									echo str_replace("<br/>","\n",$message);
-									$trading_name_array['notified'] = true;
-									$cb->set ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
-								}
-							} else {
-								echo "profile email is not set";
-							}
-						}
-					}
-				}
-			}	
-		}
-	}
-}
 
 // do currency lookup
 $options = array ();
