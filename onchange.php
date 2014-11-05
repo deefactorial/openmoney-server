@@ -207,11 +207,11 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 		//check if the currency is taken by another space or trading name
 		// do trading name lookup
 		$options = array ('startkey' => $trading_name_array['name'], 'endkey' => $trading_name_array['name'] . '\uefff');
-		$tradingname_result = $cb->view ( $design_doc_name, $trading_name_function_name, $options );
+		$tradingname_other_result = $cb->view ( $design_doc_name, $trading_name_function_name, $options );
 			
 		//print_r( $tradingname_result );
-		if( isset($tradingname_result ['rows']) ) {
-			foreach ( $tradingname_result ['rows'] as $trading_name ) {
+		if( isset($tradingname_other_result ['rows']) ) {
+			foreach ( $tradingname_other_result ['rows'] as $trading_name ) {
 				$this_currency = $trading_name['value'];
 				$this_trading_name = $trading_name ['key'];
 				//do a lookup
@@ -272,6 +272,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 			$trading_name_array['taken_at'] = intval( round(microtime(true) * 1000) );
 			$cb->set ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
 		} else {
+			echo "Deleted Trading name:" . $trading_name_array['name'] . "," . $trading_name_array['currency'];
 			$cb->delete ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'] );
 		}
 			
