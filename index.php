@@ -90,7 +90,8 @@ $app->post ( '/login', function () use($app) {
 		$context = stream_context_create ( $options );
 		$default_context = stream_context_set_default ( $options );
 		
-		if (get_http_response_code ( $url ) != "404") {
+		$response_code = get_http_response_code ( $url );
+		if ($response_code != "404") {
 			$result = file_get_contents ( $url, false, $context );
 		} else {
 			
