@@ -23,6 +23,10 @@ $profile_lookup_function = 'function(doc,meta){if(doc.type==\"profile\"&&doc.use
 
 $profile_function_name = "profile";
 
+$total_profile_lookup_function = 'function(doc,meta){if(doc.type==\"profile\"&&doc.username&&doc.email){emit(doc.username,doc.email);}}';
+
+$total_profile_function_name = "total_profile";
+
 $space_lookup_function = 'function(doc,meta){if(doc.type==\"space\"&&doc.steward&&typeof doc.space != \"undefined\"){emit(doc.space,doc.steward);}}';
 
 $space_function_name = "space";
@@ -31,7 +35,7 @@ $currency_lookup_function = 'function(doc,meta){if(doc.type==\"currency\"&&doc.c
 
 $currency_function_name = "currency";
 
-$designDoc = '{"views":{"' . $trading_name_journal_function_name . '":{"map":"' . $tradingNameJournal_lookup_function . '"},"' . $trading_name_function_name . '":{"map":"' . $tradingName_lookup_function . '"},"' . $profile_function_name . '":{"map":"' . $profile_lookup_function . '"},"' . $space_function_name . '":{"map":"' . $space_lookup_function . '"},"' . $currency_function_name . '":{"map":"' . $currency_lookup_function . '"}}}';
+$designDoc = '{"views":{"' . $trading_name_journal_function_name . '":{"map":"' . $tradingNameJournal_lookup_function . '"},"' . $trading_name_function_name . '":{"map":"' . $tradingName_lookup_function . '"},"' . $profile_function_name . '":{"map":"' . $profile_lookup_function . '"},"' . $total_profile_function_name . '":{"map":"' . $total_profile_lookup_function . '"},"' . $space_function_name . '":{"map":"' . $space_lookup_function . '"},"' . $currency_function_name . '":{"map":"' . $currency_lookup_function . '"}}}';
 	
 // echo $designDoc;
 $design_doc_name = "dev_changes";
@@ -607,4 +611,35 @@ foreach ( $spaces ['rows'] as $space ) {
 		}
 	}
 }
+
+$options = array ();
+$profiles = $cb->view( $design_doc_name, $total_profile_function_name, $options );
+foreach ( $profiles ['rows'] as $profile ) {
+	
+	$profile_array = json_decode(  $cb->get ( "profile," . $profile ['username'] ) , true );
+	
+	$duplicate_array = array();
+	
+	$options = array ();
+	$profiles_search = $cb->view( $design_doc_name, $total_profile_function_name, $options );
+	foreach ( $profiles_search ['rows'] as $profile_search) {
+		if ($profile_search['value'] == $profile_array['email']) {
+			array_push($duplicate_array, $profile_search['key']);
+		}
+	}
+	
+	if (!empty($duplicate_array)) {
+		foreach($duplicate_array as $duplicate) {
+			$duplicate_array = json_decode(  $cb->get ( "profile," . $duplicate ) , true );
+			if ($profile_array['created'] > $duplicate_array['created']) {
+				//this profile was created after the duplicate so send an error to this profile.
+				$profile_array['email'] = '';
+				$profile_array['email_error'] = 'This email is already being used on another profile. Please update your profile with another email.';
+				$cb->set ( "profile," . $profile_array['username'], json_encode ( $profile_array ) );
+			}
+		}
+	}
+	
+}
+
 ?>

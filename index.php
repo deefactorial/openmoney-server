@@ -309,6 +309,7 @@ $app->get ( '/logout', function () use($app) {
 $app->post ( '/lostpw', function () use($app) {
 	
 	$username = '';
+	$email = '';
 	function get_http_response_code($url) {
 		$headers = get_headers ( $url );
 		return substr ( $headers [0], 9, 3 );
@@ -331,6 +332,15 @@ $app->post ( '/lostpw', function () use($app) {
 	
 	if ($username != '') {
 		
+		require ("password.php");
+		function email_letter($to, $from, $subject = 'no subject', $msg = 'no msg') {
+			$headers = "From: $from\r\n";
+			$headers .= "MIME-Version: 1.0\r\n";
+			$headers .= "Content-type: text/html; charset=iso-8859-1\r\n";
+			$headers .= 'X-Mailer: PHP/' . phpversion ();
+			return mail ( $to, $subject, $msg, $headers );
+		}
+		
 		$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 		
 		$user = $cb->get ( "users," . $username );
@@ -346,18 +356,14 @@ $app->post ( '/lostpw', function () use($app) {
 			$cb->setDesignDoc ( "dev_profile", $designDoc );
 			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
 				
-			// do trading name lookup on
+			// do profile email lookup 
 			$profile_result = $cb->view ( 'dev_profile', 'profileLookup', $options );
 		
 		
 			foreach ( $profile_result ['rows'] as $row ) {
-				$user = $cb->get ( "users," . $row['value'] );
+				$user = json_decode ( $cb->get ( "users," . $row['value'] ), true );
+				$email = $username;
 			}
-			
-			$user = json_decode ( $user, true );
-			
-			
-			
 			
 			if (! isset ( $user ['username'] ) || $user ['username'] == '') {
 				// user is undefined
@@ -366,14 +372,7 @@ $app->post ( '/lostpw', function () use($app) {
 			}
 		}
 		
-		require ("password.php");
-		function email_letter($to, $from, $subject = 'no subject', $msg = 'no msg') {
-			$headers = "From: $from\r\n";
-			$headers .= "MIME-Version: 1.0\r\n";
-			$headers .= "Content-type: text/html; charset=iso-8859-1\r\n";
-			$headers .= 'X-Mailer: PHP/' . phpversion ();
-			return mail ( $to, $subject, $msg, $headers );
-		}
+
 		// email passed check send email with password reset link
 		
 		$reset_key = strtotime ( "now" ) * rand ();
@@ -391,7 +390,11 @@ $app->post ( '/lostpw', function () use($app) {
 		$subject = "openmoney: lost password reset REQUESTED for " . $user ['username'];
 		$dear = $user ['username'];
 		
-		$sentEmail = email_letter ( "\"" . $dear . "\"<" . $user ['email'] . ">", "noreply@openmoney.cc", $subject, $msg );
+		if ($email != '') {
+			$sentEmail = email_letter ( "\"" . $dear . "\"<" . $email . ">", "noreply@openmoney.cc", $subject, $msg );
+		} else {
+			$sentEmail = email_letter ( "\"" . $dear . "\"<" . $user ['email'] . ">", "noreply@openmoney.cc", $subject, $msg );
+		}
 		echo json_encode ( array ('sentEmail' => $sentEmail) );
 		$app->stop ();
 	} else {
