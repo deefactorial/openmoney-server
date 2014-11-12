@@ -108,7 +108,8 @@ $app->post ( '/login', function () use($app) {
 			
 			$json = json_decode ( $result, true );
 			
-			if (get_http_response_code ( $url ) == 404) {
+			$response_code = get_http_response_code ( $url );
+			if ($response_code == 404) {
 				//insert data
 				$data = array ('name' => $user ['username'], 'password' => $password);
 				$json = json_encode ( $data );
@@ -142,7 +143,7 @@ $app->post ( '/login', function () use($app) {
 		if (isset ( $json ['session_id'] )) {
 			
 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
-			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => $user ['username'], 'email' => $email);
+			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => $user ['username'], 'email' => $email, 'user_update_code' => $response_code);
 
 			echo json_encode ( $result );
 			$app->stop ();
