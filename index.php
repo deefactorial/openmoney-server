@@ -73,8 +73,7 @@ $app->post ( '/login', function () use($app) {
 	
 		
 		foreach ( $profile_result ['rows'] as $row ) {
-			$user = $cb->get ( "users," . $row['value'] );
-			$user = json_decode ( $user, true );
+			$user = json_decode ( $cb->get ( "users," . $row['value'] ), true );
 		}
 		
 	}
@@ -83,7 +82,7 @@ $app->post ( '/login', function () use($app) {
 	
 	if (password_verify ( $password, $user ['password'] )) {
 		
-		$url = 'https://localhost:4985/openmoney_shadow/_user/' . $username;
+		$url = 'https://localhost:4985/openmoney_shadow/_user/' . $user['username'];
 			
 		$options = array ('http' => array ('method' => 'GET', 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 		$context = stream_context_create ( $options );
