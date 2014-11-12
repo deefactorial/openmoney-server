@@ -82,6 +82,41 @@ $app->post ( '/login', function () use($app) {
 	
 	
 	if (password_verify ( $password, $user ['password'] )) {
+		
+		$url = 'https://localhost:4985/openmoney_shadow/_user/' . $username;
+			
+		$options = array ('http' => array ('method' => 'GET', 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+		$context = stream_context_create ( $options );
+		$default_context = stream_context_set_default ( $options );
+			
+		$result = file_get_contents ( $url, false, $context );
+			
+		$json = json_decode ( $result, true );
+			
+		$response_code = get_http_response_code ( $url );
+		if ($response_code == 404) {
+			//insert data
+			$data = array ('name' => $user ['username'], 'password' => $password);
+			$json = json_encode ( $data );
+			$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+			$context = stream_context_create ( $options );
+			$default_context = stream_context_set_default ( $options );
+				
+			$result = file_get_contents ( $url, false, $context );
+		} else {
+			
+			if ($json['password'] != $password) {
+				//update data
+				$json['password'] = $password;
+				$json = json_encode ( $json );
+				$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+				$context = stream_context_create ( $options );
+				$default_context = stream_context_set_default ( $options );
+					
+				$result = file_get_contents ( $url, false, $context );
+			}
+		}
+		
 		$url = 'https://localhost:4985/openmoney_shadow/_session';
 		// $url = 'https://localhost:4985/todos/_session';
 		$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
@@ -91,54 +126,9 @@ $app->post ( '/login', function () use($app) {
 		$default_context = stream_context_set_default ( $options );
 		
 		$response_code = get_http_response_code ( $url );
-		if ($response_code != "404") {
-			$result = file_get_contents ( $url, false, $context );
-		} else {
-			
-			
-			// user exists in db but not in sync_gateway so create the user
-			// do a get first to make sure user is not defined in gateway.
-			
-			$url = 'https://localhost:4985/openmoney_shadow/_user/' . $username;
-			
-			$options = array ('http' => array ('method' => 'GET', 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-			$context = stream_context_create ( $options );
-			$default_context = stream_context_set_default ( $options );
-			
-			$result = file_get_contents ( $url, false, $context );
-			
-			$json = json_decode ( $result, true );
-			
-			$response_code = get_http_response_code ( $url );
-			if ($response_code == 404) {
-				//insert data
-				$data = array ('name' => $user ['username'], 'password' => $password);
-				$json = json_encode ( $data );
-			} else {
-				//update data
-				$json['password'] = $password;
-				$json = json_encode ( $json );
-			}
-			$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-			$context = stream_context_create ( $options );
-			$default_context = stream_context_set_default ( $options );
-			
-			$result = file_get_contents ( $url, false, $context );
-			
-			$url = 'https://localhost:4985/openmoney_shadow/_session';
-			// $url = 'https://localhost:4985/todos/_session';
-			$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
-			$json = json_encode ( $data );
-			$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-			$context = stream_context_create ( $options );
-			$default_context = stream_context_set_default ( $options );
-			
-			$result = file_get_contents ( $url, false, $context );
-		}
-	
 		
+		$result = file_get_contents ( $url, false, $context );
 
-		
 		$json = json_decode ( $result, true );
 		
 		if (isset ( $json ['session_id'] )) {
