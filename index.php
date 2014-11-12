@@ -135,7 +135,7 @@ $app->post ( '/login', function () use($app) {
 		if (isset ( $json ['session_id'] )) {
 			
 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
-			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => $user ['username'], 'email' => $email, 'user_update_code' => $response_code);
+			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => $user ['username'], 'email' => $email);
 
 			echo json_encode ( $result );
 			$app->stop ();
