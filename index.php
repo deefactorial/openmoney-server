@@ -90,7 +90,7 @@ $app->post ( '/login', function () use($app) {
 			
 		$result = file_get_contents ( $url, false, $context );
 			
-		$json = json_decode ( $result, true );
+
 			
 		$response_code = get_http_response_code ( $url );
 		if ($response_code == 404) {
@@ -103,9 +103,11 @@ $app->post ( '/login', function () use($app) {
 				
 			$result = file_get_contents ( $url, false, $context );
 		} else {
+			$json = json_decode ( $result, true );
 			
-			if ($json['password'] != $password) {
+			if ((isset($json['password']) && $json['password'] != $password) || !isset($json['password'])) {
 				//update data
+				$json['name'] = $user['username'];
 				$json['password'] = $password;
 				$json = json_encode ( $json );
 				$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
