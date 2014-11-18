@@ -35,7 +35,11 @@ $currency_lookup_function = 'function(doc,meta){if(doc.type==\"currency\"&&doc.c
 
 $currency_function_name = "currency";
 
-$designDoc = '{"views":{"' . $trading_name_journal_function_name . '":{"map":"' . $tradingNameJournal_lookup_function . '"},"' . $trading_name_function_name . '":{"map":"' . $tradingName_lookup_function . '"},"' . $profile_function_name . '":{"map":"' . $profile_lookup_function . '"},"' . $total_profile_function_name . '":{"map":"' . $total_profile_lookup_function . '"},"' . $space_function_name . '":{"map":"' . $space_lookup_function . '"},"' . $currency_function_name . '":{"map":"' . $currency_lookup_function . '"}}}';
+$beamtag_lookup_function = 'function(doc,meta){if(doc.type==\"beamtag\"&&doc.expires){emit({"username":doc.username,"hashTag":doc.hashTag},doc.expires);}';
+
+$beamtag_function_name = "beamtag";
+
+$designDoc = '{"views":{"' . $trading_name_journal_function_name . '":{"map":"' . $tradingNameJournal_lookup_function . '"},"' . $trading_name_function_name . '":{"map":"' . $tradingName_lookup_function . '"},"' . $profile_function_name . '":{"map":"' . $profile_lookup_function . '"},"' . $total_profile_function_name . '":{"map":"' . $total_profile_lookup_function . '"},"' . $space_function_name . '":{"map":"' . $space_lookup_function . '"},"' . $currency_function_name . '":{"map":"' . $currency_lookup_function . '"},"' . $beamtag_function_name . '":{"map":"' . $beamtag_lookup_function . '"}}}';
 	
 // echo $designDoc;
 $design_doc_name = "dev_changes";
@@ -616,7 +620,7 @@ $options = array ();
 $profiles = $cb->view( $design_doc_name, $total_profile_function_name, $options );
 foreach ( $profiles ['rows'] as $profile ) {
 	
-	$profile_array = json_decode(  $cb->get ( "profile," . $profile ['username'] ) , true );
+	$profile_array = json_decode(  $cb->get ( "profile," . $profile ['key'] ) , true );
 	
 	$duplicate_array = array();
 	
@@ -641,5 +645,21 @@ foreach ( $profiles ['rows'] as $profile ) {
 	}
 	
 }
+
+
+//beamtag lookup
+$options = array ();
+$beamtags = $cb->view( $design_doc_name, $beamtag_function_name, $options );
+foreach ( $beamtags ['rows'] as $beamtag ) {
+
+	if (strtotime($beamtag['value']) < strtotime("-1 day")) {
+		echo "delete beamtag," . $beamtag['key']['username'] . "," . $beamtag['key']['hashTag'] . " because " + $beamtag['value'] + " is greater than a day\n";
+		//$beamtag_array = json_decode(  $cb->get ( "beamtag," . $beamtag['key']['username'] . "," . $beamtag['key']['hashTag'] ) , true );
+		//$beamtag_array['_deleted'] = true;
+		//$cb->set ( "beamtag," . $beamtag['key']['username'] . "," . $beamtag['key']['hashTag'], json_encode ( $beamtag_array ) );
+	}
+	
+}
+
 
 ?>
