@@ -616,6 +616,8 @@ foreach ( $spaces ['rows'] as $space ) {
 	}
 }
 
+
+
 $options = array ();
 $profiles = $cb->view( $design_doc_name, $total_profile_function_name, $options );
 foreach ( $profiles ['rows'] as $profile ) {
@@ -655,11 +657,12 @@ foreach ( $profiles ['rows'] as $profile ) {
 		$timezone_name = timezone_name_from_abbr(null, $profile_array['offset'] * 60, true);
 		date_default_timezone_set($timezone_name);
 		
+		echo "current time is:" . date("G:i");
 		//if this is the minute
 		//this works because this script will once run every minute.
 		if (date("G:i") == $profile_array['digesttime']) {
 			//now is time to run the email digest.
-			echo "Run email digest for " + $profile_array['email'] + "\n";
+			echo "Run email digest for " . $profile_array['email'] . "\n";
 		}
 		
 		//set timezone back to zero
