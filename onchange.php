@@ -35,7 +35,7 @@ $currency_lookup_function = 'function(doc,meta){if(doc.type==\"currency\"&&doc.c
 
 $currency_function_name = "currency";
 
-$beamtag_lookup_function = 'function(doc,meta){if(doc.type==\"beamtag\"&&doc.expires){emit({"username":doc.username,"hashTag":doc.hashTag},doc.expires);}';
+$beamtag_lookup_function = 'function(doc,meta){if(doc.type==\"beamtag\"&&doc.expires){emit({"username":doc.username,"hashTag":doc.hashTag},doc.expires);}}';
 
 $beamtag_function_name = "beamtag";
 
