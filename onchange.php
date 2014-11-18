@@ -622,6 +622,8 @@ foreach ( $profiles ['rows'] as $profile ) {
 	
 	$profile_array = json_decode(  $cb->get ( "profile," . $profile ['key'] ) , true );
 	
+	$destroyed = false;
+	
 	$duplicate_array = array();
 	
 	$options = array ();
@@ -640,8 +642,28 @@ foreach ( $profiles ['rows'] as $profile ) {
 				$profile_array['email'] = '';
 				$profile_array['email_error'] = 'This email is already being used on another profile. Please update your profile with another email.';
 				$cb->set ( "profile," . $profile_array['username'], json_encode ( $profile_array ) );
+				$destroyed = true;
 			}
 		}
+	}
+	
+	//email digest
+	if (!$destroyed && $profile_array['digest']) {
+		//check if it's time to send the digest
+		
+		//set time zone to local time zone.
+		$timezone_name = timezone_name_from_abbr(null, $profile_array['offset'] * 60, true);
+		date_default_timezone_set($timezone_name);
+		
+		//if this is the minute
+		//this works because this script will once run every minute.
+		if (date("G:i") == $profile_array['digesttime']) {
+			//now is time to run the email digest.
+			echo "Run email digest for " + $profile_array['email'] + "\n";
+		}
+		
+		//set timezone back to zero
+		date_default_timezone_set("UTC");
 	}
 	
 }
@@ -667,6 +689,9 @@ foreach ( $beamtags ['rows'] as $beamtag ) {
 	}
 	
 }
+
+
+
 
 
 ?>
