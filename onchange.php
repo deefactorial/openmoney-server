@@ -648,7 +648,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 	}
 	
 	//email digest
-	if (!$destroyed && $profile_array['digest']) {
+	if (!$destroyed && isset($profile_array['digest']) && $profile_array['digest']) {
 		//check if it's time to send the digest
 		
 		//set time zone to local time zone.
