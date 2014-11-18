@@ -653,10 +653,17 @@ $beamtags = $cb->view( $design_doc_name, $beamtag_function_name, $options );
 foreach ( $beamtags ['rows'] as $beamtag ) {
 
 	if (strtotime($beamtag['value']) < strtotime("-1 day")) {
-		echo "delete beamtag," . $beamtag['key']['username'] . "," . $beamtag['key']['hashTag'] . " because " . $beamtag['value'] . " is greater than a day\n";
-		//$beamtag_array = json_decode(  $cb->get ( "beamtag," . $beamtag['key']['username'] . "," . $beamtag['key']['hashTag'] ) , true );
-		//$beamtag_array['_deleted'] = true;
-		//$cb->set ( "beamtag," . $beamtag['key']['username'] . "," . $beamtag['key']['hashTag'], json_encode ( $beamtag_array ) );
+
+		$beamtag_array = json_decode(  $cb->get ( "beamtag," . $beamtag['key']['username'] . "," . $beamtag['key']['hashTag'] ) , true );
+		if (isset($beamtag_array['_deleted']) && $beamtag_array['_deleted'] == true) {
+			//do nothing
+		} else {
+			if (isset($beamtag_array['username'])) {
+				echo "delete beamtag," . $beamtag['key']['username'] . "," . $beamtag['key']['hashTag'] . " because " . $beamtag['value'] . " is greater than a day\n";
+				$beamtag_array['_deleted'] = true;
+				$cb->set ( "beamtag," . $beamtag['key']['username'] . "," . $beamtag['key']['hashTag'], json_encode ( $beamtag_array ) );
+			}
+		}
 	}
 	
 }
