@@ -328,17 +328,19 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 				$options = array('startkey' => $steward, 'endkey' => $steward . '\uefff');
 				$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
 				foreach ( $profiles ['rows'] as $profile ) {
+					$profile_array = json_decode($Cb->get("profile,".$profile['key']),true);
+					
 					//print_r ($profiles);
 					//echo "email:" . $profile ['value'] . "\n";
 					if (isset( $profile ['value'] ) ) {
-						if($trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
+						if( (!isset($profile_array['digest']) || $profile_array['digest'] === false) && $trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
 							if( email_letter($profile['value'], $CFG->system_email, 'New Payment', $message) ) {
 								echo str_replace("<br/>","\n",$message);
 								$trading_name_journal['from_emailed'] = true;
 									
 								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 							}
-						} else if ($trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
+						} else if ((!isset($profile_array['digest']) || $profile_array['digest'] === false) && $trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
 							if( email_letter($profile['value'], $CFG->system_email, 'New Payment', $message) ) {
 								echo str_replace("<br/>","\n",$message);
 								$trading_name_journal['to_emailed'] = true;
@@ -684,6 +686,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 			$options = array('startkey' => $profile_array['username'], 'endkey' => $profile_array['username'] . '\uefff');
 			$tradingname_result = $cb->view ( $design_doc_name, $stewardsTrading_name_function_name, $options );
 			foreach ( $tradingname_result ['rows'] as $trading_name ) {
+				
 				$ismessage = false;
 				$message = "<h1>Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "</h1><br/>".
 						   "<table style='border:0;'><tr><td>TIMESTAMP</td><td>FROM</td><td>TO</td><td>DESCRIPTION</td><td>AMOUNT</td><td>CURRENCY</td></tr>";
@@ -693,6 +696,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 				// do trading name journal lookup
 				$tradingnamejournal_result = $cb->view ( $design_doc_name, $trading_name_journal_function_name, $options );
 				foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
+					$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
 					$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
 					if($lastRun < $trading_name_journal['timestamp']) {
 						$ismessage = true;
@@ -707,6 +711,21 @@ foreach ( $profiles ['rows'] as $profile ) {
 						$message .= 
 						"</td><td>" . $trading_name_journal['amount'] . "</td>".
 						"<td>" . $trading_name_journal['currency'] ."</td></tr>";
+						//$trading_name['']
+						
+						if($trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
+							
+							$trading_name_journal['from_emailed'] = true;
+								
+							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+						
+						} else if ( $trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
+							
+							$trading_name_journal['to_emailed'] = true;
+								
+							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+						
+						}
 					}
 				}
 				$message .= "</table>";
