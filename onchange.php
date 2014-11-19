@@ -729,6 +729,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 			foreach ( $tradingname_result ['rows'] as $trading_name ) {
 				
 				$total_amount = 0;
+				echo "Check Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "\n";
 				$currency = $trading_name['value']['currency'] ;
 				$ismessage = false;
 				$message = "<h1>Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "</h1><br/>".
