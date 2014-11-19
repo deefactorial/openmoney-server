@@ -710,7 +710,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 		//this works because this script will once run every minute.
 		if (date("G:i") == $profile_array['digesttime']) {
 			//now is time to run the email digest.
-			echo "Run email digest for " . $profile_array['email'] . "\n";
+			echo "Run email digest for " . $profile_array['username'] . "\n";
 			$lastRun = strtotime("-1day");
 			if(isset($profile_array['digest_timestamp'])){
 				if($lastRun < $profile_array['digest_timestamp']){
@@ -728,15 +728,16 @@ foreach ( $profiles ['rows'] as $profile ) {
 			$tradingname_result = $cb->view ( $design_doc_name, $stewardsTrading_name_function_name, $options );
 			foreach ( $tradingname_result ['rows'] as $trading_name ) {
 				
+				$trading_name = json_decode($trading_name['value'], true);
 				$total_amount = 0;
-				echo "Check Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "\n";
-				$currency = $trading_name['value']['currency'] ;
+				echo "Check Trading Name:" . $trading_name['trading_name'] . " " . $trading_name['currency'] . "\n";
+				$currency = $trading_name['currency'] ;
 				$ismessage = false;
-				$message = "<h1>Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "</h1><br/>".
+				$message = "<h1>Trading Name:" . $trading_name['trading_name'] . " " . $trading_name['currency'] . "</h1><br/>".
 						   "<table style='border:0;'><tr><td>TIMESTAMP</td><td>FROM</td><td>TO</td><td>DESCRIPTION</td><td>AMOUNT</td><td>CURRENCY</td></tr>";
 				//get all transactions by this trading name within the last 24hrs or the last time this was run.
-				$options = array('startkey' => "trading_name,".$trading_name['value']['trading_name'].",".$trading_name['value']['currency'], 
-						          'endkey' => "trading_name,".$trading_name['value']['trading_name'].",".$trading_name['value']['currency'] . '\uefff');
+				$options = array('startkey' => "trading_name,".$trading_name['trading_name'].",".$trading_name['currency'], 
+						          'endkey' => "trading_name,".$trading_name['trading_name'].",".$trading_name['currency'] . '\uefff');
 				// do trading name journal lookup
 				$tradingnamejournal_result = $cb->view ( $design_doc_name, $trading_name_journal_function_name, $options );
 				foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
