@@ -711,7 +711,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 		if (date("G:i") == $profile_array['digesttime']) {
 			//now is time to run the email digest.
 			echo "Run email digest for " . $profile_array['username'] . "\n";
-			$lastRun = strtotime("-1day");
+			$lastRun = strtotime("-1 day");
 			if(isset($profile_array['digest_timestamp'])){
 				if($lastRun < $profile_array['digest_timestamp']){
 					$lastRun = $profile_array['digest_timestamp'];
@@ -779,7 +779,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 							}
 						}
 					}
-					$message .= "<tr><td></td><td></td><td></td><td></td><td></td><td>" . $total_amount . "</td><td>" . $currency . "</td></tr></table>";
+					$message .= "<tr><td></td><td></td><td></td><td></td><td>" . $total_amount . "</td><td>" . $currency . "</td></tr></table>";
 					if ($ismessage) {
 						$master_message .= $message;
 					}
