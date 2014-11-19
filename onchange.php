@@ -788,7 +788,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 			
 			if ($isemail) {
 				if( email_letter($profile_array ['email'], $CFG->system_email, 'Payment Digest', $master_message) ) {
-					echo str_replace("<br/>","\n",$master_message);
+					echo str_replace("<br/>","\n",$master_message) . "\n";
 					
 				}
 			} else {
