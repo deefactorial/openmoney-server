@@ -659,10 +659,16 @@ foreach ( $profiles ['rows'] as $profile ) {
 	if (!$destroyed && isset($profile_array['digest']) && $profile_array['digest']) {
 		//check if it's time to send the digest
 		
-		//set time zone to local time zone.
-		$timezone_name = timezone_name_from_abbr(null, $profile_array['offset'] * -60, false);
-		echo "current time zone " . $timezone_name . "\n";
-		date_default_timezone_set($timezone_name);
+		if(isset($profile_array['offset'])) {
+			//set time zone to local time zone.
+			$timezone_name = timezone_name_from_abbr(null, $profile_array['offset'] * -60, false);
+			echo "current time zone " . $timezone_name . "\n";
+			$profile_array['timezone'] = $timezone_name;
+			unxet($profile_array['offset']);
+			$cb->set ( "profile," . $profile_array['username'], json_encode ( $profile_array ) );
+		}
+		
+		date_default_timezone_set($profile_array['timezone']);
 		
 		echo "current time is " . date("G:i") . " run time is " . $profile_array['digesttime'] . "\n";
 		//if this is the minute
