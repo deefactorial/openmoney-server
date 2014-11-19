@@ -687,6 +687,8 @@ foreach ( $profiles ['rows'] as $profile ) {
 			$tradingname_result = $cb->view ( $design_doc_name, $stewardsTrading_name_function_name, $options );
 			foreach ( $tradingname_result ['rows'] as $trading_name ) {
 				
+				$total_amount = 0;
+				$currency = $trading_name['value']['currency'] ;
 				$ismessage = false;
 				$message = "<h1>Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "</h1><br/>".
 						   "<table style='border:0;'><tr><td>TIMESTAMP</td><td>FROM</td><td>TO</td><td>DESCRIPTION</td><td>AMOUNT</td><td>CURRENCY</td></tr>";
@@ -699,6 +701,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 					$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
 					$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
 					if($lastRun < $trading_name_journal['timestamp']) {
+						$total_amount += $trading_name_journal['amount'];
 						$ismessage = true;
 						$isemail = true;
 						//report on it.
@@ -728,7 +731,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 						}
 					}
 				}
-				$message .= "</table>";
+				$message .= "<tr><td></td><td></td><td></td><td></td><td></td><td>" . $total_amount . "</td><td>" . $currency . "</td></tr></table>";
 				if ($ismessage) {
 					$master_message .= $message;
 				}
@@ -739,6 +742,8 @@ foreach ( $profiles ['rows'] as $profile ) {
 					echo str_replace("<br/>","\n",$master_message);
 					
 				}
+			} else {
+				echo "No messages for this digest.\n";
 			}
 		}
 		

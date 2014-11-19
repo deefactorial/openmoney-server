@@ -31,3 +31,5 @@ from device to device. remote db connection can be made
 through the internet if an untrusted network can negoticate 
 public private RSA key authentication and authroization.
 
+
+
