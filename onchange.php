@@ -303,56 +303,86 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 			"<br/>Thank you,<br/>openmoney<br/>";
 				
 			
-			
+			$profile_array = json_decode($cb->get("profile,".$steward),true);
 			//check if username is email
-			if( strpos($steward,"@") !== false ) {
-					
-				if($trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
-					if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
-						echo str_replace("<br/>","\n",$message);
-						$trading_name_journal['from_emailed'] = true;
-						
-						$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
-					}
-				} else if ($trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
-					if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
-						echo str_replace("<br/>","\n",$message);
-						$trading_name_journal['to_emailed'] = true;
-						
-						$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
-					}
-				}
+			if (isset($profile_array['notification']) &&  $profile_array['notification']) {
 				
-			} else {
-				//username not an email check if they have a profile with an email.
-				$options = array('startkey' => $steward, 'endkey' => $steward . '\uefff');
-				$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
-				foreach ( $profiles ['rows'] as $profile ) {
-					$profile_array = json_decode($cb->get("profile,".$profile['key']),true);
+				if (isset($profile_array['email'])) {
+					if(isset($profile_array['offset'])) {
+						//set time zone to local time zone.
+						$timezone_name = timezone_name_from_abbr(null, $profile_array['offset'] * -60, false);
+						echo "current time zone " . $timezone_name . "\n";
+						$profile_array['timezone'] = $timezone_name;
+						unset($profile_array['offset']);
+						$cb->set ( "profile," . $profile_array['username'], json_encode ( $profile_array ) );
+					}
+					date_default_timezone_set($profile_array['timezone']);
 					
-					//print_r ($profiles);
-					//echo "email:" . $profile ['value'] . "\n";
-					if (isset( $profile ['value'] ) ) {
-						if( (!isset($profile_array['digest']) || $profile_array['digest'] === false) && $trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
-							if( email_letter($profile['value'], $CFG->system_email, 'New Payment', $message) ) {
-								echo str_replace("<br/>","\n",$message);
-								$trading_name_journal['from_emailed'] = true;
-									
-								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
-							}
-						} else if ((!isset($profile_array['digest']) || $profile_array['digest'] === false) && $trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
-							if( email_letter($profile['value'], $CFG->system_email, 'New Payment', $message) ) {
-								echo str_replace("<br/>","\n",$message);
-								$trading_name_journal['to_emailed'] = true;
-									
-								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
-							}
+					if( (!isset($profile_array['digest']) || $profile_array['digest'] === false) && $trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
+						if( email_letter($profile['email'], $CFG->system_email, 'New Payment', $message) ) {
+							echo str_replace("<br/>","\n",$message);
+							$trading_name_journal['from_emailed'] = true;
+								
+							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 						}
-					} else {
-						echo "profile email is not set";
+					} else if ((!isset($profile_array['digest']) || $profile_array['digest'] === false) && $trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
+						if( email_letter($profile['email'], $CFG->system_email, 'New Payment', $message) ) {
+							echo str_replace("<br/>","\n",$message);
+							$trading_name_journal['to_emailed'] = true;
+								
+							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+						}
 					}
 				}
 			}
+// 			if( strpos($steward,"@") !== false ) {
+					
+// 				if($trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
+// 					if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
+// 						echo str_replace("<br/>","\n",$message);
+// 						$trading_name_journal['from_emailed'] = true;
+						
+// 						$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+// 					}
+// 				} else if ($trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
+// 					if( email_letter($steward, $CFG->system_email, 'New Payment', $message) ) {
+// 						echo str_replace("<br/>","\n",$message);
+// 						$trading_name_journal['to_emailed'] = true;
+						
+// 						$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+// 					}
+// 				}
+				
+// 			} else {
+// 				//username not an email check if they have a profile with an email.
+// 				$options = array('startkey' => $steward, 'endkey' => $steward . '\uefff');
+// 				$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
+// 				foreach ( $profiles ['rows'] as $profile ) {
+// 					$profile_array = json_decode($cb->get("profile,".$profile['key']),true);
+					
+// 					//print_r ($profiles);
+// 					//echo "email:" . $profile ['value'] . "\n";
+// 					if (isset( $profile ['value'] ) ) {
+// 						if( (!isset($profile_array['digest']) || $profile_array['digest'] === false) && $trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
+// 							if( email_letter($profile['value'], $CFG->system_email, 'New Payment', $message) ) {
+// 								echo str_replace("<br/>","\n",$message);
+// 								$trading_name_journal['from_emailed'] = true;
+									
+// 								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+// 							}
+// 						} else if ((!isset($profile_array['digest']) || $profile_array['digest'] === false) && $trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
+// 							if( email_letter($profile['value'], $CFG->system_email, 'New Payment', $message) ) {
+// 								echo str_replace("<br/>","\n",$message);
+// 								$trading_name_journal['to_emailed'] = true;
+									
+// 								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+// 							}
+// 						}
+// 					} else {
+// 						echo "profile email is not set";
+// 					}
+// 				}
+// 			}
 		} 
 	}
 }
