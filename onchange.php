@@ -729,7 +729,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 			$tradingname_result = $cb->view ( $design_doc_name, $stewardsTrading_name_function_name, $options );
 			//print_r( $tradingname_result );
 			foreach ( $tradingname_result ['rows'] as $trading_name ) {
-				echo "key:" . $trading_name['key'][0] . " evals " . $trading_name['key'][0] == $profile_array['username'] . "\n";
+				//echo "key:" . $trading_name['key'][0] . " evals " . $trading_name['key'][0] == $profile_array['username'] . "\n";
 				if ($trading_name['key'][0] == $profile_array['username']) {
 					
 					//$trading_name = json_decode($trading_name['value'], true);
@@ -747,7 +747,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 					foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 						$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
 						$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
-						echo "lastrun " . $lastRun . " journal " . $trading_name_journal['timestamp'] . "\n";
+						echo "lastrun " . ($lastRun * 1000). " < journal " . $trading_name_journal['timestamp'] . "\n";
 						if(($lastRun * 1000) < $trading_name_journal['timestamp']) {
 							$total_amount += $trading_name_journal['amount'];
 							$ismessage = true;
