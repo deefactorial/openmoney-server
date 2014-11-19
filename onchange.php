@@ -731,16 +731,16 @@ foreach ( $profiles ['rows'] as $profile ) {
 			foreach ( $tradingname_result ['rows'] as $trading_name ) {
 				if ($trading_name['key'] == $profile_array['username']) {
 					
-					$trading_name = json_decode($trading_name['value'], true);
+					//$trading_name = json_decode($trading_name['value'], true);
 					$total_amount = 0;
-					echo "Check Trading Name:" . $trading_name['trading_name'] . " " . $trading_name['currency'] . "\n";
-					$currency = $trading_name['currency'] ;
+					echo "Check Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "\n";
+					$currency = $trading_name['value']['currency'] ;
 					$ismessage = false;
-					$message = "<h1>Trading Name:" . $trading_name['trading_name'] . " " . $trading_name['currency'] . "</h1><br/>".
+					$message = "<h1>Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "</h1><br/>".
 							   "<table style='border:0;'><tr><td>TIMESTAMP</td><td>FROM</td><td>TO</td><td>DESCRIPTION</td><td>AMOUNT</td><td>CURRENCY</td></tr>";
 					//get all transactions by this trading name within the last 24hrs or the last time this was run.
-					$options = array('startkey' => "trading_name,".$trading_name['trading_name'].",".$trading_name['currency'], 
-							          'endkey' => "trading_name,".$trading_name['trading_name'].",".$trading_name['currency'] . '\uefff');
+					$options = array('startkey' => "trading_name,".$trading_name['value']['trading_name'].",".$trading_name['value']['currency'], 
+							          'endkey' => "trading_name,".$trading_name['value']['trading_name'].",".$trading_name['value']['currency'] . '\uefff');
 					// do trading name journal lookup
 					$tradingnamejournal_result = $cb->view ( $design_doc_name, $trading_name_journal_function_name, $options );
 					foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
