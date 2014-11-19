@@ -305,7 +305,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 			
 			$profile_array = json_decode($cb->get("profile,".$steward),true);
 			//check if username is email
-			if (isset($profile_array['notification']) &&  $profile_array['notification']) {
+			if (isset($profile_array['notification']) && $profile_array['notification']) {
 				
 				if (isset($profile_array['email'])) {
 					if(isset($profile_array['offset'])) {
@@ -316,23 +316,27 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 						unset($profile_array['offset']);
 						$cb->set ( "profile," . $profile_array['username'], json_encode ( $profile_array ) );
 					}
-					date_default_timezone_set($profile_array['timezone']);
+					if(isset($profile_array['timezone'])) {
+						date_default_timezone_set($profile_array['timezone']);
+					}
 					
 					if( (!isset($profile_array['digest']) || $profile_array['digest'] === false) && $trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
-						if( email_letter($profile['email'], $CFG->system_email, 'New Payment', $message) ) {
+						if( email_letter($profile_array['email'], $CFG->system_email, 'New Payment', $message) ) {
 							echo str_replace("<br/>","\n",$message);
 							$trading_name_journal['from_emailed'] = true;
 								
 							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 						}
 					} else if ((!isset($profile_array['digest']) || $profile_array['digest'] === false) && $trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
-						if( email_letter($profile['email'], $CFG->system_email, 'New Payment', $message) ) {
+						if( email_letter($profile_array['email'], $CFG->system_email, 'New Payment', $message) ) {
 							echo str_replace("<br/>","\n",$message);
 							$trading_name_journal['to_emailed'] = true;
 								
 							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 						}
 					}
+					
+					date_default_timezone_set("UTC");
 				}
 			}
 // 			if( strpos($steward,"@") !== false ) {
