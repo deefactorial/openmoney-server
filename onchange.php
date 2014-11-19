@@ -335,8 +335,9 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 						}
 					}
-					
-					date_default_timezone_set("UTC");
+					if(isset($profile_array['timezone'])) {
+						date_default_timezone_set("UTC");
+					}
 				}
 			}
 // 			if( strpos($steward,"@") !== false ) {
@@ -740,7 +741,8 @@ foreach ( $profiles ['rows'] as $profile ) {
 				foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 					$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
 					$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
-					if($lastRun < $trading_name_journal['timestamp']) {
+					echo "lastrun " . $lastRun . " journal " . $trading_name_journal['timestamp'] . "\n";
+					if(($lastRun * 1000) < $trading_name_journal['timestamp']) {
 						$total_amount += $trading_name_journal['amount'];
 						$ismessage = true;
 						$isemail = true;
