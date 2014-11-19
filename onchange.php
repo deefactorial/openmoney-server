@@ -726,7 +726,9 @@ foreach ( $profiles ['rows'] as $profile ) {
 			// do trading name lookup for this user.
 			$options = array('startkey' => $profile_array['username'], 'endkey' => $profile_array['username'] . '\uefff');
 			$tradingname_result = $cb->view ( $design_doc_name, $stewardsTrading_name_function_name, $options );
+			print_r( $tradingname_result );
 			foreach ( $tradingname_result ['rows'] as $trading_name ) {
+				
 				
 				$trading_name = json_decode($trading_name['value'], true);
 				$total_amount = 0;
