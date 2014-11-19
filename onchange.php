@@ -724,7 +724,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 			$isemail = false;
 			
 			// do trading name lookup for this user.
-			$options = array('startkey' => $profile_array['username'], 'endkey' => $profile_array['username'] . '\uefff');
+			$options = array('startkey' => urlencode($profile_array['username']), 'endkey' => urlencode($profile_array['username']) . '\uefff');
 			$tradingname_result = $cb->view ( $design_doc_name, $stewardsTrading_name_function_name, $options );
 			print_r( $tradingname_result );
 			foreach ( $tradingname_result ['rows'] as $trading_name ) {
