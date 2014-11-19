@@ -11,13 +11,17 @@ function email_letter($to, $from, $subject = 'no subject', $msg = 'no msg') {
 
 $cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 
-$tradingNameJournal_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name_journal\"&&doc.from&&doc.to&&doc.currency&&!doc.to_emailed){emit(\"trading_name,\"+doc.to+\",\" +doc.currency,doc.to+\"_\"+doc.currency);}if(doc.type==\"trading_name_journal\"&&doc.from&&doc.to&&doc.currency&&!doc.from_emailed){emit(\"trading_name,\"+doc.from+\",\"+doc.currency,doc.from+\"_\"+doc.currency);}}';
+$tradingNameJournal_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name_journal\"&&doc.from&&doc.to&&doc.currency&&(!doc.to_emailed||!doc.from_emailed)){emit(\"trading_name,\"+doc.to+\",\" +doc.currency,doc.to+\"_\"+doc.currency);}if(doc.type==\"trading_name_journal\"&&doc.from&&doc.to&&doc.currency&&!doc.from_emailed){emit(\"trading_name,\"+doc.from+\",\"+doc.currency,doc.from+\"_\"+doc.currency);}}';
 
 $trading_name_journal_function_name = "tradingnamejournal";
 
 $tradingName_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name\"&&doc.name&&doc.currency&&doc.steward){emit(doc.name,doc.currency);}}';
 
 $trading_name_function_name = "tradingname";
+
+$stewardsTradingName_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name\"&&doc.name&&doc.currency&&doc.steward){emit(doc.steward,{\"trading_name\":doc.name,\"currency\":doc.currency});}}';
+
+$stewardsTrading_name_function_name = "stewardstradingname";
 
 $profile_lookup_function = 'function(doc,meta){if(doc.type==\"profile\"&&doc.username&&doc.email&&doc.notification){if(doc.notification){emit(doc.username,doc.email);}}}';
 
@@ -39,7 +43,7 @@ $beamtag_lookup_function = 'function(doc,meta){if(doc.type==\"beamtag\"&&doc.exp
 
 $beamtag_function_name = "beamtag";
 
-$designDoc = '{"views":{"' . $trading_name_journal_function_name . '":{"map":"' . $tradingNameJournal_lookup_function . '"},"' . $trading_name_function_name . '":{"map":"' . $tradingName_lookup_function . '"},"' . $profile_function_name . '":{"map":"' . $profile_lookup_function . '"},"' . $total_profile_function_name . '":{"map":"' . $total_profile_lookup_function . '"},"' . $space_function_name . '":{"map":"' . $space_lookup_function . '"},"' . $currency_function_name . '":{"map":"' . $currency_lookup_function . '"},"' . $beamtag_function_name . '":{"map":"' . $beamtag_lookup_function . '"}}}';
+$designDoc = '{"views":{"' . $trading_name_journal_function_name . '":{"map":"' . $tradingNameJournal_lookup_function . '"},"' . $trading_name_function_name . '":{"map":"' . $tradingName_lookup_function . '"},"' . $stewardsTrading_name_function_name . '":{"map":"' . $stewardsTradingName_lookup_function . '"},"' . $profile_function_name . '":{"map":"' . $profile_lookup_function . '"},"' . $total_profile_function_name . '":{"map":"' . $total_profile_lookup_function . '"},"' . $space_function_name . '":{"map":"' . $space_lookup_function . '"},"' . $currency_function_name . '":{"map":"' . $currency_lookup_function . '"},"' . $beamtag_function_name . '":{"map":"' . $beamtag_lookup_function . '"}}}';
 	
 // echo $designDoc;
 $design_doc_name = "dev_changes";
@@ -664,6 +668,59 @@ foreach ( $profiles ['rows'] as $profile ) {
 		if (date("G:i") == $profile_array['digesttime']) {
 			//now is time to run the email digest.
 			echo "Run email digest for " . $profile_array['email'] . "\n";
+			$lastRun = strtotime("-1day");
+			if(isset($profile_array['digest_timestamp'])){
+				if($lastRun < $profile_array['digest_timestamp']){
+					$lastRun = $profile_array['digest_timestamp'];
+				}
+			}
+			
+			$profile_array['digest_timestamp'] = time();
+			
+			$master_message = " Email Digest for " . date( DATE_RFC2822 ) . " <br/>";
+			$isemail = false;
+			
+			// do trading name lookup for this user.
+			$options = array('startkey' => $profile_array['username'], 'endkey' => $profile_array['username'] . '\uefff');
+			$tradingname_result = $cb->view ( $design_doc_name, $stewardsTrading_name_function_name, $options );
+			foreach ( $tradingname_result ['rows'] as $trading_name ) {
+				$ismessage = false;
+				$message = "<h1>Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "</h1><br/>".
+						   "<table style='border:0;'><tr><td>TIMESTAMP</td><td>FROM</td><td>TO</td><td>DESCRIPTION</td><td>AMOUNT</td><td>CURRENCY</td></tr>";
+				//get all transactions by this trading name within the last 24hrs or the last time this was run.
+				$options = array('startkey' => "trading_name,".$trading_name['value']['trading_name'].",".$trading_name['value']['currency'], 
+						          'endkey' => "trading_name,".$trading_name['value']['trading_name'].",".$trading_name['value']['currency'] . '\uefff');
+				// do trading name journal lookup
+				$tradingnamejournal_result = $cb->view ( $design_doc_name, $trading_name_journal_function_name, $options );
+				foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
+					$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
+					if($lastRun < $trading_name_journal['timestamp']) {
+						$ismessage = true;
+						$isemail = true;
+						//report on it.
+						$message .=
+						"<tr><td>" . date( DATE_RFC2822, intval( round( $trading_name_journal['timestamp'] / 1000 ) ) ) . "</td>" .
+						"<td>" . $trading_name_journal['from'] . "</td>".
+						"<td>" . $trading_name_journal['to'] . "</td>" .
+						"<td>";
+						isset($trading_name_journal['description']) ? $message .= $trading_name_journal['description'] : $message .= '';
+						$message .= 
+						"</td><td>" . $trading_name_journal['amount'] . "</td>".
+						"<td>" . $trading_name_journal['currency'] ."</td></tr>";
+					}
+				}
+				$message .= "</table>";
+				if ($ismessage) {
+					$master_message .= $message;
+				}
+			}
+			
+			if ($isemail) {
+				if( email_letter($profile_array ['email'], $CFG->system_email, 'Payment Digest', $master_message) ) {
+					echo str_replace("<br/>","\n",$master_message);
+					
+				}
+			}
 		}
 		
 		//set timezone back to zero
