@@ -718,7 +718,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 				}
 			}
 			
-			$profile_array['digest_timestamp'] = time();
+			
 			
 			$master_message = " Email Digest for " . date( DATE_RFC2822 ) . " <br/>";
 			$isemail = false;
@@ -789,7 +789,8 @@ foreach ( $profiles ['rows'] as $profile ) {
 			if ($isemail) {
 				if( email_letter($profile_array ['email'], $CFG->system_email, 'Payment Digest', $master_message) ) {
 					echo str_replace("<br/>","\n",$master_message) . "\n";
-					
+					$profile_array['digest_timestamp'] = time();
+					$cb->set ( "profile," . $profile_array['username'], json_encode ( $profile_array ) );
 				}
 			} else {
 				echo "No messages for this digest.\n";
