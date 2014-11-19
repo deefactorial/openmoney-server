@@ -664,7 +664,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 			$timezone_name = timezone_name_from_abbr(null, $profile_array['offset'] * -60, false);
 			echo "current time zone " . $timezone_name . "\n";
 			$profile_array['timezone'] = $timezone_name;
-			unxet($profile_array['offset']);
+			unset($profile_array['offset']);
 			$cb->set ( "profile," . $profile_array['username'], json_encode ( $profile_array ) );
 		}
 		
