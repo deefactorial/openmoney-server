@@ -654,7 +654,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 		//check if it's time to send the digest
 		
 		//set time zone to local time zone.
-		$timezone_name = timezone_name_from_abbr(null, $profile_array['offset'] * -60, -1);
+		$timezone_name = timezone_name_from_abbr(null, $profile_array['offset'] * -60, false);
 		echo "current time zone " . $timezone_name . "\n";
 		date_default_timezone_set($timezone_name);
 		
