@@ -328,7 +328,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 				$options = array('startkey' => $steward, 'endkey' => $steward . '\uefff');
 				$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
 				foreach ( $profiles ['rows'] as $profile ) {
-					$profile_array = json_decode($Cb->get("profile,".$profile['key']),true);
+					$profile_array = json_decode($cb->get("profile,".$profile['key']),true);
 					
 					//print_r ($profiles);
 					//echo "email:" . $profile ['value'] . "\n";
