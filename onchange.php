@@ -658,7 +658,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 		echo "current time zone " . $timezone_name . "\n";
 		date_default_timezone_set($timezone_name);
 		
-		echo "current time is " . date("G:i") . "\n";
+		echo "current time is " . date("G:i") . " run time is " . $profile_array['digesttime'] . "\n";
 		//if this is the minute
 		//this works because this script will once run every minute.
 		if (date("G:i") == $profile_array['digesttime']) {
