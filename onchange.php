@@ -786,7 +786,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 							}
 						}
 					}
-					$message .= "<tr><td></td><td></td><td></td><td>TOTAL:</td><td>" . $total_amount . "</td><td>" . $currency . "</td></tr></table>";
+					$message .= "<tr><td></td><td></td><td></td><td>DIGEST TOTAL:</td><td>" . $total_amount . "</td><td>" . $currency . "</td></tr></table>";
 					if ($ismessage) {
 						$master_message .= $message;
 					}
