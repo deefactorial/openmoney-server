@@ -734,7 +734,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 					
 					//$trading_name = json_decode($trading_name['value'], true);
 					$total_amount = 0;
-					echo "Check Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "\n";
+					//echo "Check Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "\n";
 					$currency = $trading_name['value']['currency'] ;
 					$ismessage = false;
 					$message = "<h1>Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "</h1><br/>".
@@ -747,9 +747,15 @@ foreach ( $profiles ['rows'] as $profile ) {
 					foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 						$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
 						$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
-						echo "lastrun " . ($lastRun * 1000). " < journal " . $trading_name_journal['timestamp'] . "\n";
+						//echo "lastrun " . ($lastRun * 1000). " < journal " . $trading_name_journal['timestamp'] . "\n";
 						if(($lastRun * 1000) < $trading_name_journal['timestamp']) {
-							$total_amount += $trading_name_journal['amount'];
+							$isnegative = $trading_name_journal['from'] == $trading_name['name'];
+							if ($isnegative) {
+								$total_amount -= $trading_name_journal['amount'];
+							} else {
+								$total_amount += $trading_name_journal['amount'];
+							}
+							
 							$ismessage = true;
 							$isemail = true;
 							//report on it.
@@ -759,8 +765,15 @@ foreach ( $profiles ['rows'] as $profile ) {
 							"<td>" . $trading_name_journal['to'] . "</td>" .
 							"<td>";
 							isset($trading_name_journal['description']) ? $message .= $trading_name_journal['description'] : $message .= '';
-							$message .= 
-							"</td><td>" . $trading_name_journal['amount'] . "</td>".
+							
+							if ($isnegative) {
+								$message .=
+								"</td><td>-" . $trading_name_journal['amount'] . "</td>";
+							} else {
+								$message .=
+								"</td><td>" . $trading_name_journal['amount'] . "</td>";
+							}
+							$message .=
 							"<td>" . $trading_name_journal['currency'] ."</td></tr>";
 							//$trading_name['']
 							
@@ -779,7 +792,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 							}
 						}
 					}
-					$message .= "<tr><td></td><td></td><td></td><td></td><td>" . $total_amount . "</td><td>" . $currency . "</td></tr></table>";
+					$message .= "<tr><td></td><td></td><td></td><td>TOTAL:</td><td>" . $total_amount . "</td><td>" . $currency . "</td></tr></table>";
 					if ($ismessage) {
 						$master_message .= $message;
 					}
@@ -788,7 +801,8 @@ foreach ( $profiles ['rows'] as $profile ) {
 			
 			if ($isemail) {
 				if( email_letter($profile_array ['email'], $CFG->system_email, 'Payment Digest', $master_message) ) {
-					echo str_replace("<br/>","\n",$master_message) . "\n";
+					//echo str_replace("<br/>","\n",$master_message) . "\n";
+					echo "digest message sent.";
 					$profile_array['digest_timestamp'] = time();
 					$cb->set ( "profile," . $profile_array['username'], json_encode ( $profile_array ) );
 				}
