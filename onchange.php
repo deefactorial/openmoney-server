@@ -727,7 +727,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 			//$options = array('startkey' => urlencode($profile_array['username']), 'endkey' => urlencode($profile_array['username']) . '\uefff');
 			$options = array();
 			$tradingname_result = $cb->view ( $design_doc_name, $stewardsTrading_name_function_name, $options );
-			print_r( $tradingname_result );
+			//print_r( $tradingname_result );
 			foreach ( $tradingname_result ['rows'] as $trading_name ) {
 				if ($trading_name['key'] == $profile_array['username']) {
 					
