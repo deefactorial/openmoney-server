@@ -724,62 +724,64 @@ foreach ( $profiles ['rows'] as $profile ) {
 			$isemail = false;
 			
 			// do trading name lookup for this user.
-			$options = array('startkey' => urlencode($profile_array['username']), 'endkey' => urlencode($profile_array['username']) . '\uefff');
+			//$options = array('startkey' => urlencode($profile_array['username']), 'endkey' => urlencode($profile_array['username']) . '\uefff');
+			$options = array();
 			$tradingname_result = $cb->view ( $design_doc_name, $stewardsTrading_name_function_name, $options );
 			print_r( $tradingname_result );
 			foreach ( $tradingname_result ['rows'] as $trading_name ) {
-				
-				
-				$trading_name = json_decode($trading_name['value'], true);
-				$total_amount = 0;
-				echo "Check Trading Name:" . $trading_name['trading_name'] . " " . $trading_name['currency'] . "\n";
-				$currency = $trading_name['currency'] ;
-				$ismessage = false;
-				$message = "<h1>Trading Name:" . $trading_name['trading_name'] . " " . $trading_name['currency'] . "</h1><br/>".
-						   "<table style='border:0;'><tr><td>TIMESTAMP</td><td>FROM</td><td>TO</td><td>DESCRIPTION</td><td>AMOUNT</td><td>CURRENCY</td></tr>";
-				//get all transactions by this trading name within the last 24hrs or the last time this was run.
-				$options = array('startkey' => "trading_name,".$trading_name['trading_name'].",".$trading_name['currency'], 
-						          'endkey' => "trading_name,".$trading_name['trading_name'].",".$trading_name['currency'] . '\uefff');
-				// do trading name journal lookup
-				$tradingnamejournal_result = $cb->view ( $design_doc_name, $trading_name_journal_function_name, $options );
-				foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
-					$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
-					$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
-					echo "lastrun " . $lastRun . " journal " . $trading_name_journal['timestamp'] . "\n";
-					if(($lastRun * 1000) < $trading_name_journal['timestamp']) {
-						$total_amount += $trading_name_journal['amount'];
-						$ismessage = true;
-						$isemail = true;
-						//report on it.
-						$message .=
-						"<tr><td>" . date( DATE_RFC2822, intval( round( $trading_name_journal['timestamp'] / 1000 ) ) ) . "</td>" .
-						"<td>" . $trading_name_journal['from'] . "</td>".
-						"<td>" . $trading_name_journal['to'] . "</td>" .
-						"<td>";
-						isset($trading_name_journal['description']) ? $message .= $trading_name_journal['description'] : $message .= '';
-						$message .= 
-						"</td><td>" . $trading_name_journal['amount'] . "</td>".
-						"<td>" . $trading_name_journal['currency'] ."</td></tr>";
-						//$trading_name['']
-						
-						if($trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
+				if ($trading_name['key'] == $profile_array['username']) {
+					
+					$trading_name = json_decode($trading_name['value'], true);
+					$total_amount = 0;
+					echo "Check Trading Name:" . $trading_name['trading_name'] . " " . $trading_name['currency'] . "\n";
+					$currency = $trading_name['currency'] ;
+					$ismessage = false;
+					$message = "<h1>Trading Name:" . $trading_name['trading_name'] . " " . $trading_name['currency'] . "</h1><br/>".
+							   "<table style='border:0;'><tr><td>TIMESTAMP</td><td>FROM</td><td>TO</td><td>DESCRIPTION</td><td>AMOUNT</td><td>CURRENCY</td></tr>";
+					//get all transactions by this trading name within the last 24hrs or the last time this was run.
+					$options = array('startkey' => "trading_name,".$trading_name['trading_name'].",".$trading_name['currency'], 
+							          'endkey' => "trading_name,".$trading_name['trading_name'].",".$trading_name['currency'] . '\uefff');
+					// do trading name journal lookup
+					$tradingnamejournal_result = $cb->view ( $design_doc_name, $trading_name_journal_function_name, $options );
+					foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
+						$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
+						$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
+						echo "lastrun " . $lastRun . " journal " . $trading_name_journal['timestamp'] . "\n";
+						if(($lastRun * 1000) < $trading_name_journal['timestamp']) {
+							$total_amount += $trading_name_journal['amount'];
+							$ismessage = true;
+							$isemail = true;
+							//report on it.
+							$message .=
+							"<tr><td>" . date( DATE_RFC2822, intval( round( $trading_name_journal['timestamp'] / 1000 ) ) ) . "</td>" .
+							"<td>" . $trading_name_journal['from'] . "</td>".
+							"<td>" . $trading_name_journal['to'] . "</td>" .
+							"<td>";
+							isset($trading_name_journal['description']) ? $message .= $trading_name_journal['description'] : $message .= '';
+							$message .= 
+							"</td><td>" . $trading_name_journal['amount'] . "</td>".
+							"<td>" . $trading_name_journal['currency'] ."</td></tr>";
+							//$trading_name['']
 							
-							$trading_name_journal['from_emailed'] = true;
+							if($trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
 								
-							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
-						
-						} else if ( $trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
+								$trading_name_journal['from_emailed'] = true;
+									
+								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 							
-							$trading_name_journal['to_emailed'] = true;
+							} else if ( $trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
 								
-							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
-						
+								$trading_name_journal['to_emailed'] = true;
+									
+								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+							
+							}
 						}
 					}
-				}
-				$message .= "<tr><td></td><td></td><td></td><td></td><td></td><td>" . $total_amount . "</td><td>" . $currency . "</td></tr></table>";
-				if ($ismessage) {
-					$master_message .= $message;
+					$message .= "<tr><td></td><td></td><td></td><td></td><td></td><td>" . $total_amount . "</td><td>" . $currency . "</td></tr></table>";
+					if ($ismessage) {
+						$master_message .= $message;
+					}
 				}
 			}
 			
