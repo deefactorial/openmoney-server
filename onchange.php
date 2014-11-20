@@ -752,18 +752,24 @@ foreach ( $profiles ['rows'] as $profile ) {
 							
 							$total_amount += $journal_trading_name['value'];
 							
-							
 							$ismessage = true;
 							$isemail = true;
 							//report on it.
 							$message .=
-							"<tr><td>" . date( DATE_RFC2822, intval( round( $trading_name_journal['timestamp'] / 1000 ) ) ) . "</td>" .
-							"<td>" . $trading_name_journal['from'] . "</td>".
-							"<td>" . $trading_name_journal['to'] . "</td>" .
+							"<tr><td>" . date( DATE_RFC2822, intval( round( $trading_name_journal['timestamp'] / 1000 ) ) ) . "</td>" ;
+							if ($journal_trading_name['key'] == $trading_name_journal['from']) {
+								$message .= "<td></td>";
+							} else {
+								$message .= "<td>" . $trading_name_journal['from'] . "</td>";
+							}
+							if ($journal_trading_name['key'] == $trading_name_journal['to']) {
+								$message .= "<td></td>";
+							} else {
+								$message .= "<td>" . $trading_name_journal['to'] . "</td>";
+							}
+							$message .=
 							"<td>";
 							isset($trading_name_journal['description']) ? $message .= $trading_name_journal['description'] : $message .= '';
-							
-							
 							$message .=
 							"</td><td>" . $journal_trading_name['value'] . "</td>";
 							
