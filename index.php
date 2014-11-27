@@ -481,29 +481,29 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			foreach ( $result ['rows'] as $row ) {
 				// remove users, from id
-// 				$username = $row ['value'];
+				$username = $row ['value'];
 			
-// 				// echo $username;
+				// echo $username;
 			
-// 				$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
+				$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
 			
-// 				// do trading name lookup on
-// 				$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup1', $options );
+				// do trading name lookup on
+				$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup1', $options );
 			
 				
-// 				foreach ( $tradingname_result ['rows'] as $row ) {
-// 					unset ( $object );
-// 					$object ['id'] = $row ['id'];
-// 					$object ['value'] = $row ['value'];
-// 					array_push ( $tradingname_array, $object );
-// 				}
-			
-				$trading_names = $row ['value'];
-				
-				//copy all trading names to a global array
-				foreach($trading_names as $trading_name) {
-					array_push ( $trading_names_array, $trading_name );
+				foreach ( $tradingname_result ['rows'] as $row ) {
+					unset ( $object );
+					$object ['id'] = $row ['id'];
+					$object ['value'] = $row ['value'];
+					array_push ( $tradingname_array, $object );
 				}
+			
+// 				$trading_names = $row ['value'];
+				
+// 				//copy all trading names to a global array
+// 				foreach($trading_names as $trading_name) {
+// 					array_push ( $trading_names_array, $trading_name );
+// 				}
 			}
 			//output array
 			echo json_encode ( $trading_names_array );
