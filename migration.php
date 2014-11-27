@@ -11,7 +11,7 @@ function email_letter($to, $from, $subject = 'no subject', $msg = 'no msg') {
 
 $cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 
-$tradingNameJournal_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name_journal\"&&doc.from&&doc.to&&doc.currency){emit(\"trading_name,\"+doc.to+\",\" +doc.currency,doc.amount);}if(doc.type==\"trading_name_journal\"&&doc.from&&doc.to&&doc.currency){emit(\"trading_name,\"+doc.from+\",\"+doc.currency,-doc.amount);}}';
+$tradingNameJournal_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name_journal\"&&doc.from&&doc.to&&doc.currency){emit(\"trading_name,\"+doc.to+\",\"+doc.currency,doc.amount);}if(doc.type==\"trading_name_journal\"&&doc.from&&doc.to&&doc.currency){emit(\"trading_name,\"+doc.from+\",\"+doc.currency,-doc.amount);}}';
 
 $trading_name_journal_function_name = "tradingnamejournal";
 
