@@ -246,7 +246,7 @@ $app->post ( '/registration', function () use($app) {
 		$currency_view ['steward'] = array ($username);
 		$currency_view ['created'] = intval( round(microtime(true) * 1000) );
 		
-		$cb->set ( "currency_view," . $currency_view ['currency'] . "," . $currency_view ['currency'], json_encode ( $currency_view ) );
+		$cb->set ( "currency_view," . $username . "," . $currency_view ['currency'], json_encode ( $currency_view ) );
 		
 		$profile ['type'] = "profile";
 		$profile ['username'] = $username;
