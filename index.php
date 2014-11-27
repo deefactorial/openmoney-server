@@ -466,7 +466,7 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			$beamlookup_function = 'function (doc, meta) { if( doc.type == \"beamtag\" ) { if(typeof doc.archived == \"undefined\" || doc.archived === false) { emit(doc.hashTag, doc.trading_names); } } }';
 			
-			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency && !doc.archived && !doc.disabled) { doc.steward.forEach(function( steward ) { emit( steward, { \"name\": doc.name, \"currency\": doc.currency } ); } ); } }';
+			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency && !doc.archived && !doc.disabled) { emit( \"trading_name,\"+doc.name+\",\"+doc.currency, { \"name\": doc.name, \"currency\": doc.currency } ); } }';
 			
 			$designDoc = '{ "views": { "tradingnamelookup2" : { "map": "' . $tradingname_lookup_function . '" }, "beamlookup2": { "map": "' . $beamlookup_function . '" } } }';
 			
@@ -481,21 +481,24 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			foreach ( $result ['rows'] as $row ) {
 				// remove users, from id
-				//$username = $row ['value'];
-			
-				// echo $username;
-			
-				$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
-			
-				// do trading name lookup on
-				$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup2', $options );
-			
+				$trading_names = $row ['value'];
+				foreach($trading_names as $trading_name) {
 				
-				foreach ( $tradingname_result ['rows'] as $row ) {
-					unset ( $object );
-					$object ['id'] = $row ['id'];
-					$object ['value'] = $row ['value'];
-					array_push ( $tradingname_array, $object );
+					// echo $username;
+					
+				
+					$options = array ('startkey' => "trading_name," . $trading_name['value']['name'] . "," . $trading_name['value']['currency'], 'endkey' => "trading_name," . $trading_name['value']['name'] . "," . $trading_name['value']['currency'] . '\uefff');
+				
+					// do trading name lookup on
+					$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup2', $options );
+				
+					
+					foreach ( $tradingname_result ['rows'] as $row ) {
+						unset ( $object );
+						$object ['id'] = $row ['id'];
+						$object ['value'] = $row ['value'];
+						array_push ( $tradingname_array, $object );
+					}
 				}
 			
 // 				$trading_names = $row ['value'];
