@@ -241,6 +241,13 @@ $app->post ( '/registration', function () use($app) {
 		
 		$cb->set ( "trading_name," . $trading_name ['trading_name'] . "," . $trading_name ['currency'], json_encode ( $trading_name ) );
 		
+		$currency_view ['type'] = "currency_view";
+		$currency_view ['currency'] = "cc";
+		$currency_view ['steward'] = array ($username);
+		$currency_view ['created'] = intval( round(microtime(true) * 1000) );
+		
+		$cb->set ( "currency_view," . $currency_view ['currency'] . "," . $currency_view ['currency'], json_encode ( $currency_view ) );
+		
 		$profile ['type'] = "profile";
 		$profile ['username'] = $username;
 		$profile ['email'] = $email;
