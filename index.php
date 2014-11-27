@@ -466,7 +466,7 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			$beamlookup_function = 'function (doc, meta) { if( doc.type == \"beamtag\" ) { if(typeof doc.archived == \"undefined\" || doc.archived === false) { emit(doc.hashTag, doc.trading_names); } } }';
 			
-			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency && !doc.archived && !doc.disabled) { emit( \"trading_name,\"+doc.name+\",\"+doc.currency, { \"name\": doc.name, \"currency\": doc.currency } ); } }';
+			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency && !doc.archived && !doc.disabled) { emit( \"trading_name,\"+doc.name+\",\"+doc.currency, { \"trading_name\": doc.name, \"currency\": doc.currency } ); } }';
 			
 			$designDoc = '{ "views": { "tradingnamelookup3" : { "map": "' . $tradingname_lookup_function . '" }, "beamlookup2": { "map": "' . $beamlookup_function . '" } } }';
 			
