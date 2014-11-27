@@ -83,7 +83,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 	$trading_name_array = json_decode ( $trading_name_array, true );
 
 	foreach($trading_name_array['steward'] as $steward) {
-		$currency_view = json_decode( $cb->get("currency_view," . $steward . "," . $currency['currency']), true);
+		$currency_view = json_decode( $cb->get("currency_view," . $steward . "," . $currency), true);
 		if (!isset($currency_view['currency'])) {
 			$currency_view ['type'] = "currency_view";
 			$currency_view ['currency'] = "cc";
