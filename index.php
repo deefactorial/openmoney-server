@@ -493,12 +493,12 @@ $app->post ( '/lookupTag', function () use($app) {
 					$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup3', $options );
 				
 					print_r($tradingname_result);
-					foreach ( $tradingname_result ['rows'] as $row ) {
-						unset ( $object );
-						$object ['id'] = $row ['id'];
-						$object ['value'] = $row ['value'];
-						array_push ( $tradingname_array, $object );
-					}
+// 					foreach ( $tradingname_result ['rows'] as $row ) {
+// 						unset ( $object );
+// 						$object ['id'] = $row ['id'];
+// 						$object ['value'] = $row ['value'];
+// 						array_push ( $tradingname_array, $object );
+// 					}
 				}
 			
 // 				$trading_names = $row ['value'];
