@@ -78,19 +78,13 @@ $app->post ( '/login', function () use($app) {
 		
 	}
 	
-	
-	
-	if (password_verify ( $password, $user ['password'] )) {
+	if (isset( $user ['password'] ) && password_verify ( $password, $user ['password'] )) {
 		
 		$url = 'https://localhost:4985/openmoney_shadow/_user/' . $user['username'];
 			
 		$options = array ('http' => array ('method' => 'GET', 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 		$context = stream_context_create ( $options );
 		$default_context = stream_context_set_default ( $options );
-			
-		$result = file_get_contents ( $url, false, $context );
-			
-
 			
 		$response_code = get_http_response_code ( $url );
 		if ($response_code == 404) {
@@ -103,6 +97,7 @@ $app->post ( '/login', function () use($app) {
 				
 			$result = file_get_contents ( $url, false, $context );
 		} else {
+			$result = file_get_contents ( $url, false, $context );
 			$json = json_decode ( $result, true );
 			
 			if ((isset($json['password']) && $json['password'] != $password) || !isset($json['password'])) {
