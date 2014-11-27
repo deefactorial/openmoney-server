@@ -497,7 +497,7 @@ $app->post ( '/lookupTag', function () use($app) {
 						unset ( $object );
 						$object ['id'] = $row ['id'];
 						$object ['value'] = $row ['value'];
-						array_push ( $tradingname_array, $object );
+						array_push ( $trading_names_array, $object );
 					}
 				}
 			
