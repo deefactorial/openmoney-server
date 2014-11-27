@@ -466,9 +466,9 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			$beamlookup_function = 'function (doc, meta) { if( doc.type == \"beamtag\" ) { if(typeof doc.archived == \"undefined\" || doc.archived === false) { emit(doc.hashTag, doc.trading_names); } } }';
 			
-			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency && !doc.archived) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { \"name\": doc.name, \"currency\": doc.currency } ); } ); } }';
+			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency && !doc.archived && !doc.disabled) { doc.steward.forEach(function( steward ) { emit( steward, { \"name\": doc.name, \"currency\": doc.currency } ); } ); } }';
 			
-			$designDoc = '{ "views": { "tradingnamelookup1" : { "map": "' . $tradingname_lookup_function . '" }, "beamlookup2": { "map": "' . $beamlookup_function . '" } } }';
+			$designDoc = '{ "views": { "tradingnamelookup2" : { "map": "' . $tradingname_lookup_function . '" }, "beamlookup2": { "map": "' . $beamlookup_function . '" } } }';
 			
 			// echo $designDoc;
 			
@@ -485,7 +485,7 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 				// echo $username;
 			
-				$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
+				$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
 			
 				// do trading name lookup on
 				$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup1', $options );
