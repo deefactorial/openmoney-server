@@ -468,7 +468,7 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency && !doc.archived && !doc.disabled) { emit( \"trading_name,\"+doc.name+\",\"+doc.currency, { \"name\": doc.name, \"currency\": doc.currency } ); } }';
 			
-			$designDoc = '{ "views": { "tradingnamelookup2" : { "map": "' . $tradingname_lookup_function . '" }, "beamlookup2": { "map": "' . $beamlookup_function . '" } } }';
+			$designDoc = '{ "views": { "tradingnamelookup3" : { "map": "' . $tradingname_lookup_function . '" }, "beamlookup2": { "map": "' . $beamlookup_function . '" } } }';
 			
 			// echo $designDoc;
 			
@@ -490,9 +490,9 @@ $app->post ( '/lookupTag', function () use($app) {
 					$options = array ('startkey' => "trading_name," . $trading_name['value']['name'] . "," . $trading_name['value']['currency'], 'endkey' => "trading_name," . $trading_name['value']['name'] . "," . $trading_name['value']['currency'] . '\uefff');
 				
 					// do trading name lookup on
-					$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup2', $options );
+					$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup3', $options );
 				
-					
+					print_r($tradingname_result);
 					foreach ( $tradingname_result ['rows'] as $row ) {
 						unset ( $object );
 						$object ['id'] = $row ['id'];
