@@ -516,7 +516,7 @@ $app->post ( '/lookupTag', function () use($app) {
 					$trading_name_from_view['trading_name'] = $trading_name['trading_name'];
 					$trading_name_from_view['currency'] = $trading_name['currency'];
 					$trading_name_from_view['created'] = intval( round(microtime(true) * 1000) );
-					$cb->set ("trading_name_view," . $trading_name_from_view['steward'] . "," . $trading_name_from_view['trading_name'] . "," . $trading_name_from_view['currency'] , json_encode ( $trading_name_from_view ) );
+					$cb->set ("trading_name_view," . $username . "," . $trading_name_from_view['trading_name'] . "," . $trading_name_from_view['currency'] , json_encode ( $trading_name_from_view ) );
 				}
 			}
 			
