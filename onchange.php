@@ -281,7 +281,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 								foreach( $trading_name_from['steward'] as $steward ) {
 									$trading_name_view = json_decode( $cb->get("trading_name_view," . $steward . "," . $trading_name_to['name'] . "," . $trading_name_to['currency']) , true);
 									if (!isset($trading_name_view['trading_name'])) {
-										$trading_name_from_view = array();
+										
 										$trading_name_from_view['type'] = "trading_name_view";
 										$trading_name_from_view['steward'] = array( $steward );										
 										$trading_name_from_view['trading_name'] = $trading_name_to['name'];
