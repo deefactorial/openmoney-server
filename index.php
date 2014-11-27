@@ -494,10 +494,10 @@ $app->post ( '/lookupTag', function () use($app) {
 				
 					//print_r($tradingname_result);
 					foreach ( $tradingname_result ['rows'] as $row ) {
-						unset ( $object );
-						$object ['id'] = $row ['id'];
-						$object ['value'] = $row ['value'];
-						array_push ( $trading_names_array, $object );
+// 						unset ( $object );
+// 						$object ['id'] = $row ['id'];
+// 						$object ['value'] = $row ['value'];
+						array_push ( $trading_names_array, $row['value'] );
 					}
 					
 					$trading_name_view = json_decode( $cb->get("trading_name_view," . $username . "," . $trading_name['trading_name'] . "," . $trading_name['currency']) , true);
