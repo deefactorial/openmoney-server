@@ -481,7 +481,7 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			foreach ( $result ['rows'] as $row ) {
 				// remove users, from id
-				$username = $row ['value'];
+				//$username = $row ['value'];
 			
 				// echo $username;
 			
