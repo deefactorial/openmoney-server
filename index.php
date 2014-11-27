@@ -488,7 +488,7 @@ $app->post ( '/lookupTag', function () use($app) {
 				$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
 			
 				// do trading name lookup on
-				$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup1', $options );
+				$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup2', $options );
 			
 				
 				foreach ( $tradingname_result ['rows'] as $row ) {
