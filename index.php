@@ -487,7 +487,7 @@ $app->post ( '/lookupTag', function () use($app) {
 					// echo $username;
 					
 				
-					$options = array ('startkey' => "trading_name," . $trading_name['name'] . "," . $trading_name['currency'], 'endkey' => "trading_name," . $trading_name['name'] . "," . $trading_name['currency'] . '\uefff');
+					$options = array ('startkey' => "trading_name," . $trading_name['trading_name'] . "," . $trading_name['currency'], 'endkey' => "trading_name," . $trading_name['trading_name'] . "," . $trading_name['currency'] . '\uefff');
 				
 					// do trading name lookup on
 					$tradingname_result = $cb->view ( 'dev_nfctag', 'tradingnamelookup3', $options );
