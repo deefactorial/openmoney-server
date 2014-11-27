@@ -276,7 +276,35 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 								$trading_name_journal['verified'] = true;
 								$trading_name_journal['verified_timestamp'] = intval( round(microtime(true) * 1000) );
 								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
-							}
+								
+								//add trading name views if they don't exist.
+								foreach( $trading_name_from['steward'] as $steward ) {
+									$trading_name_view = json_decode( $cb->get("trading_name_view," . $steward . "," . $trading_name_to['name'] . "," . $trading_name_to['currency']) , true);
+									if (!isset($trading_name_view['trading_name'])) {
+										$trading_name_from_view = array();
+										$trading_name_from_view['type'] = "trading_name_view";
+										$trading_name_from_view['steward'] = array( $steward );										
+										$trading_name_from_view['trading_name'] = $trading_name_to['name'];
+										$trading_name_from_view['currency'] = $trading_name_to['currency'];
+										$trading_name_from_view['created'] = intval( round(microtime(true) * 1000) );
+										$cb->set ("trading_name_view," . $trading_name_from_view['steward'] . "," . $trading_name_from_view['trading_name'] . "," . $trading_name_from_view['currency'] , json_encode ( $trading_name_from_view ) );
+									}
+								}
+								
+								foreach( $trading_name_to['steward'] as $steward ) {
+									$trading_name_view = json_decode( $cb->get("trading_name_view," . $steward . "," . $trading_name_from['name'] . "," . $trading_name_from['currency']) , true);
+									if (!isset($trading_name_view['trading_name'])) {
+										$trading_name_from_view = array();
+										$trading_name_from_view['type'] = "trading_name_view";
+										$trading_name_from_view['steward'] = array( $steward );
+										$trading_name_from_view['trading_name'] = $trading_name_from['name'];
+										$trading_name_from_view['currency'] = $trading_name_from['currency'];
+										$trading_name_from_view['created'] = intval( round(microtime(true) * 1000) );
+										$cb->set ("trading_name_view," . $trading_name_from_view['steward'] . "," . $trading_name_from_view['trading_name'] . "," . $trading_name_from_view['currency'] , json_encode ( $trading_name_from_view ) );
+									}
+								}
+								
+							} 
 						}
 					}
 				}
@@ -774,7 +802,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 							"</td><td>" . $journal_trading_name['value'] . "</td>";
 							
 							$message .=
-							"<td>" . $trading_name_journal['currency'] ."</td></tr>";
+							"<td>" . $trading_name_journal['currency'] ."</td></tr>";1
 							//$trading_name['']
 							
 							if($trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {

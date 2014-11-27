@@ -464,7 +464,7 @@ $app->post ( '/lookupTag', function () use($app) {
 			
 			$beamlookup_function = 'function (doc, meta) { if( doc.type == \"beamtag\" ) { if(typeof doc.archived == \"undefined\" || doc.archived === false) { emit(doc.hashTag, doc.trading_names); } } }';
 			
-			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { \"name\": doc.name, \"currency\": doc.currency } ); } ); } }';
+			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency && !doc.archived) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { \"name\": doc.name, \"currency\": doc.currency } ); } ); } }';
 			
 			$designDoc = '{ "views": { "tradingnamelookup1" : { "map": "' . $tradingname_lookup_function . '" }, "beamlookup2": { "map": "' . $beamlookup_function . '" } } }';
 			
@@ -505,6 +505,20 @@ $app->post ( '/lookupTag', function () use($app) {
 			}
 			//output array
 			echo json_encode ( $trading_names_array );
+			
+			//add the trading names to this users view of trading names.
+			foreach($trading_names_array as $trading_name) {
+				$trading_name_view = json_decode( $cb->get("trading_name_view," . $username . "," . $trading_name['trading_name'] . "," . $trading_name['currency']) , true);
+				if (!isset($trading_name_view['trading_name'])) {
+					$trading_name_from_view = array();
+					$trading_name_from_view['type'] = "trading_name_view";
+					$trading_name_from_view['steward'] = array( $username );
+					$trading_name_from_view['trading_name'] = $trading_name['trading_name'];
+					$trading_name_from_view['currency'] = $trading_name['currency'];
+					$trading_name_from_view['created'] = intval( round(microtime(true) * 1000) );
+					$cb->set ("trading_name_view," . $trading_name_from_view['steward'] . "," . $trading_name_from_view['trading_name'] . "," . $trading_name_from_view['currency'] , json_encode ( $trading_name_from_view ) );
+				}
+			}
 			
 			$app->stop ();
 		}
@@ -588,7 +602,7 @@ $app->post ( '/customerLookup', function () use($app) {
 			// setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
 			// $result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires']);
 			
-			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { \"name\": doc.name, \"currency\": doc.currency } ); } ); } }';
+			$tradingname_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name\" && doc.steward && doc.name && doc.currency && !doc.archived) { doc.steward.forEach(function( steward ) { emit( [steward, doc.currency, doc.name], { \"name\": doc.name, \"currency\": doc.currency } ); } ); } }';
 			
 			$designDoc = '{ "views": { "tradingnamelookup" : { "map": "' . $tradingname_lookup_function . '" } } }';
 			
