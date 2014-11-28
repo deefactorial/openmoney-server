@@ -763,6 +763,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 					//$trading_name = json_decode($trading_name['value'], true);
 					$total_amount = 0;
 					//echo "Check Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "\n";
+					$this_trading_name = $trading_name['value']['trading_name'];
 					$currency = $trading_name['value']['currency'] ;
 					$ismessage = false;
 					$message = "<h1>Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "</h1><br/>".
@@ -785,12 +786,12 @@ foreach ( $profiles ['rows'] as $profile ) {
 							//report on it.
 							$message .=
 							"<tr><td>" . date( DATE_RFC2822, intval( round( $trading_name_journal['timestamp'] / 1000 ) ) ) . "</td>" ;
-							if ($journal_trading_name['key'] == $trading_name_journal['from']) {
+							if ($this_trading_name == $trading_name_journal['from']) {
 								$message .= "<td></td>";
 							} else {
 								$message .= "<td>" . $trading_name_journal['from'] . "</td>";
 							}
-							if ($journal_trading_name['key'] == $trading_name_journal['to']) {
+							if ($this_trading_name == $trading_name_journal['to']) {
 								$message .= "<td></td>";
 							} else {
 								$message .= "<td>" . $trading_name_journal['to'] . "</td>";
