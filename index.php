@@ -698,9 +698,14 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			
 			$tradingname_array = array ();
 			foreach ( $accounts ['rows'] as $account ) {
-				print_r($account);
+				//print_r($account);
+				
+				if($accounts['key']['steward'] == $username){
+					array_push($tradingname_array, $account);
+				}
 			}
 			
+			echo json_encode ( $tradingname_array );
 		}
 		
 	}
