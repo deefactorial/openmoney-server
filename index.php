@@ -700,13 +700,13 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			foreach ( $accounts ['rows'] as $account ) {
 				//print_r($account);
 				
-				if($account['key']['steward'] == $username){
+				if($account['key']['steward'][0] == $username){
 					array_push($tradingname_array, $account);
 				}
 			}
 			
 			echo json_encode ( $tradingname_array );
-			echo $username;
+			//echo $username;
 		}
 		
 	}
