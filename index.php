@@ -715,7 +715,6 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 							$account['doc'] = json_decode ( $cb->get ( $account['id'] ), true );
 						}
 						$account['_id'] = $account['id'];
-						unset($account['id']);
 						$account['value'] = '';
 						array_push($tradingname_array, $account);
 						array_push($tradingname_id_array, $account['_id']);
@@ -736,6 +735,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 					$object['doc'] = json_decode ( $cb->get ( $trading_name['value'] ), true );
 					if ($object['doc']) {
 						$object['_id'] = $trading_name['value'];
+						$object['id'] = $trading_name['value'];
 						$object['key']['currency'] = $object['doc']['currency'];
 						$object['key']['steward'] = $object['doc']['steward'];
 						$object['key']['trading_name'] = $object['doc']['name'];
