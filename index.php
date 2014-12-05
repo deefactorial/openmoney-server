@@ -682,12 +682,21 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		
 		parse_str($_SERVER['QUERY_STRING'],$options);
 		
-		print_r($options);
+		//print_r($options);
 			
-		$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
+		//$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
 			
 		// do trading name lookup on
-		$tradingname_result = $cb->view ( 'dev_openmoney', $viewname, $options );
+		if ($viewname == 'accounts') {
+		
+			$accounts = $cb->view ( 'dev_openmoney', $viewname, $options );
+			
+			$tradingname_array = array ();
+			foreach ( $accounts ['rows'] as $account ) {
+				print_r($account);
+			}
+			
+		}
 		
 	}
 	
