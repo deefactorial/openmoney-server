@@ -636,7 +636,7 @@ $app->post ( '/customerLookup', function () use($app) {
 	}
 } );
 
-$app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname', function () use($app) {
+$app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname', function ($viewname) use($app) {
 	
 	echo $viewname;
 	
