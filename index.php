@@ -714,9 +714,11 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 						if($include_docs){
 							$account['doc'] = json_decode ( $cb->get ( $account['id'] ), true );
 						}
+						$account['_id'] = $account['id'];
+						unset($account['id']);
 						$account['value'] = '';
 						array_push($tradingname_array, $account);
-						array_push($tradingname_id_array, $account['id']);
+						array_push($tradingname_id_array, $account['_id']);
 					}
 				}
 			}
@@ -733,7 +735,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 					unset($object);
 					$object['doc'] = json_decode ( $cb->get ( $trading_name['value'] ), true );
 					if ($object['doc']) {
-						$object['id'] = $trading_name['value'];
+						$object['_id'] = $trading_name['value'];
 						$object['key']['currency'] = $object['doc']['currency'];
 						$object['key']['steward'] = $object['doc']['steward'];
 						$object['key']['trading_name'] = $object['doc']['name'];
@@ -765,7 +767,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				$trading_name_object['trading_name'] = $trading_name['name'];
 				
 				unset($object);
-				$object['id'] = $options['startkey'];
+				$object['_id'] = $options['startkey'];
 				$object['key'] = $trading_name_object;
 				$object['value'] = $balance;
 				array_push($tradingname_array, $object);
@@ -798,7 +800,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 						$value['name'] = $currency_object['name'];
 						
 						unset($object);
-						$object['id'] = "currency," . $currency_object['currency'];
+						$object['_id'] = "currency," . $currency_object['currency'];
 						$object['key'] = $currency_object['currency'];
 						$object['value'] = $value;
 						
@@ -826,7 +828,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			$spaces_array = array();
 			foreach($spaces_result['rows'] as $space){
 				unset($object);
-				$object['id'] = $space['id'];
+				$object['_id'] = $space['id'];
 				$object['key'] = $space['value'];
 				$object['value'] = '';
 				
