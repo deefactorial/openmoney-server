@@ -837,7 +837,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				array_push($spaces_array, $object);
 			}
 			
-			$rows = array("rows"=>$currency_array);
+			$rows = array("rows"=>$spaces_array);
 				
 			echo json_encode ( $rows );
 			
