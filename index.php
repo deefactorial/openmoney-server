@@ -642,6 +642,10 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname', function 
 	
 	$username = '';
 	$password = '';
+	
+	$username = $_SERVER['PHP_AUTH_USER'];
+	$password = $_SERVER['PHP_AUTH_PW'];
+	
 	function get_http_response_code($url) {
 		$headers = get_headers ( $url );
 		return substr ( $headers [0], 9, 3 );
