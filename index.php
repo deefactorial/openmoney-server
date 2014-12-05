@@ -678,8 +678,11 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 	
 	if (password_verify ( $password, $user ['password'] )) {
 		
-		echo print_r(parse_str($_SERVER['QUERY_STRING']));
+		$options = array();
 		
+		parse_str($_SERVER['QUERY_STRING'],$options);
+		
+		print_r($options);
 			
 		$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
 			
