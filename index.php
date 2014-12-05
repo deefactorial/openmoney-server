@@ -771,7 +771,53 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				
 			echo json_encode ( $rows );
 			
+		} else if ($viewname == 'currencies') {
+			
+			//$currencies_result = $cb->view ( 'dev_openmoney', $viewname, $options );
+			
+			$currency_view_lookup_function = 'function (doc, meta) { if( doc.type == \"currency_view\" && doc.steward && doc.currency && !doc.archived) { doc.steward.forEach(function( steward ) { emit( steward , \"currency,\" + doc.currency ); } ); } }';
+			
+			$designDoc = '{ "views": { "currency_view" : { "map": "' . $currency_view_lookup_function . '" } } }';
+				
+			$cb->setDesignDoc ( "dev_openmoney_helper", $designDoc );
+			
+			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+			
+			// do currency view lookup 
+			$currency_view_result = $cb->view ( 'dev_openmoney_helper', 'currency_view', $options );
+			
+			$currency_id_array = array();
+			$currency_array = array();
+			foreach ( $currency_view_result ['rows'] as $currency ) {
+				if( ! in_array( $currency['value'], $currency_id_array ) ) {
+					
+					$currency_object = json_decode ( $cb->get ( $currency['value'] ), true );
+					if ($currency_object) {
+						unset($value);
+						$value['currency'] = $currency_object['currency'];
+						$value['name'] = $currency_object['name'];
+						
+						unset($object);
+						$object['id'] = $currency_object['value'];
+						$object['key'] = $currency_object['currency'];
+						$object['value'] = $value;
+						
+						if ($include_docs) {
+							$object['doc'] = $currency_object;
+						}
+						
+						array_push($currency_array, $object);
+					}
+				}
+			}
+			
+			$rows = array("rows"=>$currency_array);
+			
+			echo json_encode ( $rows );
+			
 		} else {
+			
+			
 			echo $viewname;
 			print_r($options);
 		}
