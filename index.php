@@ -767,7 +767,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				$trading_name_object['trading_name'] = $trading_name['name'];
 				
 				unset($object);
-				$object['_id'] = $options['startkey'];
+				$object['id'] = $options['startkey'];
 				$object['key'] = $trading_name_object;
 				$object['value'] = $balance;
 				array_push($tradingname_array, $object);
