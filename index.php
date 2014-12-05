@@ -815,6 +815,32 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			
 			echo json_encode ( $rows );
 			
+		} else if($viewname == 'spaces') {
+			
+			unset($options);
+			
+			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+			
+			$spaces_result = $cb->view ( 'dev_openmoney', $viewname, $options );
+			
+			$spaces_array = array();
+			foreach($spaces_result['rows'] as $space){
+				unset($object);
+				$object['id'] = $space['id'];
+				$object['key'] = $space['space'];
+				$object['value'] = '';
+				
+				if($include_docs) {
+					$object['doc'] = json_decode ( $cb->get ( $space['id'] ), true );
+				}
+				
+				array_push($spaces_array, $object);
+			}
+			
+			$rows = array("rows"=>$currency_array);
+				
+			echo json_encode ( $rows );
+			
 		} else {
 			
 			
