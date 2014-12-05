@@ -854,6 +854,8 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			print_r($options);
 		}
 		
+	} else {
+		echo "failed to autheticate!";
 	}
 	
 	
