@@ -855,7 +855,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		}
 		
 	} else {
-		echo "failed to autheticate!:" . $username . ":" . $password ;
+		echo "failed to autheticate!:(" . $username . "):(" . $password . ")" ;
 	}
 	
 	
