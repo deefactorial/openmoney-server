@@ -854,6 +854,25 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			print_r($options);
 		}
 		
+	} else if ($viewname == 'account_details') {
+		
+		//$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+			
+		$trading_name = json_decode ( $cb->get ( $options['endkey'] ), true );
+		
+		if ($trading_name) {
+			
+			foreach($trading_name['steward'] as $steward) {
+				if ($steward == $username) {
+					$account_details = $cb->view ( 'dev_openmoney', $viewname, $options );
+					
+					echo json_encode ($account_details);
+				}
+			}
+		}
+		
+		
+		
 	} else {
 		echo "failed to autheticate!:(" . $username . "):(" . $password . ")";
 		print_r(getallheaders ());
