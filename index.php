@@ -700,8 +700,13 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			foreach ( $accounts ['rows'] as $account ) {
 				//print_r($account);
 				
-				if($account['key']['steward'][0] == $username){
-					array_push($tradingname_array, $account);
+				foreach($account['key']['steward'] as $steward) {
+					if($steward == $username){
+						if($include_docs){
+							$account['doc'] = $cb->get ( $account['id'] );
+						}
+						array_push($tradingname_array, $account);
+					}
 				}
 			}
 			
