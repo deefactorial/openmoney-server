@@ -708,7 +708,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 						}
 						$account['value'] = '';
 						array_push($tradingname_array, $account);
-						array_push($tradingname_id_array, $accout['id']);
+						array_push($tradingname_id_array, $account['id']);
 					}
 				}
 			}
