@@ -703,7 +703,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				foreach($account['key']['steward'] as $steward) {
 					if($steward == $username){
 						if($include_docs){
-							$account['doc'] = $cb->get ( $account['id'] );
+							$account['doc'] = json_decode ( $cb->get ( $account['id'] ), true );
 						}
 						array_push($tradingname_array, $account);
 					}
