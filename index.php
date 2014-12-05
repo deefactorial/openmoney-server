@@ -827,7 +827,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			foreach($spaces_result['rows'] as $space){
 				unset($object);
 				$object['id'] = $space['id'];
-				$object['key'] = $space['space'];
+				$object['key'] = $space['value'];
 				$object['value'] = '';
 				
 				if($include_docs) {
