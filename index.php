@@ -706,6 +706,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			}
 			
 			echo json_encode ( $tradingname_array );
+			echo $username;
 		}
 		
 	}
