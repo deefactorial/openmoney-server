@@ -713,11 +713,11 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 					if($steward == $username){
 						if($include_docs){
 							$account['doc'] = json_decode ( $cb->get ( $account['id'] ), true );
+							$account['doc']['_id'] = $account['_id'];
 						}
-						$account['_id'] = $account['id'];
 						$account['value'] = '';
 						array_push($tradingname_array, $account);
-						array_push($tradingname_id_array, $account['_id']);
+						array_push($tradingname_id_array, $account['id']);
 					}
 				}
 			}
@@ -734,7 +734,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 					unset($object);
 					$object['doc'] = json_decode ( $cb->get ( $trading_name['value'] ), true );
 					if ($object['doc']) {
-						$object['_id'] = $trading_name['value'];
+						$object['doc']['_id'] = $trading_name['value'];
 						$object['id'] = $trading_name['value'];
 						$object['key']['currency'] = $object['doc']['currency'];
 						$object['key']['steward'] = $object['doc']['steward'];
@@ -800,12 +800,13 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 						$value['name'] = $currency_object['name'];
 						
 						unset($object);
-						$object['_id'] = "currency," . $currency_object['currency'];
+						$object['id'] = "currency," . $currency_object['currency'];
 						$object['key'] = $currency_object['currency'];
 						$object['value'] = $value;
 						
 						if ($include_docs) {
 							$object['doc'] = $currency_object;
+							$object['doc']['_id'] = $object['id'];
 						}
 						
 						array_push($currency_array, $object);
@@ -828,12 +829,13 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			$spaces_array = array();
 			foreach($spaces_result['rows'] as $space){
 				unset($object);
-				$object['_id'] = $space['id'];
+				$object['id'] = $space['id'];
 				$object['key'] = $space['value'];
 				$object['value'] = '';
 				
 				if($include_docs) {
 					$object['doc'] = json_decode ( $cb->get ( $space['id'] ), true );
+					$object['doc']['_id'] = $space['id'];
 				}
 				
 				array_push($spaces_array, $object);
