@@ -858,19 +858,20 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		
 		//$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
 			
-		$trading_name = json_decode ( $cb->get ( $options['endkey'] ), true );
-		
-		if ($trading_name) {
+		if (isset($options['endkey'])) {
+			$trading_name = json_decode ( $cb->get ( $options['endkey'] ), true );
 			
-			foreach($trading_name['steward'] as $steward) {
-				if ($steward == $username) {
-					$account_details = $cb->view ( 'dev_openmoney', $viewname, $options );
-					
-					echo json_encode ($account_details);
+			if ($trading_name) {
+				
+				foreach($trading_name['steward'] as $steward) {
+					if ($steward == $username) {
+						$account_details = $cb->view ( 'dev_openmoney', $viewname, $options );
+						
+						echo json_encode ($account_details);
+					}
 				}
 			}
 		}
-		
 		
 		
 	} else {
