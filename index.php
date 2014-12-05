@@ -636,9 +636,9 @@ $app->post ( '/customerLookup', function () use($app) {
 	}
 } );
 
-$app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname', function ($viewname) use($app) {
+$app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function ($viewname) use($app) {
 	
-	echo $viewname;
+	
 	
 	$username = '';
 	$password = '';
@@ -677,6 +677,14 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname', function 
 	require ("password.php");
 	
 	if (password_verify ( $password, $user ['password'] )) {
+		
+		echo $_SERVER['QUERY_STRING'];
+		
+			
+		$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
+			
+		// do trading name lookup on
+		$tradingname_result = $cb->view ( 'dev_openmoney', $viewname, $options );
 		
 	}
 	
