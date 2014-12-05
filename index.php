@@ -728,13 +728,15 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				if( ! in_array( $trading_name['value'], $tradingname_id_array ) ) {
 					unset($object);
 					$object['doc'] = json_decode ( $cb->get ( $trading_name['value'] ), true );
-					$object['id'] = $trading_name['value'];
-					$object['key']['currency'] = $object['doc']['currency'];
-					$object['key']['steward'] = $object['doc']['steward'];
-					$object['key']['trading_name'] = $object['doc']['name'];
-					$object['value'] = '';
-					array_push($tradingname_array, $object);
-					array_push($tradingname_id_array, $object['id']);
+					if ($object['doc']) {
+						$object['id'] = $trading_name['value'];
+						$object['key']['currency'] = $object['doc']['currency'];
+						$object['key']['steward'] = $object['doc']['steward'];
+						$object['key']['trading_name'] = $object['doc']['name'];
+						$object['value'] = '';
+						array_push($tradingname_array, $object);
+						array_push($tradingname_id_array, $object['id']);
+					}
 				}
 			}
 			
