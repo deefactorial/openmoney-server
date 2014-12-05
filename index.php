@@ -798,7 +798,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 						$value['name'] = $currency_object['name'];
 						
 						unset($object);
-						$object['id'] = $currency_object['value'];
+						$object['id'] = "currency," . $currency_object['currency'];
 						$object['key'] = $currency_object['currency'];
 						$object['value'] = $value;
 						
