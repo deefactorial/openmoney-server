@@ -713,6 +713,9 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			
 			echo json_encode ( $rows );
 			//echo $username;
+		} else {
+			echo $viewname;
+			print_r($options);
 		}
 		
 	}
