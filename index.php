@@ -683,6 +683,11 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		parse_str($_SERVER['QUERY_STRING'],$options);
 		
 		//print_r($options);
+		$include_docs = false;
+		if (isset($options['include_docs'])){
+			$include_docs = $options['include_docs'];
+			unset($options['include_docs']);
+		}
 			
 		//$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
 			
