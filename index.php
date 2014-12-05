@@ -636,5 +636,48 @@ $app->post ( '/customerLookup', function () use($app) {
 	}
 } );
 
+$app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname', function () use($app) {
+	
+	echo $viewname;
+	
+	$username = '';
+	$password = '';
+	function get_http_response_code($url) {
+		$headers = get_headers ( $url );
+		return substr ( $headers [0], 9, 3 );
+	}
+	
+	if (($username == '' && $password == '') && (! isset ( $_POST ['username'] ) || ! isset ( $_POST ['password'] ))) {
+		$post = json_decode ( file_get_contents ( 'php://input' ), true );
+	
+		$username = $post ['username'];
+		$password = $post ['password'];
+	
+		if ($username == '' && $password == '') {
+			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email and password are required !') ) );
+		}
+	} else {
+		if ($username == '' && $password == '') {
+			$username = $_POST ['username'];
+			$password = $_POST ['password'];
+		}
+	}
+	
+	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
+	
+	$user = $cb->get ( "users," . $username );
+	
+	$user = json_decode ( $user, true );
+	
+	// TODO: cytpographically decode password using cryptographic algorithms specified in the $user ['cryptographic_algorithms'] array.
+	require ("password.php");
+	
+	if (password_verify ( $password, $user ['password'] )) {
+		
+	}
+	
+	
+} );
+
 $app->run ();
 ?>
