@@ -678,6 +678,14 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 	
 	if (password_verify ( $password, $user ['password'] )) {
 		
+		$trading_name_view_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name_view\" && doc.steward && doc.trading_name && doc.currency && !doc.archived) { doc.steward.forEach(function( steward ) { emit( steward , \"trading_name,\" + doc.trading_name + \",\" + doc.currency ); } ); } }';
+		
+		$designDoc = '{ "views": { "trading_name_view" : { "map": "' . $trading_name_view_lookup_function . '" }, "currency_view" : { "map": "' . $currency_view_lookup_function . '" } } }';
+			
+		$currency_view_lookup_function = 'function (doc, meta) { if( doc.type == \"currency_view\" && doc.steward && doc.currency && !doc.archived) { doc.steward.forEach(function( steward ) { emit( steward , \"currency,\" + doc.currency ); } ); } }';
+		
+		$cb->setDesignDoc ( "dev_openmoney_helper", $designDoc );
+		
 		$options = array();
 		
 		parse_str($_SERVER['QUERY_STRING'],$options);
@@ -713,11 +721,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				}
 			}
 			
-			$trading_name_view_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name_view\" && doc.steward && doc.trading_name && doc.currency && !doc.archived) { doc.steward.forEach(function( steward ) { emit( steward , \"trading_name,\" + doc.trading_name + \",\" + doc.currency ); } ); } }';
-				
-			$designDoc = '{ "views": { "trading_name_view" : { "map": "' . $trading_name_view_lookup_function . '" } } }';
-			
-			$cb->setDesignDoc ( "dev_openmoney_helper", $designDoc );
+
 			
 			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
 				
@@ -775,11 +779,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			
 			//$currencies_result = $cb->view ( 'dev_openmoney', $viewname, $options );
 			
-			$currency_view_lookup_function = 'function (doc, meta) { if( doc.type == \"currency_view\" && doc.steward && doc.currency && !doc.archived) { doc.steward.forEach(function( steward ) { emit( steward , \"currency,\" + doc.currency ); } ); } }';
-			
-			$designDoc = '{ "views": { "currency_view" : { "map": "' . $currency_view_lookup_function . '" } } }';
-				
-			$cb->setDesignDoc ( "dev_openmoney_helper", $designDoc );
+
 			
 			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
 			
