@@ -690,13 +690,14 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		}
 			
 		//$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
-			
+		
 		// do trading name lookup on
 		if ($viewname == 'accounts') {
 		
 			$accounts = $cb->view ( 'dev_openmoney', $viewname, $options );
 			
 			$tradingname_array = array ();
+			$tradingname_id_array = array ();
 			foreach ( $accounts ['rows'] as $account ) {
 				//print_r($account);
 				
@@ -705,10 +706,38 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 						if($include_docs){
 							$account['doc'] = json_decode ( $cb->get ( $account['id'] ), true );
 						}
+						$account['value'] = '';
 						array_push($tradingname_array, $account);
+						array_push($tradingname_id_array, $accout['id']);
 					}
 				}
 			}
+			
+			$trading_name_view_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name_view\" && doc.steward && doc.trading_name && doc.currency && !doc.archived) { doc.steward.forEach(function( steward ) { emit( steward , \"trading_name,\" + doc.trading_name + \",\" + doc.currency ); } ); } }';
+				
+			$designDoc = '{ "views": { "trading_name_view" : { "map": "' . $trading_name_view_lookup_function . '" } } }';
+			
+			$cb->setDesignDoc ( "dev_openmoney_helper", $designDoc );
+			
+			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+				
+			// do trading name lookup on
+			$trading_name_view_result = $cb->view ( 'dev_openmoney_helper', 'trading_name_view', $options );
+			
+			foreach ( $trading_name_view_result ['rows'] as $trading_name ) {
+				if( ! in_array( $tradingname_id_array, $trading_name['value'] ) ) {
+					unset($object);
+					$object['doc'] = json_decode ( $cb->get ( $trading_name['value'] ), true );
+					$object['id'] = $trading_name['value'];
+					$object['key']['currency'] = $object['doc']['currency'];
+					$object['key']['steward'] = $object['doc']['steward'];
+					$object['key']['trading_name'] = $object['doc']['name'];
+					$object['value'] = '';
+					array_push($tradingname_array, $object);
+					array_push($tradingname_id_array, $object['id']);
+				}
+			}
+			
 			$rows = array("rows"=>$tradingname_array);
 			
 			echo json_encode ( $rows );
