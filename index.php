@@ -741,7 +741,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 						$object['key']['trading_name'] = $object['doc']['name'];
 						$object['value'] = '';
 						array_push($tradingname_array, $object);
-						array_push($tradingname_id_array, $object['_id']);
+						array_push($tradingname_id_array, $object['id']);
 					}
 				}
 			}
