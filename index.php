@@ -855,7 +855,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		}
 		
 	} else {
-		echo "failed to autheticate!:(" . $username . "):(" . $password . ") AUTH_TYPE:(" . $_SERVER['AUTH_TYPE'] . ")" ;
+		echo "failed to autheticate!:(" . $username . "):(" . $password . ")";
 		print_r(getallheaders ());
 	}
 	
