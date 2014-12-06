@@ -861,6 +861,8 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				$options['startkey'] = array($options['startkey'], '\uefff');
 				$options['endkey'] = array($options['endkey'], "" );
 				
+				print_r($options);
+				
 				if ($trading_name) {
 					
 					foreach($trading_name['steward'] as $steward) {
