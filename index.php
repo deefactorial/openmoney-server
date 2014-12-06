@@ -852,7 +852,9 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		} else if ($viewname == 'account_details') {
 		
 			//$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
-				
+
+			print_r($options);
+			
 			if (isset($options['endkey'])) {
 				$trading_name = json_decode ( $cb->get ( $options['endkey'] ), true );
 				
