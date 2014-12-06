@@ -761,24 +761,26 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			foreach ( $account_balance_result ['rows'] as $entry ) {
 				$balance += $entry['value'];
 			}
-			$trading_name = json_decode ( $cb->get ( $options['startkey'] ), true );
 			
-			if ($trading_name) {
-				unset($trading_name_object);
-				$trading_name_object['currency'] = $trading_name['currency'];
-				$trading_name_object['trading_name'] = $trading_name['name'];
+			if (isset($options['startkey'])) {
+				$trading_name = json_decode ( $cb->get ( $options['startkey'] ), true );
 				
-				unset($object);
-				$object['id'] = $options['startkey'];
-				$object['key'] = $trading_name_object;
-				$object['value'] = $balance;
-				array_push($tradingname_array, $object);
+				if ($trading_name) {
+					unset($trading_name_object);
+					$trading_name_object['currency'] = $trading_name['currency'];
+					$trading_name_object['trading_name'] = $trading_name['name'];
+					
+					unset($object);
+					$object['id'] = $options['startkey'];
+					$object['key'] = $trading_name_object;
+					$object['value'] = $balance;
+					array_push($tradingname_array, $object);
+				}
+				
+				$rows = array("rows"=>$tradingname_array);
+					
+				echo json_encode ( $rows );
 			}
-			
-			$rows = array("rows"=>$tradingname_array);
-				
-			echo json_encode ( $rows );
-			
 		} else if ($viewname == 'currencies') {
 			
 			//$currencies_result = $cb->view ( 'dev_openmoney', $viewname, $options );
