@@ -876,6 +876,15 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			}
 			
 			
+		} else if ($viewname == 'nfc_tags') {
+			
+			$options = array ( array('startkey' => $username), array('endkey' => $username . '\uefff' ) ) ;
+			
+			$nfc_tags = $cb->view ( 'dev_openmoney', $viewname, $options );
+			
+			echo json_encode ($nfc_tags);
+			
+			
 		} else {
 			
 			
