@@ -777,7 +777,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 					array_push($tradingname_array, $object);
 				}
 				
-				$rows = array("rows"=>$tradingname_array);
+				$rows = array("rows"=>$tradingname_array, "total_rows" => sizeof($tradingname_array));
 					
 				echo json_encode ( $rows );
 			}
