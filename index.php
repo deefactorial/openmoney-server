@@ -704,6 +704,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		// do trading name lookup on
 		if ($viewname == 'accounts') {
 		
+			$options['stale'] = false;
 			$accounts = $cb->view ( 'dev_openmoney', $viewname, $options );
 			
 			$tradingname_array = array ();
