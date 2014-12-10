@@ -16,7 +16,8 @@ $app->notFound ( function () use($app) {
 // $app->view ( new \JsonApiView () );
 // $app->add ( new \JsonApiMiddleware () );
 $app->get ( '/', function () use($app) {
-	echo json_encode ( array ('message' => "Welcome the openmoney json API! go to https://cloud.openmoney.cc/README.md for more information.") );
+	$app->redirect('/webclient/');
+	//echo json_encode ( array ('message' => "Welcome the openmoney json API! go to https://cloud.openmoney.cc/README.md for more information.") );
 } );
 
 $app->post ( '/login', function () use($app) {
