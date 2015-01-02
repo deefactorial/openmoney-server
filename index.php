@@ -693,6 +693,13 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		
 		parse_str($_SERVER['QUERY_STRING'],$options);
 		
+		if (isset($options['startkey'])) {
+			$options['startkey'] = trim( $options['startkey'], '"');
+		}
+		if (isset($options['endkey'])) {
+			$options['endkey'] = trim( $options['endkey'], '"');
+		}
+		
 		//print_r($options);
 		$include_docs = false;
 		if (isset($options['include_docs'])){
@@ -755,12 +762,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			echo json_encode ( $rows );
 			//echo $username;
 		} else if($viewname == 'account_balance') {
-			if (isset($options['startkey'])) {
-				$options['startkey'] = trim( $options['startkey'], '"');
-			}
-			if (isset($options['endkey'])) {
-				$options['endkey'] = trim( $options['endkey'], '"');
-			}
+			
 			$account_balance_result = $cb->view ( 'dev_openmoney', $viewname, $options );
 			
 			$balance = 0;
@@ -860,13 +862,13 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		
 			//$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
 
-			print_r($options);
+			//print_r($options);
 			
 			if (isset($options['endkey'])) {
 				$trading_name = json_decode ( $cb->get ( trim( $options['endkey'], '"') ), true );
 				
-				$options['startkey'] = array( trim( $options['startkey'], '"' ) );
-				$options['endkey'] = array( trim( $options['endkey'], '"') );
+				$options['startkey'] = array( $options['startkey'] );
+				$options['endkey'] = array( $options['endkey'] );
 				$options['stale'] = false;
 				
 				//print_r($options);
