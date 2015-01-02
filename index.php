@@ -858,7 +858,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			print_r($options);
 			
 			if (isset($options['endkey'])) {
-				$trading_name = json_decode ( $cb->get ( $options['endkey'] ), true );
+				$trading_name = json_decode ( $cb->get ( trim( $options['endkey'], '"') ), true );
 				
 				$options['startkey'] = array( trim( $options['startkey'], '"' ) );
 				$options['endkey'] = array( trim( $options['endkey'], '"') );
