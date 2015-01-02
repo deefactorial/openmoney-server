@@ -755,7 +755,12 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			echo json_encode ( $rows );
 			//echo $username;
 		} else if($viewname == 'account_balance') {
-			
+			if (isset($options['startkey'])) {
+				$options['startkey'] = trim( $options['startkey'], '"');
+			}
+			if (isset($options['endkey'])) {
+				$options['endkey'] = trim( $options['endkey'], '"');
+			}
 			$account_balance_result = $cb->view ( 'dev_openmoney', $viewname, $options );
 			
 			$balance = 0;
