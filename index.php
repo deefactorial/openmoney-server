@@ -799,6 +799,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 
 			
 			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+			$options['stale'] = false;
 			
 			// do currency view lookup 
 			$currency_view_result = $cb->view ( 'dev_openmoney_helper', 'currency_view', $options );
@@ -838,6 +839,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			unset($options);
 			
 			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+			$options['stale'] = false;
 			
 			$spaces_result = $cb->view ( 'dev_openmoney', $viewname, $options );
 			
@@ -871,6 +873,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				
 				$options['startkey'] = array( $options['startkey'] );
 				$options['endkey'] = array( $options['endkey'] );
+				$options['stale'] = false;
 				
 				
 				//print_r($options);
@@ -891,6 +894,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		} else if ($viewname == 'nfc_tags') {
 			
 			$options = array ( 'startkey' => array($username), 'endkey' => array($username . '\uefff') ) ;
+			$options['stale'] = false;
 			
 			$nfc_tags = $cb->view ( 'dev_openmoney', $viewname, $options );
 			
