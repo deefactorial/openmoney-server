@@ -806,7 +806,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			foreach ( $currency_view_result ['rows'] as $currency ) {
 				if( ! in_array( $currency['value'], $currency_id_array ) ) {
 					
-					$currency_object = json_decode ( $cb->get ( $currency['value'] ), true );
+					$currency_object = json_decode ( $cb->get ( strtolower( $currency['value'] ) ), true );
 					if ($currency_object) {
 						unset($value);
 						$value['currency'] = $currency_object['currency'];
