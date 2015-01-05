@@ -700,6 +700,8 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			$options['endkey'] = trim( $options['endkey'], '"');
 		}
 		
+		$options['stale'] = false;
+		
 		//print_r($options);
 		$include_docs = false;
 		if (isset($options['include_docs'])){
@@ -869,7 +871,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				
 				$options['startkey'] = array( $options['startkey'] );
 				$options['endkey'] = array( $options['endkey'] );
-				$options['stale'] = false;
+				
 				
 				//print_r($options);
 				
