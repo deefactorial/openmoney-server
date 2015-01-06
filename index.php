@@ -227,7 +227,7 @@ $app->post ( '/registration', function () use($app) {
 		$subspace = "";
 		
 		$tradingName = $subusername;
-		$dotPattern = "/^([\p{L}\p{N}_]+\.)+([\p{L}\p{N}_]+)$/u";
+		$dotPattern = "/^([\w\d_]+\.)+([\p{L}\p{N}_]+)$/u";
 		if (preg_match ( $dotPattern, $subusername, $matches )) {
 			$tradingName = $matches [0]; // contains dot
 			$match = '';
