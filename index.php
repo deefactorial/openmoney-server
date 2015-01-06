@@ -226,10 +226,10 @@ $app->post ( '/registration', function () use($app) {
 		
 		$subspace = "";
 		
-		$trading_name = $subusername;
+		$tradingName = $subusername;
 		$dotPattern = "/^([\p{L}\p{N}-]+\.)+([\p{L}\p{N}-]+)$/u";
 		if (preg_match ( $dotPattern, $subusername, $matches )) {
-			$trading_name = $matches [0]; // contains dot
+			$tradingName = $matches [0]; // contains dot
 			$match = '';
 			$exists = true;
 			for($i = count ( $matches ) - 1; $i > 1; $i --) {
@@ -281,16 +281,16 @@ $app->post ( '/registration', function () use($app) {
 		}
 		
 		$trading_name_space ['type'] = "space";
-		$trading_name_space ['space'] = $trading_name;
+		$trading_name_space ['space'] = $tradingName;
 		$trading_name_space ['subspace'] = $subspace;
-		$trading_name_space ['steward'] = array (strtolower($username));
+		$trading_name_space ['steward'] = array ( strtolower($username) );
 		$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
 		
 		$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
 		
 		$trading_name ['type'] = "trading_name";
-		$trading_name ['trading_name'] = $trading_name;
-		$trading_name ['name'] = $trading_name;
+		$trading_name ['trading_name'] = $tradingName;
+		$trading_name ['name'] = $tradingName;
 		$trading_name ['space'] = $subspace;
 		$trading_name ['currency'] = "cc";
 		$trading_name ['steward'] = array (strtolower($username));
