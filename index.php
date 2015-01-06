@@ -257,7 +257,7 @@ $app->post ( '/registration', function () use($app) {
 				
 				for($i = count ( $matches ) - 1; $i > 0; $i --) {
 					// concatenate match to beginning of string.
-					if( $i == count ( $matches ) && $matches [$i] == ".cc" ){
+					if( $i == count ( $matches ) - 1 && $matches [$i] == ".cc" ){
 						
 					} else {
 						$match = $matches [$i] . $match;
