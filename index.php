@@ -219,70 +219,116 @@ $app->post ( '/registration', function () use($app) {
 		
 		$cb->set ( "users," . strtolower( $username ), json_encode ( $user ) );
 		$subusername = $username;
-		if( strpos ( $username, "@" ) )
+		if( strpos ( $username, "@" ) !== false)
 			$subusername = substr ( $username, 0, strpos ( $username, "@" ) );
 		//$subusername = str_replace ( ".", "", $subusername );
 		$subusername = preg_replace ( "/[^a-zA-Z\d_\.]*/", "", $subusername );
 		
-		$subspace = "";
-		
+		$subspace = "";		
 		$tradingName = $subusername;
-		$dotPattern = "/^([\w\d_]+\.)+([\p{L}\p{N}_]+)$/u";
-		if (preg_match ( $dotPattern, $subusername, $matches )) {
-			$tradingName = $matches [0]; // contains dot
-			$match = '';
-			$exists = true;
-			for($i = count ( $matches ) - 1; $i > 0; $i --) {
-				// concatenate match to beginning of string.
-				$match = $matches [$i] . $match;
-				// do a space check to make sure it exists first.
-				$space = json_decode( $cb->get( "space," . strtolower($match) ), true);
+		
+		if( strpos ( $subusername, ".") !== false) {
+			$tradingName = substr( $subusername, 0, strpos( $subusername, ".") );
+			$subspace = substr( $subusername, strpos( $subusername, ".") + 1,strlen($subusername) );
+			$space = json_decode( $cb->get( "space," . strtolower($subspace) ), true);
+			if( isset( $space['steward'] ) ) {
+				//TODO: add user to space
+				
+			} else {
+				$subspace .= ".cc";
+				//check if space exists in cc space
+				$space = json_decode( $cb->get( "space," . strtolower($subspace) ), true);
 				if( isset( $space['steward'] ) ) {
-					//TODO: add this users space view
+					//TODO: add user to space
 					
 				} else {
-					//either return error or create space.
-					$exists = false;
-				}
-			}
-			$init_space = $match;
-			
-			if($exists) {
-				//create the trading name in that space
-				$subspace = $init_space;
-			} else {
-				//create the space in the cc space.
-				$subspace = '.cc';
-				$match = '.cc';
-				
-				for($i = count ( $matches ) - 1; $i > 0; $i --) {
-					// concatenate match to beginning of string.
-					if( $i == count ( $matches ) - 1 && $matches [$i] == ".cc" ){
+					//create the space
+					$spaces_array = explode(".",$subspace);
+					$current_space = "cc";
+					$subspace = "cc";
+					for($i = count($spaces_array) - 1; $i >= 0; $i--){
+						if( $i == count ( $spaces_array ) - 1 && $spaces_array [$i] == ".cc" ){
 						
-					} else {
-						$match = $matches [$i] . $match;
-						// do a space check to make sure it exists first.
-						$space = json_decode( $cb->get( "space," . strtolower($match) ), true);
-						if( isset( $space['steward'] ) ) {
-							//TODO: add this users space view
-								
 						} else {
-							//create the space as this users
-							$trading_name_space ['type'] = "space";
-							$trading_name_space ['space'] = $match;
-							$trading_name_space ['subspace'] = $subspace;
-							$trading_name_space ['steward'] = array (strtolower($username));
-							$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
-							$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
+							$current_space .= "." . $spaces_array[$i];
+							//if space doesn't exist create it.
+							$space = json_decode( $cb->get( "space," . strtolower($current_space) ), true);
+							if( isset( $space['steward'] ) ) {
+								//TODO: add this users space view
+	
+							} else {
+								//create the space as this users
+								$trading_name_space ['type'] = "space";
+								$trading_name_space ['space'] = $current_space;
+								$trading_name_space ['subspace'] = $subspace;
+								$trading_name_space ['steward'] = array (strtolower($username));
+								$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
+								$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
+							}
+							$subspace = $current_space;
 						}
-						$subspace = $match;
 					}
 				}
 			}
-			
-		} else {
-			//user didn't have a dot in username
 		}
+		
+		
+// 		$dotPattern = "/^([\w\d_]+\.)+([\p{L}\p{N}_]+)$/u";
+// 		if (preg_match ( $dotPattern, $subusername, $matches )) {
+// 			$tradingName = $matches [0]; // contains dot
+// 			$match = '';
+// 			$exists = true;
+// 			for($i = count ( $matches ) - 1; $i > 0; $i --) {
+// 				// concatenate match to beginning of string.
+// 				$match = $matches [$i] . $match;
+// 				// do a space check to make sure it exists first.
+// 				$space = json_decode( $cb->get( "space," . strtolower($match) ), true);
+// 				if( isset( $space['steward'] ) ) {
+// 					//TODO: add this users space view
+					
+// 				} else {
+// 					//either return error or create space.
+// 					$exists = false;
+// 				}
+// 			}
+// 			$init_space = $match;
+			
+// 			if($exists) {
+// 				//create the trading name in that space
+// 				$subspace = $init_space;
+// 			} else {
+// 				//create the space in the cc space.
+// 				$subspace = '.cc';
+// 				$match = '.cc';
+				
+// 				for($i = count ( $matches ) - 1; $i > 0; $i --) {
+// 					// concatenate match to beginning of string.
+// 					if( $i == count ( $matches ) - 1 && $matches [$i] == ".cc" ){
+						
+// 					} else {
+// 						$match = $matches [$i] . $match;
+// 						// do a space check to make sure it exists first.
+// 						$space = json_decode( $cb->get( "space," . strtolower($match) ), true);
+// 						if( isset( $space['steward'] ) ) {
+// 							//TODO: add this users space view
+								
+// 						} else {
+// 							//create the space as this users
+// 							$trading_name_space ['type'] = "space";
+// 							$trading_name_space ['space'] = $match;
+// 							$trading_name_space ['subspace'] = $subspace;
+// 							$trading_name_space ['steward'] = array (strtolower($username));
+// 							$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
+// 							$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
+// 						}
+// 						$subspace = $match;
+// 					}
+// 				}
+// 			}
+			
+// 		} else {
+// 			//user didn't have a dot in username
+// 		}
 		
 		$trading_name_space ['type'] = "space";
 		$trading_name_space ['space'] = $tradingName;
