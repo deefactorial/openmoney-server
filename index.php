@@ -227,12 +227,12 @@ $app->post ( '/registration', function () use($app) {
 		$subspace = "";
 		
 		$tradingName = $subusername;
-		$dotPattern = "/^([\p{L}\p{N}-]+\.)+([\p{L}\p{N}-]+)$/u";
+		$dotPattern = "/^([\p{L}\p{N}_]+\.)+([\p{L}\p{N}_]+)$/u";
 		if (preg_match ( $dotPattern, $subusername, $matches )) {
 			$tradingName = $matches [0]; // contains dot
 			$match = '';
 			$exists = true;
-			for($i = count ( $matches ) - 1; $i > 1; $i --) {
+			for($i = count ( $matches ) - 1; $i > 0; $i --) {
 				// concatenate match to beginning of string.
 				$match = $matches [$i] . $match;
 				// do a space check to make sure it exists first.
@@ -255,7 +255,7 @@ $app->post ( '/registration', function () use($app) {
 				$subspace = '.cc';
 				$match = '.cc';
 				
-				for($i = count ( $matches ) - 1; $i > 1; $i --) {
+				for($i = count ( $matches ) - 1; $i > 0; $i --) {
 					// concatenate match to beginning of string.
 					if( $i == count ( $matches ) && $matches [$i] == ".cc" ){
 						
