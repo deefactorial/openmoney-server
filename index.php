@@ -224,24 +224,79 @@ $app->post ( '/registration', function () use($app) {
 		//$subusername = str_replace ( ".", "", $subusername );
 		$subusername = preg_replace ( "/[^a-zA-Z\d_\.]*/", "", $subusername );
 		
+		$subspace = "";
+		
+		$trading_name = $subusername;
+		$dotPattern = "/^([\p{L}\p{N}-]+\.)+([\p{L}\p{N}-]+)$/u";
+		if (preg_match ( $dotPattern, $subusername, $matches )) {
+			$trading_name = $matches [0]; // contains dot
+			$match = '';
+			$exists = true;
+			for($i = count ( $matches ) - 1; $i > 1; $i --) {
+				// concatenate match to beginning of string.
+				$match = $matches [$i] . $match;
+				// do a space check to make sure it exists first.
+				$space = json_decode( $cb->get( "space," . strtolower($match) ), true);
+				if( isset( $space['steward'] ) ) {
+					//TODO: add this users space view
+					
+				} else {
+					//either return error or create space.
+					$exists = false;
+				}
+			}
+			$init_space = $match;
+			
+			if($exists) {
+				//create the trading name in that space
+				$subspace = $init_space;
+			} else {
+				//create the space in the cc space.
+				$subspace = '.cc';
+				$match = '.cc';
+				
+				for($i = count ( $matches ) - 1; $i > 1; $i --) {
+					// concatenate match to beginning of string.
+					$match = $matches [$i] . $match;
+					// do a space check to make sure it exists first.
+					$space = json_decode( $cb->get( "space," . strtolower($match) ), true);
+					if( isset( $space['steward'] ) ) {
+						//TODO: add this users space view
+							
+					} else {
+						//create the space as this users
+						$trading_name_space ['type'] = "space";
+						$trading_name_space ['space'] = $match;
+						$trading_name_space ['subspace'] = $subspace;
+						$trading_name_space ['steward'] = array (strtolower($username));
+						$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
+						$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
+					}
+					$subspace = $match;
+				}
+			}
+			
+		} else {
+			//user didn't have a dot in username
+		}
 		
 		$trading_name_space ['type'] = "space";
-		$trading_name_space ['space'] = $subusername;
-		$trading_name_space ['subspace'] = '';
+		$trading_name_space ['space'] = $trading_name;
+		$trading_name_space ['subspace'] = $subspace;
 		$trading_name_space ['steward'] = array (strtolower($username));
 		$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
 		
 		$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
 		
 		$trading_name ['type'] = "trading_name";
-		$trading_name ['trading_name'] = $subusername;
-		$trading_name ['name'] = $subusername;
-		$trading_name ['space'] = "";
+		$trading_name ['trading_name'] = $trading_name;
+		$trading_name ['name'] = $trading_name;
+		$trading_name ['space'] = $subspace;
 		$trading_name ['currency'] = "cc";
 		$trading_name ['steward'] = array (strtolower($username));
 		$trading_name ['created'] = intval( round(microtime(true) * 1000) );
 		
-		$cb->set ( "trading_name," . strtolower( $trading_name ['trading_name'] ) . "," . $trading_name ['currency'], json_encode ( $trading_name ) );
+		$cb->set ( "trading_name," . strtolower( $trading_name ['trading_name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
 		
 		$currency_view ['type'] = "currency_view";
 		$currency_view ['currency'] = "cc";
@@ -249,6 +304,19 @@ $app->post ( '/registration', function () use($app) {
 		$currency_view ['created'] = intval( round(microtime(true) * 1000) );
 		
 		$cb->set ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
+		
+		$currency = json_decode( $cb->get( "currency," . strtolower( $subspace ) ), true);
+		if( isset( $currency['steward'] ) ) {
+			$trading_name ['currency'] = $currency['currency'];
+			$cb->set ( "trading_name," . strtolower( $trading_name ['trading_name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
+			
+			$currency_view ['type'] = "currency_view";
+			$currency_view ['currency'] = strtolower( $trading_name ['currency'] );
+			$currency_view ['steward'] = array (strtolower($username));
+			$currency_view ['created'] = intval( round(microtime(true) * 1000) );
+			
+			$cb->set ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
+		}
 		
 		$profile ['type'] = "profile";
 		$profile ['username'] = strtolower($username);
