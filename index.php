@@ -341,13 +341,13 @@ $app->post ( '/registration', function () use($app) {
 		
 		$trading_name ['type'] = "trading_name";
 		$trading_name ['trading_name'] = $tradingName;
-		$trading_name ['name'] = $tradingName;
+		$trading_name ['name'] = $tradingName . "." . $subspace;
 		$trading_name ['space'] = $subspace;
 		$trading_name ['currency'] = "cc";
 		$trading_name ['steward'] = array (strtolower($username));
 		$trading_name ['created'] = intval( round(microtime(true) * 1000) );
 		
-		$cb->set ( "trading_name," . strtolower( $trading_name ['trading_name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
+		$cb->set ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
 		
 		$currency_view ['type'] = "currency_view";
 		$currency_view ['currency'] = "cc";
