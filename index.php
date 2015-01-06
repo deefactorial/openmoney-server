@@ -244,10 +244,11 @@ $app->post ( '/registration', function () use($app) {
 				} else {
 					//create the space
 					$spaces_array = explode(".",$subspace);
-					$current_space = "cc";
-					$subspace = "cc";
+					$current_space = "";
+					$subspace = "";
 					for($i = count($spaces_array) - 1; $i >= 0; $i--){
-						if( $i == count ( $spaces_array ) - 1 && $spaces_array [$i] == ".cc" ){
+						//check if the root of what they asked for is cc and ignore
+						if( $i == count ( $spaces_array ) - 2 && $spaces_array [$i] == ".cc" ){
 						
 						} else {
 							$current_space =  $spaces_array[$i] . "." . $current_space ;
