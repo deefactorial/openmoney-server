@@ -235,17 +235,17 @@ $app->post ( '/registration', function () use($app) {
 				//TODO: add user to space
 				
 			} else {
-				$subspace = $subspace . ".cc";
+				
 				//check if space exists in cc space
-				$space = json_decode( $cb->get( "space," . strtolower($subspace) ), true);
+				$space = json_decode( $cb->get( "space," . strtolower($subspace) . ".cc" ), true);
 				if( isset( $space['steward'] ) ) {
 					//TODO: add user to space view
-					
+					$subspace = $subspace . ".cc";
 				} else {
 					//create the space
 					$spaces_array = explode(".",$subspace);
-					$current_space = "";
-					$subspace = "";
+					$current_space = "cc";
+					$subspace = "cc";
 					for($i = count($spaces_array) - 1; $i >= 0; $i--){
 						//check if the root of what they asked for is cc and ignore
 						if( $i == count ( $spaces_array ) - 2 && $spaces_array [$i] == ".cc" ){
