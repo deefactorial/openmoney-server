@@ -739,6 +739,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 
 			
 			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+			$options['stale'] = false;
 				
 			// do trading name lookup on
 			$trading_name_view_result = $cb->view ( 'dev_openmoney_helper', 'trading_name_view', $options );
