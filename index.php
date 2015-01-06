@@ -228,7 +228,7 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name_space ['type'] = "space";
 		$trading_name_space ['space'] = $subusername;
 		$trading_name_space ['subspace'] = '';
-		$trading_name_space ['steward'] = array ($username);
+		$trading_name_space ['steward'] = array (strtolower($username));
 		$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
 		
 		$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
@@ -238,20 +238,20 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name ['name'] = $subusername;
 		$trading_name ['space'] = "";
 		$trading_name ['currency'] = "cc";
-		$trading_name ['steward'] = array ($username);
+		$trading_name ['steward'] = array (strtolower($username));
 		$trading_name ['created'] = intval( round(microtime(true) * 1000) );
 		
 		$cb->set ( "trading_name," . strtolower( $trading_name ['trading_name'] ) . "," . $trading_name ['currency'], json_encode ( $trading_name ) );
 		
 		$currency_view ['type'] = "currency_view";
 		$currency_view ['currency'] = "cc";
-		$currency_view ['steward'] = array ($username);
+		$currency_view ['steward'] = array (strtolower($username));
 		$currency_view ['created'] = intval( round(microtime(true) * 1000) );
 		
 		$cb->set ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
 		
 		$profile ['type'] = "profile";
-		$profile ['username'] = $username;
+		$profile ['username'] = strtolower($username);
 		$profile ['email'] = $email;
 		$profile ['notification'] = true;
 		$profile ['mode'] = false;
