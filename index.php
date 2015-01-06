@@ -206,7 +206,7 @@ $app->post ( '/registration', function () use($app) {
 	
 	if (! isset ( $user ['password'] ) || $user ['password'] == '') {
 		
-		$user ['username'] = $username;
+		$user ['username'] = strtolower( $username );
 		$user ['email'] = $email;
 		$user ['cost'] = $options ['cost'] = 10;
 		$user ['type'] = "users";
@@ -217,20 +217,21 @@ $app->post ( '/registration', function () use($app) {
 		$user ['password_encryption_algorithm'] = array (PASSWORD_BCRYPT);
 		$user ['created'] = intval( round(microtime(true) * 1000) );
 		
-		$cb->set ( "users," . $username, json_encode ( $user ) );
+		$cb->set ( "users," . strtolower( $username ), json_encode ( $user ) );
 		$subusername = $username;
 		if( strpos ( $username, "@" ) )
 			$subusername = substr ( $username, 0, strpos ( $username, "@" ) );
 		//$subusername = str_replace ( ".", "", $subusername );
-		$subusername = preg_replace ( "/[^a-zA-Z\d]*/", "", $subusername );
+		$subusername = preg_replace ( "/[^a-zA-Z\d_\.]*/", "", $subusername );
+		
 		
 		$trading_name_space ['type'] = "space";
 		$trading_name_space ['space'] = $subusername;
 		$trading_name_space ['subspace'] = '';
 		$trading_name_space ['steward'] = array ($username);
-		$trading_name_space ['created'] = intval( round(microtime(true) * 1000) );
+		$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
 		
-		$cb->set ( "space," . $trading_name_space ['space'], json_encode ( $trading_name_space ) );
+		$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
 		
 		$trading_name ['type'] = "trading_name";
 		$trading_name ['trading_name'] = $subusername;
@@ -240,14 +241,14 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name ['steward'] = array ($username);
 		$trading_name ['created'] = intval( round(microtime(true) * 1000) );
 		
-		$cb->set ( "trading_name," . $trading_name ['trading_name'] . "," . $trading_name ['currency'], json_encode ( $trading_name ) );
+		$cb->set ( "trading_name," . strtolower( $trading_name ['trading_name'] ) . "," . $trading_name ['currency'], json_encode ( $trading_name ) );
 		
 		$currency_view ['type'] = "currency_view";
 		$currency_view ['currency'] = "cc";
 		$currency_view ['steward'] = array ($username);
 		$currency_view ['created'] = intval( round(microtime(true) * 1000) );
 		
-		$cb->set ( "currency_view," . $username . "," . $currency_view ['currency'], json_encode ( $currency_view ) );
+		$cb->set ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
 		
 		$profile ['type'] = "profile";
 		$profile ['username'] = $username;
@@ -257,7 +258,7 @@ $app->post ( '/registration', function () use($app) {
 		$profile ['theme'] = false;
 		$profile ['created'] = intval( round(microtime(true) * 1000) );
 		
-		$cb->set ( "profile," . $username , json_encode ( $profile ) );
+		$cb->set ( "profile," . strtolower( $username ) , json_encode ( $profile ) );
 		
 		// TODO: send email verification or write an email bot to look for new registrations
 		
@@ -273,7 +274,7 @@ $app->post ( '/registration', function () use($app) {
 			$result = file_get_contents ( $url, false, $context );
 		} else {
 			// user exists in db but not in sync_gateway so create the user
-			$url = 'https://localhost:4985/openmoney_shadow/_user/' . $username;
+			$url = 'https://localhost:4985/openmoney_shadow/_user/' . strtolower( $username );
 			// $url = 'https://localhost:4985/todos/_user/' . $username;
 			$data = array ('name' => $user ['username'], 'password' => $password);
 			$json = json_encode ( $data );
