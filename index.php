@@ -257,22 +257,26 @@ $app->post ( '/registration', function () use($app) {
 				
 				for($i = count ( $matches ) - 1; $i > 1; $i --) {
 					// concatenate match to beginning of string.
-					$match = $matches [$i] . $match;
-					// do a space check to make sure it exists first.
-					$space = json_decode( $cb->get( "space," . strtolower($match) ), true);
-					if( isset( $space['steward'] ) ) {
-						//TODO: add this users space view
-							
+					if( $i == count ( $matches ) && $matches [$i] == ".cc" ){
+						
 					} else {
-						//create the space as this users
-						$trading_name_space ['type'] = "space";
-						$trading_name_space ['space'] = $match;
-						$trading_name_space ['subspace'] = $subspace;
-						$trading_name_space ['steward'] = array (strtolower($username));
-						$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
-						$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
+						$match = $matches [$i] . $match;
+						// do a space check to make sure it exists first.
+						$space = json_decode( $cb->get( "space," . strtolower($match) ), true);
+						if( isset( $space['steward'] ) ) {
+							//TODO: add this users space view
+								
+						} else {
+							//create the space as this users
+							$trading_name_space ['type'] = "space";
+							$trading_name_space ['space'] = $match;
+							$trading_name_space ['subspace'] = $subspace;
+							$trading_name_space ['steward'] = array (strtolower($username));
+							$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
+							$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
+						}
+						$subspace = $match;
 					}
-					$subspace = $match;
 				}
 			}
 			
