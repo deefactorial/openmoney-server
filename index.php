@@ -235,11 +235,11 @@ $app->post ( '/registration', function () use($app) {
 				//TODO: add user to space
 				
 			} else {
-				$subspace .= ".cc";
+				$subspace = $subspace . ".cc";
 				//check if space exists in cc space
 				$space = json_decode( $cb->get( "space," . strtolower($subspace) ), true);
 				if( isset( $space['steward'] ) ) {
-					//TODO: add user to space
+					//TODO: add user to space view
 					
 				} else {
 					//create the space
@@ -250,7 +250,7 @@ $app->post ( '/registration', function () use($app) {
 						if( $i == count ( $spaces_array ) - 1 && $spaces_array [$i] == ".cc" ){
 						
 						} else {
-							$current_space .= "." . $spaces_array[$i];
+							$current_space =  $spaces_array[$i] . "." . $current_space ;
 							//if space doesn't exist create it.
 							$space = json_decode( $cb->get( "space," . strtolower($current_space) ), true);
 							if( isset( $space['steward'] ) ) {
