@@ -230,6 +230,7 @@ $app->post ( '/registration', function () use($app) {
 		if( strpos ( $subusername, ".") !== false) {
 			$tradingName = substr( $subusername, 0, strpos( $subusername, ".") );
 			$subspace = substr( $subusername, strpos( $subusername, ".") + 1,strlen($subusername) );
+			unset($space);
 			$space = json_decode( $cb->get( "space," . strtolower($subspace) ), true);
 			if( isset( $space['steward'] ) ) {
 				
@@ -271,6 +272,7 @@ $app->post ( '/registration', function () use($app) {
 					} else {
 						$current_space =  $spaces_array[$i] . "." . $current_space ;
 						//if space doesn't exist create it.
+						unset($space);
 						$space = json_decode( $cb->get( "space," . strtolower($current_space) ), true);
 						if( ! isset( $space['steward'] ) ) {
 							
