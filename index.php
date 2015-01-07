@@ -242,7 +242,7 @@ $app->post ( '/registration', function () use($app) {
 				$trading_name_space_view ['steward'] = array ( strtolower($username) );
 				$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 					
-				$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space_view ) );
+				$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 				
 				for($i = count($spaces_array) - 1; $i >= 0; $i--){
 					$current_space =  $spaces_array[$i] . "." . $current_space ;
@@ -252,7 +252,7 @@ $app->post ( '/registration', function () use($app) {
 					$trading_name_space_view ['steward'] = array ( strtolower($username) );
 					$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 					
-					$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space_view ) );
+					$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 				}
 				
 				$subspace = $current_space;
@@ -290,7 +290,7 @@ $app->post ( '/registration', function () use($app) {
 						$trading_name_space_view ['steward'] = array ( strtolower($username) );
 						$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 							
-						$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space_view ) );
+						$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 						
 						$subspace = $current_space;
 					}
@@ -312,7 +312,7 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name_space_view ['steward'] = array ( strtolower($username) );
 		$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 		
-		$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space_view ) );
+		$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 		
 		$trading_name ['type'] = "trading_name";
 		$trading_name ['trading_name'] = $tradingName;
