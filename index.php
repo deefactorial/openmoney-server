@@ -332,7 +332,7 @@ $app->post ( '/registration', function () use($app) {
 // 		}
 		
 		$trading_name_space ['type'] = "space";
-		$trading_name_space ['space'] = $tradingName;
+		$trading_name_space ['space'] = $tradingName . "." . $subspace;
 		$trading_name_space ['subspace'] = $subspace;
 		$trading_name_space ['steward'] = array ( strtolower($username) );
 		$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
