@@ -331,8 +331,9 @@ $app->post ( '/registration', function () use($app) {
 // 			//user didn't have a dot in username
 // 		}
 		
+		
 		$trading_name_space ['type'] = "space";
-		$trading_name_space ['space'] = $subspace != "" ? $tradingName . "." . $subspace : $tradingName;
+		$trading_name_space ['space'] = $subspace != "" ? $tradingName . "." . $subspace : $tradingName . ".cc";
 		$trading_name_space ['subspace'] = $subspace;
 		$trading_name_space ['steward'] = array ( strtolower($username) );
 		$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
@@ -341,7 +342,7 @@ $app->post ( '/registration', function () use($app) {
 		
 		$trading_name ['type'] = "trading_name";
 		$trading_name ['trading_name'] = $tradingName;
-		$trading_name ['name'] = $subspace != "" ? $tradingName . "." . $subspace : $tradingName;
+		$trading_name ['name'] = $subspace != "" ? $tradingName . "." . $subspace : $tradingName . ".cc";
 		$trading_name ['space'] = $subspace;
 		$trading_name ['currency'] = "cc";
 		$trading_name ['steward'] = array (strtolower($username));
