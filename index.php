@@ -809,10 +809,18 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			unset($options['include_docs']);
 		}
 		
-		$stale = true;
+		$stale = false;
 		if (isset($options['stale'])){
 			$stale = $options['stale'];
-			unset($options['stale']);
+			if($stale == "update_after") {
+				$options['stale'] = $stale = true;
+			}
+			if($stale == "ok"){
+				$options['stale'] = $stale = true;
+			}
+			//unset($options['stale']);
+		} else {
+			$options['stale'] = $stale;
 		}
 			
 		//$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
