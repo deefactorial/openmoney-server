@@ -947,7 +947,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 					if ($space_object) {
 						unset($value);
 						$value['space'] = $space_object['space'];
-						$value['name'] = $space_object['name'];
+						//$value['name'] = $space_object['name'];
 			
 						unset($object);
 						$object['id'] = "space," . $space_object['space'];
