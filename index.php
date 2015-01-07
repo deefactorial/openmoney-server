@@ -932,31 +932,67 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			
 		} else if($viewname == 'spaces') {
 			
-			unset($options);
-			
 			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
 			$options['stale'] = false;
-			
-			$spaces_result = $cb->view ( 'dev_openmoney', $viewname, $options );
-			
-			$spaces_array = array();
-			foreach($spaces_result['rows'] as $space){
-				unset($object);
-				$object['id'] = $space['id'];
-				$object['key'] = $space['value'];
-				$object['value'] = '';
 				
-				if($include_docs) {
-					$object['doc'] = json_decode ( $cb->get ( $space['id'] ), true );
-					$object['doc']['_id'] = $space['id'];
+			// do currency view lookup
+			$space_view = $cb->view ( 'dev_openmoney_helper', 'space_view', $options );
+				
+			$space_id_array = array();
+			$space_array = array();
+			foreach ( $space_view ['rows'] as $space ) {
+				if( ! in_array( $space['value'], $space_id_array ) ) {
+						
+					$space_object = json_decode ( $cb->get ( strtolower( $space['value'] ) ), true );
+					if ($space_object) {
+						unset($value);
+						$value['space'] = $space_object['space'];
+						$value['name'] = $space_object['name'];
+			
+						unset($object);
+						$object['id'] = "space," . $space_object['space'];
+						$object['key'] = $space_object['space'];
+						$object['value'] = $value;
+			
+						if ($include_docs) {
+							$object['doc'] = $space_object;
+							$object['doc']['_id'] = $object['id'];
+						}
+			
+						array_push($space_array, $object);
+					}
 				}
-				
-				array_push($spaces_array, $object);
 			}
-			
-			$rows = array("rows"=>$spaces_array);
+				
+			$rows = array("rows"=>$space_array);
 				
 			echo json_encode ( $rows );
+			
+// 			unset($options);
+			
+// 			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+// 			$options['stale'] = false;
+			
+// 			$spaces_result = $cb->view ( 'dev_openmoney', $viewname, $options );
+			
+// 			$spaces_array = array();
+// 			foreach($spaces_result['rows'] as $space){
+// 				unset($object);
+// 				$object['id'] = $space['id'];
+// 				$object['key'] = $space['value'];
+// 				$object['value'] = '';
+				
+// 				if($include_docs) {
+// 					$object['doc'] = json_decode ( $cb->get ( $space['id'] ), true );
+// 					$object['doc']['_id'] = $space['id'];
+// 				}
+				
+// 				array_push($spaces_array, $object);
+// 			}
+			
+// 			$rows = array("rows"=>$spaces_array);
+				
+// 			echo json_encode ( $rows );
 			
 		} else if ($viewname == 'account_details') {
 		
