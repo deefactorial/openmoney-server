@@ -314,6 +314,13 @@ $app->post ( '/registration', function () use($app) {
 		
 		$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 		
+		$trading_name_space_view ['type'] = "space_view";
+		$trading_name_space_view ['space'] = "cc";
+		$trading_name_space_view ['steward'] = array ( strtolower($username) );
+		$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
+		
+		$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+		
 		$trading_name ['type'] = "trading_name";
 		$trading_name ['trading_name'] = $tradingName;
 		$trading_name ['name'] = $subspace != "" ? $tradingName . "." . $subspace : $tradingName . ".cc";
@@ -795,13 +802,17 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			$options['endkey'] = trim( $options['endkey'], '"');
 		}
 		
-		$options['stale'] = false;
-		
 		//print_r($options);
 		$include_docs = false;
 		if (isset($options['include_docs'])){
 			$include_docs = $options['include_docs'];
 			unset($options['include_docs']);
+		}
+		
+		$stale = true;
+		if (isset($options['stale'])){
+			$stale = $options['stale'];
+			unset($options['stale']);
 		}
 			
 		//$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
@@ -809,7 +820,6 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		// do trading name lookup on
 		if ($viewname == 'accounts') {
 		
-			$options['stale'] = false;
 			$accounts = $cb->view ( 'dev_openmoney', $viewname, $options );
 			
 			$tradingname_array = array ();
@@ -833,7 +843,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 
 			
 			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
-			$options['stale'] = false;
+			$options['stale'] = $stale;
 				
 			// do trading name lookup on
 			$trading_name_view_result = $cb->view ( 'dev_openmoney_helper', 'trading_name_view', $options );
@@ -895,7 +905,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 
 			
 			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
-			$options['stale'] = false;
+			$options['stale'] = $stale;
 			
 			// do currency view lookup 
 			$currency_view_result = $cb->view ( 'dev_openmoney_helper', 'currency_view', $options );
@@ -933,7 +943,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		} else if($viewname == 'spaces') {
 			
 			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
-			$options['stale'] = false;
+			$options['stale'] = $stale;
 				
 			// do currency view lookup
 			$space_view = $cb->view ( 'dev_openmoney_helper', 'space_view', $options );
@@ -1005,7 +1015,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				
 				$options['startkey'] = array( $options['startkey'] );
 				$options['endkey'] = array( $options['endkey'] );
-				$options['stale'] = false;
+				$options['stale'] = $stale;
 				
 				
 				//print_r($options);
@@ -1026,7 +1036,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		} else if ($viewname == 'nfc_tags') {
 			
 			$options = array ( 'startkey' => array($username), 'endkey' => array($username . '\uefff') ) ;
-			$options['stale'] = false;
+			$options['stale'] = $stale;
 			
 			$nfc_tags = $cb->view ( 'dev_openmoney', $viewname, $options );
 			
