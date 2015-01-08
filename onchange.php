@@ -495,7 +495,7 @@ foreach ( $currencies ['rows'] as $currency ) {
 	if (!$taken) {
 	
 	
-		if(!isset($currency['notified'])) {
+		if(!isset($currency['notified']) && isset($currency['currency'])) {
 			
 			if( !isset( $currency['key'] ) ) {
 				//generate the key and hash
