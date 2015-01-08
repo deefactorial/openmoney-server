@@ -873,17 +873,17 @@ foreach ( $beamtags ['rows'] as $beamtag ) {
 $options = array();
 $options['stale'] = false;
 
-$view = $cb->view( "dev_openmoney", "account_balance", $options );
-$view = $cb->view( "dev_openmoney", "account_details", $options );
-$view = $cb->view( "dev_openmoney", "accounts", $options );
-$view = $cb->view( "dev_openmoney", "currencies", $options );
-$view = $cb->view( "dev_openmoney", "spaces", $options );
-$view = $cb->view( "dev_openmoney_helper", "trading_name_view", $options );
-$view = $cb->view( "dev_openmoney_helper", "curency_view", $options );
-$view = $cb->view( "dev_openmoney_helper", "space_view", $options );
-$view = $cb->view( "dev_openmoney", "nfc_tags", $options );
+// $view = $cb->view( "dev_openmoney", "account_balance", $options );
+// $view = $cb->view( "dev_openmoney", "account_details", $options );
+// $view = $cb->view( "dev_openmoney", "accounts", $options );
+// $view = $cb->view( "dev_openmoney", "currencies", $options );
+// $view = $cb->view( "dev_openmoney", "spaces", $options );
+// $view = $cb->view( "dev_openmoney_helper", "trading_name_view", $options );
+// $view = $cb->view( "dev_openmoney_helper", "curency_view", $options );
+// $view = $cb->view( "dev_openmoney_helper", "space_view", $options );
+// $view = $cb->view( "dev_openmoney", "nfc_tags", $options );
 
-
+exit();
 
 
 ?>
