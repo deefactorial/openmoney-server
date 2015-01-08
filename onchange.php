@@ -147,7 +147,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 		$taken = $trading_name_array['taken'];
 	}
 
-	if (!$taken) {
+	if (!$taken && isset( $trading_name_array['name'] )) {
 
 		if(!isset($trading_name_array['notified'])) {
 				
