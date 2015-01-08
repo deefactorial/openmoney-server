@@ -340,6 +340,7 @@ $app->post ( '/registration', function () use($app) {
 		
 		$cb->set ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
 		
+		unset($currency);
 		$currency = json_decode( $cb->get( "currency," . strtolower( $subspace ) ), true);
 		if( isset( $currency['steward'] ) ) {
 			$trading_name ['currency'] = $currency['currency'];
@@ -1032,7 +1033,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				
 				$options['startkey'] = array( $options['startkey'] );
 				$options['endkey'] = array( $options['endkey'] );
-				$options['stale'] = $stale;
+				$options['stale'] = false;
 				
 				
 				//print_r($options);
