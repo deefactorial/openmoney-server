@@ -627,7 +627,7 @@ foreach ( $spaces ['rows'] as $space ) {
 	
 	if (!$taken) {
 	
-		if(!isset($space['notified'])) {
+		if(!isset($space['notified']) && isset($space['space'])) {
 	
 			if( !isset( $space['key'] ) ) {
 				//generate the key and hash
