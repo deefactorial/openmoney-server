@@ -581,7 +581,7 @@ $app->post ( '/lookupTag', function () use($app) {
 			$cb->setDesignDoc ( "dev_nfctag", $designDoc );
 			
 			
-			$result = $cb->view ( 'dev_nfctag', 'beamlookup2', array ('startkey' => $key, 'endkey' => $key . '\uefff', 'stale' => false) );
+			$result = $cb->view ( 'dev_nfctag', 'beamlookup2', array ('startkey' => $key, 'endkey' => $key . '\uefff') );
 			
 			$trading_names_array = array();
 			
