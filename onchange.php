@@ -568,7 +568,7 @@ foreach ( $spaces ['rows'] as $space ) {
 	
 	
 	$taken = false;
-	if( !isset( $space['taken'] ) ) {
+	if( !isset( $space['taken'] ) && isset( $space['space'] ) ) {
 			
 		//check if the currency is taken by another space or trading name
 		// do trading name lookup
