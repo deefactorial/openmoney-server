@@ -811,7 +811,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			unset($options['include_docs']);
 		}
 		
-		$stale = false;
+		$stale = true;
 		if (isset($options['stale'])){
 			$stale = $options['stale'];
 			if($stale == "update_after") {
@@ -823,6 +823,11 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			//unset($options['stale']);
 		} else {
 			$options['stale'] = $stale;
+		}
+		
+		if( $options['stale'] == true ) {
+			//this is the default
+			unset($options['stale']);
 		}
 			
 		//$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
