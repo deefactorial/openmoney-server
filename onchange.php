@@ -2,11 +2,15 @@
 require ("config.php");
 
 function email_letter($to, $from, $subject = 'no subject', $msg = 'no msg') {
-	$headers = "From: $from\r\n";
-	$headers .= "MIME-Version: 1.0\r\n";
-	$headers .= "Content-type: text/html; charset=iso-8859-1\r\n";
-	$headers .= 'X-Mailer: PHP/' . phpversion ();
-	return mail ( $to, $subject, $msg, $headers );
+ 	if( strpos($to,"@") !== false && strpos($from,"@") !== false ) {	
+		$headers = "From: $from\r\n";
+		$headers .= "MIME-Version: 1.0\r\n";
+		$headers .= "Content-type: text/html; charset=iso-8859-1\r\n";
+		$headers .= 'X-Mailer: PHP/' . phpversion ();
+		return mail ( $to, $subject, $msg, $headers );
+ 	} else {
+ 		return false;
+ 	}
 }
 
 $cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
