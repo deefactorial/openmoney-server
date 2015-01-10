@@ -432,11 +432,13 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 echo "jornal verification:" . (time() - $time) . " seconds\n";
 $time = time();
 
+$count = 0;
 
 // do currency lookup
 $options = array ();
 $currencies = $cb->view( $design_doc_name, $currency_function_name, $options );
 foreach ( $currencies ['rows'] as $currency ) {
+	$count++;
 
 	//init
 	$currency_name = $currency ['key'];
@@ -566,19 +568,21 @@ foreach ( $currencies ['rows'] as $currency ) {
 	}
 }
 
-echo "currency processing:" . (time() - $time) . " seconds\n";
+echo "currency processing:" . (time() - $time) . " seconds, count: " . $count . "\n";
 $time = time();
+
+$count = 0;
 
 // do space lookup
 $options = array ();
 $spaces = $cb->view( $design_doc_name, $space_function_name, $options );
 foreach ( $spaces ['rows'] as $space ) {
+	$count++;
 
 	//init
 	$space_stewards = $space ['value'];
-	$space = $space ['key'];
-	$space = $cb->get ( "space," . $space );
-	$space = json_decode( $space , true );
+	$space_name = $space ['key'];
+	$space = json_decode($cb->get ( "space," . $space_name ), true );
 	
 	
 	$taken = false;
@@ -699,7 +703,7 @@ foreach ( $spaces ['rows'] as $space ) {
 	}
 }
 
-echo "space processing:" . (time() - $time) . " seconds\n";
+echo "space processing:" . (time() - $time) . " seconds, count: " . $count . "\n";
 $time = time();
 
 
