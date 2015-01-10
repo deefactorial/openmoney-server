@@ -777,7 +777,17 @@ foreach ( $profiles ['rows'] as $profile ) {
 							          'endkey' => "trading_name,".$trading_name['value']['trading_name'].",".$trading_name['value']['currency'] . '\uefff');
 					// do trading name journal lookup
 					$tradingnamejournal_result = $cb->view ( $design_doc_name, $trading_name_journal_function_name, $options );
+					$sorted_trading_name_jornal_result = array();
+					$sorted_trading_name_jornal_result['rows'] = array();
 					foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
+						$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
+						$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
+						$timestamp = $trading_name_journal['timestamp'];
+						$sorted_trading_name_jornal_result['rows'][$timestamp] = $journal_trading_name;
+					}
+					ksort($sorted_trading_name_jornal_result['rows']);
+					
+					foreach ( $sorted_trading_name_jornal_result['rows'] ['rows'] as $journal_trading_name ) {
 						$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
 						$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
 						//echo "lastrun " . ($lastRun * 1000). " < journal " . $trading_name_journal['timestamp'] . "\n";
