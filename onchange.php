@@ -737,10 +737,10 @@ foreach ( $profiles ['rows'] as $profile ) {
 		
 		date_default_timezone_set($profile_array['timezone']);
 		
-		//echo "current time is " . date("G:i") . " run time is " . $profile_array['digesttime'] . "\n";
+		echo "current time is " . date("G:i") . " run time is " . $profile_array['digesttime'] . "\n";
 		//if this is the minute
 		//this works because this script will once run every minute.
-		if (date("G:i") == $profile_array['digesttime']) {
+		if (date("G:i") == $profile_array['digesttime'] || (isset($profile_array['digest_timestamp']) && strtotime("-1 day") > $profile_array['digest_timestamp']) ) {
 			//now is time to run the email digest.
 			echo "Run email digest for " . $profile_array['username'] . "\n";
 			$lastRun = strtotime("-1 day");
