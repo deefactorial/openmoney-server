@@ -36,9 +36,9 @@ $total_profile_lookup_function = 'function(doc,meta){if(doc.type==\"profile\"&&d
 
 $total_profile_function_name = "total_profile";
 
-$space_lookup_function = 'function(doc,meta){if(doc.type==\"space\"&&doc.steward&&typeof doc.space != \"undefined\"){emit(doc.space,doc.steward);}}';
+$space_lookup_function = 'function(doc,meta){if(doc.type==\"space\"&&doc.steward&&doc.space){emit(doc.space,doc.steward);}}';
 
-$space_function_name = "space";
+$space_function_name = "space1";
 
 $currency_lookup_function = 'function(doc,meta){if(doc.type==\"currency\"&&doc.currency&&doc.steward){emit(doc.currency,doc.steward);}}';
 
