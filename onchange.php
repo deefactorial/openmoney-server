@@ -634,7 +634,7 @@ foreach ( $spaces ['rows'] as $space ) {
 		}
 			
 	} else {
-		$taken = $currency['taken'];
+		$taken = $space['taken'];
 	}
 	
 	if (!$taken) {
