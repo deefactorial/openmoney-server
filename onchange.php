@@ -1,4 +1,5 @@
 <?php
+$time = time();
 require ("config.php");
 
 function email_letter($to, $from, $subject = 'no subject', $msg = 'no msg') {
@@ -54,6 +55,7 @@ $design_doc_name = "dev_changes";
 
 $cb->setDesignDoc ($design_doc_name,json_decode(json_encode($designDoc)));
 
+echo "setup processing:" . (time() - $time) . " seconds\n";
 $time = time();
 
 // do trading name lookup
@@ -215,7 +217,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 }
 
 
-echo "trading name processing:" . (time() - $time) / 1000 . " seconds\n";
+echo "trading name processing:" . (time() - $time) . " seconds\n";
 $time = time();
 	
 $options = array ();
@@ -427,7 +429,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	}
 }
 
-echo "jornal verification:" . (time() - $time) / 1000 . " seconds\n";
+echo "jornal verification:" . (time() - $time) . " seconds\n";
 $time = time();
 
 
@@ -564,7 +566,7 @@ foreach ( $currencies ['rows'] as $currency ) {
 	}
 }
 
-echo "currency processing:" . (time() - $time) / 1000 . " seconds\n";
+echo "currency processing:" . (time() - $time) . " seconds\n";
 $time = time();
 
 // do space lookup
@@ -626,7 +628,7 @@ foreach ( $spaces ['rows'] as $space ) {
 		}
 			
 		if (!$taken) {
-			$space['taken'] = $taken;
+			$space['taken'] = $taken; //false
 			$space['taken_at'] = intval( round(microtime(true) * 1000) );
 			$cb->set ( "space," . $space['space'], json_encode ( $space ) );
 		} else {
@@ -697,7 +699,7 @@ foreach ( $spaces ['rows'] as $space ) {
 	}
 }
 
-echo "space processing:" . (time() - $time) / 1000 . " seconds\n";
+echo "space processing:" . (time() - $time) . " seconds\n";
 $time = time();
 
 
@@ -870,7 +872,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 	
 }
 
-echo "digest processing:" . (time() - $time) / 1000 . " seconds \n";
+echo "digest processing:" . (time() - $time) . " seconds \n";
 $time = time();
 
 
@@ -910,7 +912,7 @@ $options['stale'] = false;
 // $view = $cb->view( "dev_openmoney_helper", "space_view", $options );
 // $view = $cb->view( "dev_openmoney", "nfc_tags", $options );
 
-echo "beamtag processing:" . (time() - $time) / 1000 . " seconds\n";
+echo "beamtag processing:" . (time() - $time) . " seconds\n";
 $time = time();
 
 exit();
