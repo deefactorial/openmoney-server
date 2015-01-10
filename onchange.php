@@ -787,7 +787,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 					}
 					ksort($sorted_trading_name_jornal_result['rows']);
 					
-					foreach ( $sorted_trading_name_jornal_result['rows'] ['rows'] as $journal_trading_name ) {
+					foreach ( $sorted_trading_name_jornal_result['rows'] as $journal_trading_name ) {
 						$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
 						$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
 						//echo "lastrun " . ($lastRun * 1000). " < journal " . $trading_name_journal['timestamp'] . "\n";
