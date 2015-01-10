@@ -215,7 +215,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 }
 
 
-echo "trading name processing:" . (time() - $time_before) / 1000 ;
+echo "trading name processing:" . (time() - $time) / 1000 ;
 $time = time();
 	
 $options = array ();
@@ -427,7 +427,7 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	}
 }
 
-echo "jornal verification:" . (time() - $time_before) / 1000 ;
+echo "jornal verification:" . (time() - $time) / 1000 ;
 $time = time();
 
 
@@ -564,7 +564,7 @@ foreach ( $currencies ['rows'] as $currency ) {
 	}
 }
 
-echo "currency processing:" . (time() - $time_before) / 1000 ;
+echo "currency processing:" . (time() - $time) / 1000 ;
 $time = time();
 
 // do space lookup
@@ -697,7 +697,7 @@ foreach ( $spaces ['rows'] as $space ) {
 	}
 }
 
-echo "space processing:" . (time() - $time_before) / 1000 ;
+echo "space processing:" . (time() - $time) / 1000 ;
 $time = time();
 
 
@@ -870,7 +870,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 	
 }
 
-echo "digest processing:" . (time() - $time_before) / 1000 ;
+echo "digest processing:" . (time() - $time) / 1000 ;
 $time = time();
 
 
@@ -910,7 +910,7 @@ $options['stale'] = false;
 // $view = $cb->view( "dev_openmoney_helper", "space_view", $options );
 // $view = $cb->view( "dev_openmoney", "nfc_tags", $options );
 
-echo "beamtag processing:" . (time() - $time_before) / 1000 ;
+echo "beamtag processing:" . (time() - $time) / 1000 ;
 $time = time();
 
 exit();
