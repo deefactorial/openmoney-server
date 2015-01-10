@@ -54,6 +54,7 @@ $design_doc_name = "dev_changes";
 
 $cb->setDesignDoc ($design_doc_name,json_decode(json_encode($designDoc)));
 
+$time = time();
 
 // do trading name lookup
 $options = array ();
@@ -214,6 +215,8 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 }
 
 
+echo "trading name processing:" . (time() - $time_before) / 1000 ;
+$time = time();
 	
 $options = array ();
 	
@@ -424,6 +427,8 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 	}
 }
 
+echo "jornal verification:" . (time() - $time_before) / 1000 ;
+$time = time();
 
 
 // do currency lookup
@@ -559,6 +564,9 @@ foreach ( $currencies ['rows'] as $currency ) {
 	}
 }
 
+echo "currency processing:" . (time() - $time_before) / 1000 ;
+$time = time();
+
 // do space lookup
 $options = array ();
 $spaces = $cb->view( $design_doc_name, $space_function_name, $options );
@@ -689,6 +697,8 @@ foreach ( $spaces ['rows'] as $space ) {
 	}
 }
 
+echo "space processing:" . (time() - $time_before) / 1000 ;
+$time = time();
 
 
 $options = array ();
@@ -860,6 +870,9 @@ foreach ( $profiles ['rows'] as $profile ) {
 	
 }
 
+echo "digest processing:" . (time() - $time_before) / 1000 ;
+$time = time();
+
 
 //beamtag lookup
 $options = array ();
@@ -896,6 +909,9 @@ $options['stale'] = false;
 // $view = $cb->view( "dev_openmoney_helper", "curency_view", $options );
 // $view = $cb->view( "dev_openmoney_helper", "space_view", $options );
 // $view = $cb->view( "dev_openmoney", "nfc_tags", $options );
+
+echo "beamtag processing:" . (time() - $time_before) / 1000 ;
+$time = time();
 
 exit();
 
