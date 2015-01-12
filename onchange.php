@@ -36,13 +36,13 @@ $total_profile_lookup_function = 'function(doc,meta){if(doc.type==\"profile\"&&d
 
 $total_profile_function_name = "total_profile";
 
-$space_lookup_function = 'function(doc,meta){if(doc.type==\"space\"&&doc.steward&&doc.space){emit(doc.space,doc.steward);}}';
+$space_lookup_function = 'function(doc,meta){if(doc.type==\"space\"&&doc.steward&&doc.space&&typeof doc.taken == \"undefined\"){emit(doc.space,doc.steward);}}';
 
-$space_function_name = "space1";
+$space_function_name = "space2";
 
-$currency_lookup_function = 'function(doc,meta){if(doc.type==\"currency\"&&doc.currency&&doc.steward){emit(doc.currency,doc.steward);}}';
+$currency_lookup_function = 'function(doc,meta){if(doc.type==\"currency\"&&doc.currency&&doc.steward&&typeof doc.taken == \"undefined\"){emit(doc.currency,doc.steward);}}';
 
-$currency_function_name = "currency";
+$currency_function_name = "currency1";
 
 $beamtag_lookup_function = 'function(doc,meta){if(doc.type==\"beamtag\"&&doc.expires){emit({\"username\":doc.username,\"hashTag\":doc.hashTag},doc.expires);}}';
 
@@ -69,6 +69,8 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 	//init
 	$currency = $trading_name['value'];
 	$trading_name = $trading_name ['key'];
+
+
 
 	//do a lookup
 	$trading_name_array = $cb->get ( "trading_name," . $trading_name . "," . $currency );
@@ -184,10 +186,11 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 				
 				
 			//lookup currency stewards and notify them.
-			$options = array('startkey' => $trading_name_array['currency'], 'endkey' => $trading_name_array['currency'] . '\uefff');
-			$currencies = $cb->view( $design_doc_name, $currency_function_name, $options );
-			foreach ( $currencies ['rows'] as $currency_array ) {
-				foreach( $currency_array ['value'] as $currency_steward ) {
+			$currency_array = json_decode("currency,".$trading_name_array['currency'].true);
+// 			$options = array('startkey' => $trading_name_array['currency'], 'endkey' => $trading_name_array['currency'] . '\uefff');
+// 			$currencies = $cb->view( $design_doc_name, $currency_function_name, $options );
+// 			foreach ( $currencies ['rows'] as $currency_array ) {
+				foreach( $currency_array ['steward'] as $currency_steward ) {
 					if( strpos($currency_steward,"@") !== false ) {
 						if( email_letter($currency_steward, $CFG->system_email, 'New Trading Name Created', $message) ) {
 							echo str_replace("<br/>","\n",$message);
@@ -211,7 +214,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 						}
 					}
 				}
-			}
+			//}
 		}
 	}
 }
@@ -536,10 +539,11 @@ foreach ( $currencies ['rows'] as $currency ) {
 			"<br/>Thank you,<br/>openmoney<br/>";
 	
 			//lookup space stewards and notify them.
-			$options = array('startkey' => $currency['space'], 'endkey' => $currency['space'] . '\uefff');
-			$spaces = $cb->view( $design_doc_name, $space_function_name, $options );
-			foreach ( $spaces ['rows'] as $space ) {
-				foreach( $space ['value'] as $space_steward ) {
+			$subspace = json_decode($cb->get("space," . $currency['space']), true);
+// 			$options = array('startkey' => $currency['space'], 'endkey' => $currency['space'] . '\uefff');
+// 			$spaces = $cb->view( $design_doc_name, $space_function_name, $options );
+// 			foreach ( $spaces ['rows'] as $space ) {
+				foreach( $space ['steward'] as $space_steward ) {
 					if( strpos($space_steward,"@") !== false ) {
 						if( email_letter($space_steward, $CFG->system_email, 'New Currency Created', $message) ) {
 							echo str_replace("<br/>","\n",$message);
@@ -563,7 +567,7 @@ foreach ( $currencies ['rows'] as $currency ) {
 						}
 					}
 				}
-			}
+			//}
 		}
 	}
 }
@@ -670,11 +674,12 @@ foreach ( $spaces ['rows'] as $space ) {
 			"<br/>".
 			"<br/>Thank you,<br/>openmoney<br/>";
 	
+			$subspace = json_decode($cb->get("space," . $space['subspace']), true);
 			//lookup space stewards and notify them.
-			$options = array('startkey' => $space['subspace'], 'endkey' => $space['subspace'] . '\uefff');
-			$spaces = $cb->view( $design_doc_name, $space_function_name, $options );
-			foreach ( $spaces ['rows'] as $subspace ) {
-				foreach( $subspace ['value'] as $subspace_steward ) {
+// 			$options = array('startkey' => $space['subspace'], 'endkey' => $space['subspace'] . '\uefff');
+// 			$spaces = $cb->view( $design_doc_name, $space_function_name, $options );
+// 			foreach ( $spaces ['rows'] as $subspace ) {
+				foreach( $subspace ['steward'] as $subspace_steward ) {
 					if( strpos($subspace_steward,"@") !== false ) {
 						if( email_letter($subspace_steward, $CFG->system_email, 'New Space Created', $message) ) {
 							echo str_replace("<br/>","\n",$message);
@@ -698,7 +703,7 @@ foreach ( $spaces ['rows'] as $space ) {
 						}
 					}
 				}
-			}
+			//}
 		}
 	}
 }
