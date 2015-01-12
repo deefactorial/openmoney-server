@@ -804,7 +804,16 @@ foreach ( $profiles ['rows'] as $profile ) {
 						$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
 						$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
 						$timestamp = $trading_name_journal['timestamp'];
-						$sorted_trading_name_jornal_result['rows'][$timestamp] = $journal_trading_name;
+						if( ! isset( $sorted_trading_name_jornal_result['rows'][$timestamp] ) ) {
+							$sorted_trading_name_jornal_result['rows'][$timestamp] = $journal_trading_name;
+						} else {
+							$i = 1;
+							while( isset($sorted_trading_name_jornal_result['rows'][$timestamp+$i]) ){
+								$i++;
+							}
+							$sorted_trading_name_jornal_result['rows'][$timestamp+$i] = $journal_trading_name;
+						}
+						
 					}
 					ksort($sorted_trading_name_jornal_result['rows']);
 					
