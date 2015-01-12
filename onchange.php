@@ -186,7 +186,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 				
 				
 			//lookup currency stewards and notify them.
-			$currency_array = json_decode("currency,".$trading_name_array['currency'].true);
+			$currency_array = json_decode($cb->get("currency,".$trading_name_array['currency']),true);
 // 			$options = array('startkey' => $trading_name_array['currency'], 'endkey' => $trading_name_array['currency'] . '\uefff');
 // 			$currencies = $cb->view( $design_doc_name, $currency_function_name, $options );
 // 			foreach ( $currencies ['rows'] as $currency_array ) {
