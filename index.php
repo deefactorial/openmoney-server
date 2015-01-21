@@ -245,7 +245,7 @@ $app->post ( '/registration', function () use($app) {
 					
 				$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 				
-				for($i = count($spaces_array) - 1; $i >= 0; $i--){
+				for($i = count($spaces_array) - 2; $i >= 0; $i--){
 					$current_space =  $spaces_array[$i] . "." . $current_space ;
 					
 					$trading_name_space_view ['type'] = "space_view";
