@@ -323,6 +323,9 @@ $app->post ( '/registration', function () use($app) {
 		
 		$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 		
+		
+		
+		
 		$trading_name ['type'] = "trading_name";
 		$trading_name ['trading_name'] = $tradingName;
 		$trading_name ['name'] = $subspace != "" ? $tradingName . "." . $subspace : $tradingName . ".cc";
@@ -331,7 +334,13 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name ['steward'] = array (strtolower($username));
 		$trading_name ['created'] = intval( round(microtime(true) * 1000) );
 		
-		$cb->set ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
+		$exists = json_decode( $cb->get ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ) ), true);
+		
+		if( isset( $exists['steward'] ) ){
+			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'User already exists!') ) );
+		} else {
+			$cb->set ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
+		}
 		
 		$currency_view ['type'] = "currency_view";
 		$currency_view ['currency'] = "cc";
@@ -344,7 +353,16 @@ $app->post ( '/registration', function () use($app) {
 		$currency = json_decode( $cb->get( "currency," . strtolower( $subspace ) ), true);
 		if( isset( $currency['steward'] ) ) {
 			$trading_name ['currency'] = $currency['currency'];
-			$cb->set ( "trading_name," . strtolower( $trading_name ['trading_name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
+			
+			$exists = json_decode( $cb->get ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ) ), true);
+			
+			if( isset( $exists['steward'] )){
+				if( $exists['steward'] != $trading_name['steward'] ) {  
+					$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'User already exists!') ) );
+				}
+			} else {
+				$cb->set ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
+			}
 			
 			$currency_view ['type'] = "currency_view";
 			$currency_view ['currency'] = strtolower( $trading_name ['currency'] );
