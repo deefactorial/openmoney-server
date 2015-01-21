@@ -236,7 +236,7 @@ $app->post ( '/registration', function () use($app) {
 				
 				$spaces_array = explode(".",$subspace);
 				
-				$current_space = $spaces_array[ count( $spaces_array ) ]; //last element
+				$current_space = $spaces_array[ count( $spaces_array ) - 1 ]; //last element
 				
 				$trading_name_space_view ['type'] = "space_view";
 				$trading_name_space_view ['space'] = $current_space;
