@@ -267,7 +267,7 @@ $app->post ( '/registration', function () use($app) {
 				$subspace = "cc";
 				for($i = count($spaces_array) - 1; $i >= 0; $i--){
 					//check if the root of what they asked for is cc and ignore
-					if( $i == count ( $spaces_array ) - 2 && $spaces_array [$i] == ".cc" ){
+					if( $i == count ( $spaces_array ) - 1 && $spaces_array [$i] == ".cc" ){
 					
 					} else {
 						$current_space =  $spaces_array[$i] . "." . $current_space ;
