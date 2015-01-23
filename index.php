@@ -836,7 +836,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		if (isset($options['stale'])){
 			$stale = $options['stale'];
 			if($stale == "update_after") {
-				$options['stale'] = $stale = true;
+				$options['stale'] = $stale = false;
 			}
 			if($stale == "ok"){
 				$options['stale'] = $stale = true;
