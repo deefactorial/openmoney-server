@@ -431,7 +431,7 @@ $app->post ( '/registration', function () use($app) {
 // 			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'The session could not be set!') ) );
 // 		}
 
-		$url = 'https://localhost:4985/openmoney_shadow/_user/' . $user['username'];
+		$url = 'https://localhost:4985/openmoney_shadow/_user/' . strtolower( $username );
 			
 		$options = array ('http' => array ('method' => 'GET', 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 		$context = stream_context_create ( $options );
@@ -440,7 +440,7 @@ $app->post ( '/registration', function () use($app) {
 		$response_code = get_http_response_code ( $url );
 		if ($response_code == 404) {
 			//insert data
-			$data = array ('name' => $user ['username'], 'password' => $password);
+			$data = array ('name' => strtolower( $username ), 'password' => $password);
 			$json = json_encode ( $data );
 			$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 			$context = stream_context_create ( $options );
@@ -453,7 +453,7 @@ $app->post ( '/registration', function () use($app) {
 				
 			if ((isset($json['password']) && $json['password'] != $password) || !isset($json['password'])) {
 				//update data
-				$json['name'] = $user['username'];
+				$json['name'] = strtolower( $username );
 				$json['password'] = $password;
 				$json = json_encode ( $json );
 				$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
@@ -466,7 +466,7 @@ $app->post ( '/registration', function () use($app) {
 		
 		$url = 'https://localhost:4985/openmoney_shadow/_session';
 		// $url = 'https://localhost:4985/todos/_session';
-		$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
+		$data = array ('name' => strtolower( $username ), 'ttl' => 86400); // time to live 24hrs
 		$json = json_encode ( $data );
 		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 		$context = stream_context_create ( $options );
@@ -481,7 +481,7 @@ $app->post ( '/registration', function () use($app) {
 		if (isset ( $json ['session_id'] )) {
 				
 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
-			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => $user ['username'], 'email' => $email);
+			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => strtolower( $username ), 'email' => $email);
 		
 			echo json_encode ( $result );
 			$app->stop ();
