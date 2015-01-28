@@ -466,7 +466,7 @@ $app->post ( '/registration', function () use($app) {
 		
 		$url = 'https://localhost:4985/openmoney_shadow/_session';
 		// $url = 'https://localhost:4985/todos/_session';
-		$data = array ('name' => strtolower( $username ), 'ttl' => 86400); // time to live 24hrs
+		$data = array ('name' => strtolower( $username ), 'password' => $password, 'ttl' => 86400); // time to live 24hrs
 		$json = json_encode ( $data );
 		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 		$context = stream_context_create ( $options );
