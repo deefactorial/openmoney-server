@@ -346,8 +346,14 @@ $app->post ( '/registration', function () use($app) {
 		
 		$cb->set ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
 		
+		$subspace_document = json_decode( $cb->get( "space," . strtolower( $subspace ) ), true);
+		$defaultcurrency = strtolower( $subspace );
+		if(isset($subspace_document['defaultcurrency'])){
+			$defaultcurrency = strtolower( $subspace_document['defaultcurrency'] );
+		}
+		
 		unset($currency);
-		$currency = json_decode( $cb->get( "currency," . strtolower( $subspace ) ), true);
+		$currency = json_decode( $cb->get( "currency," . strtolower( $defaultcurrency ) ), true);
 		if( isset( $currency['steward'] ) ) {
 			$trading_name ['currency'] = $currency['currency'];
 			
