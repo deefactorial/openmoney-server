@@ -747,18 +747,18 @@ $app->post ( '/customerLookup', function () use($app) {
 	require ("password.php");
 	
 	if (password_verify ( $password, $user ['password'] )) {
-		$url = 'https://localhost:4985/openmoney_shadow/_session';
-		// $url = 'https://localhost:4985/todos/_session';
-		$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
-		$json = json_encode ( $data );
-		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-		$context = stream_context_create ( $options );
-		$default_context = stream_context_set_default ( $options );
+// 		$url = 'https://localhost:4985/openmoney_shadow/_session';
+// 		// $url = 'https://localhost:4985/todos/_session';
+// 		$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
+// 		$json = json_encode ( $data );
+// 		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+// 		$context = stream_context_create ( $options );
+// 		$default_context = stream_context_set_default ( $options );
 		
-		if (get_http_response_code ( $url ) != "404") {
-			$result = file_get_contents ( $url, false, $context );
-		} else {
-			// user exists in db but not in sync_gateway so create the user
+// 		if (get_http_response_code ( $url ) != "404") {
+// 			$result = file_get_contents ( $url, false, $context );
+// 		} else {
+// 			// user exists in db but not in sync_gateway so create the user
 // 			$url = 'https://localhost:4985/openmoney_shadow/_user/' . $username;
 // 			// $url = 'https://localhost:4985/todos/_user/' . $username;
 // 			$data = array ('name' => $user ['username'], 'password' => $password);
