@@ -321,10 +321,7 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name_space_view ['steward'] = array ( strtolower($username) );
 		$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 		
-		$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
-		
-		
-		
+		$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );	
 		
 		$trading_name ['type'] = "trading_name";
 		$trading_name ['trading_name'] = $tradingName;
@@ -683,15 +680,19 @@ $app->post ( '/lookupTag', function () use($app) {
 						array_push ( $trading_names_array, $row['value'] );
 					}
 					
-					$trading_name_view = json_decode( $cb->get("trading_name_view," . $username . "," . $trading_name['trading_name'] . "," . $trading_name['currency']) , true);
-					if (!isset($trading_name_view['trading_name'])) {
-							
-						$trading_name_from_view['type'] = "trading_name_view";
-						$trading_name_from_view['steward'] = array( $username );
-						$trading_name_from_view['trading_name'] = $trading_name['trading_name'];
-						$trading_name_from_view['currency'] = $trading_name['currency'];
-						$trading_name_from_view['created'] = intval( round(microtime(true) * 1000) );
-						$cb->set ("trading_name_view," . $username . "," . $trading_name_from_view['trading_name'] . "," . $trading_name_from_view['currency'] , json_encode ( $trading_name_from_view ) );
+					if( isset( $trading_name['trading_name'] ) && $trading_name['trading_name'] != null ) {
+					
+						$trading_name_view = json_decode( $cb->get("trading_name_view," . $username . "," . $trading_name['trading_name'] . "," . $trading_name['currency']) , true);
+						if (!isset($trading_name_view['trading_name'])) {
+								
+							$trading_name_from_view['type'] = "trading_name_view";
+							$trading_name_from_view['steward'] = array( $username );
+							$trading_name_from_view['trading_name'] = $trading_name['trading_name'];
+							$trading_name_from_view['currency'] = $trading_name['currency'];
+							$trading_name_from_view['created'] = intval( round(microtime(true) * 1000) );
+							$cb->set ("trading_name_view," . $username . "," . $trading_name_from_view['trading_name'] . "," . $trading_name_from_view['currency'] , json_encode ( $trading_name_from_view ) );
+						}
+					
 					}
 				}
 			
