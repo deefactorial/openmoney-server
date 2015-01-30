@@ -811,9 +811,7 @@ $app->post ( '/customerLookup', function () use($app) {
 			echo json_encode ( $tradingname_array );
 			
 			$app->stop ();
-		} else {
-			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'The session could not be set!') ) );
-		}
+		} 
 	} else {
 		$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Password did not match!') ) );
 	}
