@@ -591,9 +591,10 @@ $app->post ( '/lostpw', function () use($app) {
 		$dear = $user ['username'];
 		
 		if ($email != '') {
-			$sentEmail = email_letter ( "\"" . $dear . "\"<" . $email . ">", "noreply@openmoney.cc", $subject, $msg );
+			$sentEmail = email_letter ( "\"" . $dear . "\"<" . $email . ">", "noreply@cloud.openmoney.cc", $subject, $msg );
 		} else {
-			$sentEmail = email_letter ( "\"" . $dear . "\"<" . $user ['email'] . ">", "noreply@openmoney.cc", $subject, $msg );
+			$profile = $cb->get("profile," . strtolower( $user['username'] ), true);
+			$sentEmail = email_letter ( "\"" . $dear . "\"<" . $profile ['email'] . ">", "noreply@cloud.openmoney.cc", $subject, $msg );
 		}
 		echo json_encode ( array ('sentEmail' => $sentEmail) );
 		$app->stop ();
