@@ -17,10 +17,10 @@ $user = json_decode ( $user, true );
 
 if (! isset ( $user ['username'] ) || $user ['username'] == '') {
 	
-	$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
-	$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
-	$cb->setDesignDoc ( "dev_profile", $designDoc );
-	$options = array ('startkey' => $email, 'endkey' => $email . '\uefff');
+// 	$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
+// 	$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
+// 	$cb->setDesignDoc ( "dev_profile", $designDoc );
+	$options = array ('startkey' => $email, 'endkey' => $email . '\uefff', 'stale' => false);
 	
 	// do trading name lookup on
 	$profile_result = $cb->view ( 'dev_profile', 'profileLookup', $options );
