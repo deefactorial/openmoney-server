@@ -20,7 +20,7 @@ $tradingNameJournal_lookup_function = 'function(doc,meta){if(doc.type==\"trading
 
 $trading_name_journal_function_name = "tradingnamejournal";
 
-$taken_tradingName_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name\"&&doc.name&&doc.currency&&doc.steward&&!doc.taken){emit(doc.name,doc.currency);}}';
+$taken_tradingName_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name\"&&doc.name&&doc.currency&&doc.steward&&typeof doc.taken == \"undefined\"){emit(doc.name,doc.currency);}}';
 
 $taken_trading_name_function_name = "tradingname_taken";
 

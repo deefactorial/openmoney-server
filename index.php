@@ -131,7 +131,7 @@ $app->post ( '/login', function () use($app) {
 		if (isset ( $json ['session_id'] )) {
 			
 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
-			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => $user ['username'], 'email' => $email);
+			$result = array ('cookie_name' => $json['cookie_name'], 'sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => $user ['username'], 'email' => $email);
 
 			echo json_encode ( $result );
 			$app->stop ();
@@ -484,7 +484,7 @@ $app->post ( '/registration', function () use($app) {
 		if (isset ( $json ['session_id'] )) {
 				
 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
-			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => strtolower( $username ), 'email' => $email);
+			$result = array ('cookie_name' => $json['cookie_name'], 'sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => strtolower( $username ), 'email' => $email);
 		
 			echo json_encode ( $result );
 			$app->stop ();
