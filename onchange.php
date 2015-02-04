@@ -20,6 +20,10 @@ $tradingNameJournal_lookup_function = 'function(doc,meta){if(doc.type==\"trading
 
 $trading_name_journal_function_name = "tradingnamejournal";
 
+$taken_tradingName_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name\"&&doc.name&&doc.currency&&doc.steward&&!doc.taken){emit(doc.name,doc.currency);}}';
+
+$taken_trading_name_function_name = "tradingname_taken";
+
 $tradingName_lookup_function = 'function(doc,meta){if(doc.type==\"trading_name\"&&doc.name&&doc.currency&&doc.steward){emit(doc.name,doc.currency);}}';
 
 $trading_name_function_name = "tradingname";
@@ -48,7 +52,7 @@ $beamtag_lookup_function = 'function(doc,meta){if(doc.type==\"beamtag\"&&doc.exp
 
 $beamtag_function_name = "beamtag";
 
-$designDoc = '{"views":{"' . $trading_name_journal_function_name . '":{"map":"' . $tradingNameJournal_lookup_function . '"},"' . $trading_name_function_name . '":{"map":"' . $tradingName_lookup_function . '"},"' . $stewardsTrading_name_function_name . '":{"map":"' . $stewardsTradingName_lookup_function . '"},"' . $profile_function_name . '":{"map":"' . $profile_lookup_function . '"},"' . $total_profile_function_name . '":{"map":"' . $total_profile_lookup_function . '"},"' . $space_function_name . '":{"map":"' . $space_lookup_function . '"},"' . $currency_function_name . '":{"map":"' . $currency_lookup_function . '"},"' . $beamtag_function_name . '":{"map":"' . $beamtag_lookup_function . '"}}}';
+$designDoc = '{"views":{"' . $trading_name_journal_function_name . '":{"map":"' . $tradingNameJournal_lookup_function . '"},"' . $taken_trading_name_function_name . '":{"map":"' . $taken_tradingName_lookup_function . '"},"' . $trading_name_function_name . '":{"map":"' . $tradingName_lookup_function . '"},"' . $stewardsTrading_name_function_name . '":{"map":"' . $stewardsTradingName_lookup_function . '"},"' . $profile_function_name . '":{"map":"' . $profile_lookup_function . '"},"' . $total_profile_function_name . '":{"map":"' . $total_profile_lookup_function . '"},"' . $space_function_name . '":{"map":"' . $space_lookup_function . '"},"' . $currency_function_name . '":{"map":"' . $currency_lookup_function . '"},"' . $beamtag_function_name . '":{"map":"' . $beamtag_lookup_function . '"}}}';
 	
 // echo $designDoc;
 $design_doc_name = "dev_changes";
@@ -60,7 +64,7 @@ $time = time();
 
 // do trading name lookup
 $options = array ();
-$tradingname_result = $cb->view ( $design_doc_name, $trading_name_function_name, $options );
+$tradingname_result = $cb->view ( $design_doc_name, $taken_trading_name_function_name, $options );
 
 //print_r( $tradingname_result );
 foreach ( $tradingname_result ['rows'] as $trading_name ) {
@@ -80,7 +84,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 	$taken = false;
 	if( ! isset( $trading_name_array['taken'] ) && isset( $trading_name_array['name'] ) ) {
 			
-		//check if the currency is taken by another space or trading name
+		//check if the trading_name is taken by another trading name with a different currency
 		// do trading name lookup
 		$options = array ('startkey' => $trading_name_array['name'], 'endkey' => $trading_name_array['name'] . '\uefff');
 		$tradingname_other_result = $cb->view ( $design_doc_name, $trading_name_function_name, $options );
@@ -93,6 +97,8 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 				//do a lookup
 				$trading_array = $cb->get ( "trading_name," . $this_trading_name . "," . $this_currency );
 				$trading_array = json_decode ( $trading_array, true );
+				
+				//check if the user is someone else other than this user
 				$inarray = false;
 				if (isset($trading_array['steward'])) {
 					foreach($trading_array['steward'] as $steward) {
