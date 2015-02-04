@@ -57,7 +57,7 @@ $designDoc = '{"views":{"' . $trading_name_journal_function_name . '":{"map":"' 
 // echo $designDoc;
 $design_doc_name = "dev_changes";
 
-$cb->setDesignDoc ($design_doc_name,json_decode(json_encode($designDoc)));
+//$cb->setDesignDoc ($design_doc_name,json_decode(json_encode($designDoc)));
 
 echo "setup processing:" . (time() - $time) . " seconds\n";
 $time = time();
