@@ -883,6 +883,20 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		$password = $_SERVER['PHP_AUTH_PW'];
 	}
 	
+	$session = false;
+	session_start();
+	if( isset( $_SESSION['username'] ) && isset( $_SESSION['expiry'] ) && isset( $_SESSION['password'] ) && $_SESSION['expiry'] > time() ) {
+		$username = $_SESSION['username'];
+		$password = $_SESSION['password'];
+		$session = true;
+	} else {
+		// remove all session variables
+		session_unset();
+		// destroy the session
+		session_destroy();
+	}
+	session_write_close();
+	
 	function get_http_response_code($url) {
 		$headers = get_headers ( $url );
 		return substr ( $headers [0], 9, 3 );
@@ -915,7 +929,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 	// TODO: cytpographically decode password using cryptographic algorithms specified in the $user ['cryptographic_algorithms'] array.
 	require ("password.php");
 	
-	if (password_verify ( $password, $user ['password'] )) {
+	if (password_verify ( $password, $user ['password'] ) || $session) {
 		
 // 		$trading_name_view_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name_view\" && doc.steward && doc.trading_name && doc.currency && !doc.archived) { doc.steward.forEach(function( steward ) { emit( steward , \"trading_name,\" + doc.trading_name + \",\" + doc.currency ); } ); } }';
 			
