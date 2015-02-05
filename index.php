@@ -882,12 +882,13 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		$username = $_SERVER['PHP_AUTH_USER'];
 		$password = $_SERVER['PHP_AUTH_PW'];
 	}
-	
+	$expiry = '';
 	$session = false;
 	session_start();
 	if( isset( $_SESSION['username'] ) && isset( $_SESSION['expiry'] ) && isset( $_SESSION['password'] ) && $_SESSION['expiry'] > time() ) {
 		$username = $_SESSION['username'];
 		$password = $_SESSION['password'];
+		$expiry = $_SESSION['expiry'];
 		$session = true;
 	} else {
 		// remove all session variables
@@ -1215,7 +1216,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		}
 		
 	} else {
-		echo "failed to autheticate!:(" . $username . "):(" . $password . ")";
+		echo "failed to autheticate!:(" . $username . "):(" . $password . "):" . $expiry;
 		print_r(getallheaders ());
 	}
 	
