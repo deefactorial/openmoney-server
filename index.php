@@ -530,9 +530,9 @@ $app->get ( '/logout', function () use($app) {
 	if (isset( $_SESSION['session_id'] ) ){
 		$url = 'https://localhost:4985/openmoney_shadow/_session/' . $_SESSION['session_id'];
 		// $url = 'https://localhost:4985/todos/_session';
-		$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
+		//$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
 		$json = json_encode ( $data );
-		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+		$options = array ('http' => array ('method' => 'DELETE', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 		$context = stream_context_create ( $options );
 		$default_context = stream_context_set_default ( $options );
 		
