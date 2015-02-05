@@ -142,7 +142,8 @@ $app->post ( '/login', function () use($app) {
 			$_SESSION['username'] = strtolower( $user ['username'] );
 			$_SESSION['password'] = $session_token;
 			$_SESSION['session_id'] = $json ['session_id'];
-			$_SESSION['expires'] = strtotime ( $json ['expires'] );
+			$objDateTime = new DateTime($json ['expires']);;
+			$_SESSION['expires'] = $objDateTime->format("s");
 			session_write_close();
 			
 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
@@ -882,14 +883,14 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		$username = $_SERVER['PHP_AUTH_USER'];
 		$password = $_SERVER['PHP_AUTH_PW'];
 	}
-	$expiry = '';
+	$expires = '';
 	$session = false;
 	session_start();
 	print_r($_SESSION);
-	if( isset( $_SESSION['username'] ) && isset( $_SESSION['expiry'] ) && isset( $_SESSION['password'] ) && $_SESSION['expiry'] > time() ) {
+	if( isset( $_SESSION['username'] ) && isset( $_SESSION['expiry'] ) && isset( $_SESSION['password'] ) && $_SESSION['expires'] > time() ) {
 		$username = $_SESSION['username'];
 		$password = $_SESSION['password'];
-		$expiry = $_SESSION['expiry'];
+		$expires = $_SESSION['expires'];
 		$session = true;
 	} else {
 		// remove all session variables
@@ -1217,7 +1218,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		}
 		
 	} else {
-		echo "failed to autheticate!:(" . $username . "):(" . $password . "):" . $expiry;
+		echo "failed to autheticate!:(" . $username . "):(" . $password . "):" . $expires;
 		print_r(getallheaders ());
 	}
 	
