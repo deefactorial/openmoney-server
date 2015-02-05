@@ -536,7 +536,7 @@ $app->get ( '/logout', function () use($app) {
 		$context = stream_context_create ( $options );
 		$default_context = stream_context_set_default ( $options );
 		
-		$response_code = get_http_response_code ( $url );
+		//$response_code = get_http_response_code ( $url );
 		
 		$result = file_get_contents ( $url, false, $context );
 		
