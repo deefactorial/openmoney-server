@@ -108,7 +108,10 @@ $app->post ( '/login', function () use($app) {
 		$default_context = stream_context_set_default ( $options );
 			
 		$response_code = get_http_response_code ( $url );
-		$json = json_decode ( file_get_contents ( $url, false, $context ), true);
+		$json = array();
+		if( $response_code != 404) {
+			$json = json_decode ( file_get_contents ( $url, false, $context ), true);
+		}
 		
 		if (! isset( $json['name'] ) || (isset($json['password']) && $json['password'] != $password)) {
 			//insert data
@@ -523,7 +526,10 @@ $app->post ( '/registration', function () use($app) {
 		$default_context = stream_context_set_default ( $options );
 			
 		$response_code = get_http_response_code ( $url );
-		$json = json_decode ( file_get_contents ( $url, false, $context ), true);
+		$json = array();
+		if( $response_code != 404) {
+			$json = json_decode ( file_get_contents ( $url, false, $context ), true);
+		}
 		
 		if (! isset( $json['name'] ) || (isset($json['password']) && $json['password'] != $password)) {
 			//insert data
