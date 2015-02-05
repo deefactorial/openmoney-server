@@ -29,6 +29,19 @@ $app->post ( '/login', function () use($app) {
 		$headers = get_headers ( $url );
 		return substr ( $headers [0], 9, 3 );
 	}
+	$session = false;
+	session_start();
+	if( isset( $_SESSION['username'] ) && isset( $_SESSION['expiry'] ) && isset( $_SESSION['password'] ) && $_SESSION['expiry'] > time() ) {
+		$username = $_SESSION['username'];
+		$password = $_SESSION['password'];
+		$session = true;		
+	} else {
+		// remove all session variables
+		session_unset();
+		// destroy the session
+		session_destroy();
+	}
+	session_write_close();
 	
 	if (($username == '' && $password == '' && $email == '') && (! isset ( $_POST ['username'] ) || ! isset ( $_POST ['password'] ) || ! isset ( $_POST ['email'] ))) {
 		$post = json_decode ( file_get_contents ( 'php://input' ), true );
@@ -44,7 +57,7 @@ $app->post ( '/login', function () use($app) {
 			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'Email or Username and password are required !') ) );
 		}
 	} else {
-		if ($username == '' && $password == '' && $email == '') {
+		if ($username == '' && $password == '' && $email == '' && $session == false) {
 			if( isset( $_POST ['username']) )
 				$username = $_POST ['username'];
 			if( isset( $_POST ['password']) )
@@ -79,7 +92,7 @@ $app->post ( '/login', function () use($app) {
 		
 	}
 	
-	if (isset( $user ['password'] ) && password_verify ( $password, $user ['password'] )) {
+	if ( (isset( $user ['password'] ) && password_verify ( $password, $user ['password'] ) ) || ($session && $user ['password'] == $password) ) {
 		
 		$url = 'https://localhost:4985/openmoney_shadow/_user/' . $user['username'];
 			
@@ -129,6 +142,13 @@ $app->post ( '/login', function () use($app) {
 		$json = json_decode ( $result, true );
 		
 		if (isset ( $json ['session_id'] )) {
+			
+			session_start();
+			$_SESSION['username'] = strtolower( $user ['username'] );
+			$_SESSION['password'] = $user ['password']; // store encrypted password in session.
+			$_SESSION['session_id'] = $json ['session_id'];
+			$_SESSION['expires'] = strtotime ( $json ['expires'] );
+			session_write_close();
 			
 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
 			$result = array ('cookie_name' => $json['cookie_name'], 'sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => $user ['username'], 'email' => $email);
@@ -482,6 +502,13 @@ $app->post ( '/registration', function () use($app) {
 		$json = json_decode ( $result, true );
 		
 		if (isset ( $json ['session_id'] )) {
+			
+			session_start();
+			$_SESSION['username'] = strtolower( $username );
+			$_SESSION['password'] = $user ['password']; // store encrypted password in session.
+			$_SESSION['session_id'] = $json ['session_id'];
+			$_SESSION['expires'] = strtotime ( $json ['expires'] );
+			session_write_close();
 				
 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
 			$result = array ('cookie_name' => $json['cookie_name'], 'sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => strtolower( $username ), 'email' => $email);
@@ -498,6 +525,30 @@ $app->post ( '/registration', function () use($app) {
 } );
 
 $app->get ( '/logout', function () use($app) {
+	
+	session_start();
+	if (isset( $_SESSION['session_id'] ) ){
+		$url = 'https://localhost:4985/openmoney_shadow/_session/' . $_SESSION['session_id'];
+		// $url = 'https://localhost:4985/todos/_session';
+		$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
+		$json = json_encode ( $data );
+		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+		$context = stream_context_create ( $options );
+		$default_context = stream_context_set_default ( $options );
+		
+		$response_code = get_http_response_code ( $url );
+		
+		$result = file_get_contents ( $url, false, $context );
+		
+		$json = json_decode ( $result, true );
+	}
+	
+	// remove all session variables
+	session_unset();
+	// destroy the session
+	session_destroy();
+	
+	session_write_close();
 	
 	unset ( $_COOKIE ['SyncGatewaySession'] );
 	setcookie ( "SyncGatewaySession", '', time () - 3600, '/' );
