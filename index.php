@@ -37,10 +37,11 @@ $app->post ( '/login', function () use($app) {
 	}
 	$session = false;
 	session_start();
-	if( isset( $_SESSION['username'] ) && isset( $_SESSION['expiry'] ) && isset( $_SESSION['password'] ) && $_SESSION['expiry'] > time() ) {
+	if( isset( $_SESSION['username'] ) && isset( $_SESSION['expires'] ) && isset( $_SESSION['password'] ) && $_SESSION['expires'] > time() ) {
 		$username = $_SESSION['username'];
 		$password = $_SESSION['password'];
-		$session = true;		
+		$expires = $_SESSION['expires'];
+		$session = true;
 	} else {
 		// remove all session variables
 		session_unset();
@@ -98,7 +99,7 @@ $app->post ( '/login', function () use($app) {
 		
 	}
 	
-	if ( (isset( $user ['password'] ) && password_verify ( $password, $user ['password'] ) ) || ($session && $user ['password'] == $password) ) {
+	if ( (isset( $user ['password'] ) && password_verify ( $password, $user ['password'] ) ) || $session ) {
 		
 		$url = 'https://localhost:4985/openmoney_shadow/_user/' . $user['username'];
 			
@@ -886,7 +887,6 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 	$expires = '';
 	$session = false;
 	session_start();
-	//print_r($_SESSION);
 	if( isset( $_SESSION['username'] ) && isset( $_SESSION['expires'] ) && isset( $_SESSION['password'] ) && $_SESSION['expires'] > time() ) {
 		$username = $_SESSION['username'];
 		$password = $_SESSION['password'];
