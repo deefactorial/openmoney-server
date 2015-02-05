@@ -142,7 +142,7 @@ $app->post ( '/login', function () use($app) {
 			$_SESSION['username'] = strtolower( $user ['username'] );
 			$_SESSION['password'] = $session_token;
 			$_SESSION['session_id'] = $json ['session_id'];
-			$objDateTime = new DateTime($json ['expires']);;
+			$objDateTime = new DateTime($json ['expires'], $timezone = new DateTimeZone('UTC') );;
 			$_SESSION['expires'] = $objDateTime->format("s");
 			session_write_close();
 			
