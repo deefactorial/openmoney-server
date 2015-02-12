@@ -150,7 +150,7 @@ $app->post ( '/login', function () use($app) {
 			$_SESSION['expires'] = time() + 86400;
 			session_write_close();
 			
-			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
+			//setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
 			$result = array ('cookie_name' => $json['cookie_name'], 'sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => $user ['username'], 'session_token' => $session_token, 'email' => $email);
 
 			echo json_encode ( $result );
@@ -568,7 +568,7 @@ $app->post ( '/registration', function () use($app) {
 			$_SESSION['expires'] = time() + 86400;
 			session_write_close();
 				
-			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
+			//setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
 			$result = array ('cookie_name' => $json['cookie_name'], 'sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => $user ['username'], 'session_token' => $session_token, 'email' => $email);
 		
 			echo json_encode ( $result );
@@ -609,7 +609,7 @@ $app->get ( '/logout', function () use($app) {
 	session_write_close();
 	
 	unset ( $_COOKIE ['SyncGatewaySession'] );
-	setcookie ( "SyncGatewaySession", '', time () - 3600, '/' );
+	//setcookie ( "SyncGatewaySession", '', time () - 3600, '/' );
 	
 	echo json_encode ( array ('error' => false, 'msg' => 'you are now logged out') );
 	$app->stop ();
