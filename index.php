@@ -467,7 +467,7 @@ $app->post ( '/registration', function () use($app) {
 			$_SESSION['expires'] = time() + 86400;
 			session_write_close();
 		
-			setcookie ( $json ['cookie_name'], $session ['session_id'], strtotime ( $session ['expires'] ) );
+			setcookie ( $session ['cookie_name'], $session ['session_id'], strtotime ( $session ['expires'] ) );
 			$result = array ('cookie_name' => $session['cookie_name'], 'sessionID' => $session ['session_id'], 'expires' => $session ['expires'], 'username' => $user ['username'], 'session_token' => $session_token, 'email' => $email);
 		
 			echo json_encode ( $result );
