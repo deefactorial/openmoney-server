@@ -219,12 +219,64 @@ $app->post ( '/registration', function () use($app) {
 		
 	}
 	
-	
-	
 	// TODO: cytpographically decode password using cryptographic algorithms specified in the $user ['cryptographic_algorithms'] array.
 	require ("password.php");
 	
 	if (! isset ( $user ['password'] ) || $user ['password'] == '') {
+		unset($user);
+		
+		$user ['username'] = strtolower( $username );
+		$user ['email'] = $email;
+		$user ['cost'] = $options ['cost'] = 10;
+		$user ['type'] = "users";
+		
+		$password_hash = password_hash ( $password, PASSWORD_BCRYPT, $options );
+		
+		$user ['password'] = $password_hash;
+		$user ['password_encryption_algorithm'] = array (PASSWORD_BCRYPT);
+		$user ['created'] = intval( round(microtime(true) * 1000) );
+		
+		
+		$url = 'https://localhost:4985/openmoney_shadow/_user/' . $user['username'];
+			
+		$options = array ('http' => array ('method' => 'GET', 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+		$context = stream_context_create ( $options );
+		$default_context = stream_context_set_default ( $options );
+			
+		$response_code = get_http_response_code ( $url );
+		$json = array();
+		if( $response_code != 404) {
+			$json = json_decode ( file_get_contents ( $url, false, $context ), true);
+		}
+		
+		if (! isset( $json['name'] ) || (isset($json['password']) && $json['password'] != $password)) {
+			//insert data
+			$data = array ('name' => $user ['username'], 'password' => $password);
+			$json = json_encode ( $data );
+			$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+			$context = stream_context_create ( $options );
+			$default_context = stream_context_set_default ( $options );
+		
+			$result = file_get_contents ( $url, false, $context );
+		}
+		
+		$session_token = randomString( 64 );
+		
+		$url = 'https://localhost:4985/openmoney_shadow/_session';
+		// $url = 'https://localhost:4985/todos/_session';
+		$data = array ('name' => $user ['username'], 'password' => $session_token , 'ttl' => 86400); // time to live 24hrs
+		$json = json_encode ( $data );
+		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+		$context = stream_context_create ( $options );
+		$default_context = stream_context_set_default ( $options );
+		
+		//$response_code = get_http_response_code ( $url );
+		
+		$result = file_get_contents ( $url, false, $context );
+		
+		$session = json_decode ( $result, true );
+		
+
 		
 		$user ['username'] = strtolower( $username );
 		$user ['email'] = $email;
@@ -405,171 +457,18 @@ $app->post ( '/registration', function () use($app) {
 		
 		$cb->set ( "profile," . strtolower( $username ) , json_encode ( $profile ) );
 		
-		// TODO: send email verification or write an email bot to look for new registrations
+		if (isset ( $session ['session_id'] )) {
 		
-// 		$url = 'https://localhost:4985/openmoney_shadow/_session';
-// 		// $url = 'https://localhost:4985/todos/_session';
-// 		$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
-// 		$json = json_encode ( $data );
-// 		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-// 		$context = stream_context_create ( $options );
-// 		$default_context = stream_context_set_default ( $options );
-		
-// 		if (get_http_response_code ( $url ) != "404") {
-// 			$result = file_get_contents ( $url, false, $context );
-// 		} else {
-// 			// user exists in db but not in sync_gateway so create the user
-// 			$url = 'https://localhost:4985/openmoney_shadow/_user/' . strtolower( $username );
-// 			// $url = 'https://localhost:4985/todos/_user/' . $username;
-// 			$data = array ('name' => $user ['username'], 'password' => $password);
-// 			$json = json_encode ( $data );
-// 			$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-// 			$context = stream_context_create ( $options );
-// 			$default_context = stream_context_set_default ( $options );
-			
-// 			$result = file_get_contents ( $url, false, $context );
-			
-// 			$url = 'https://localhost:4985/openmoney_shadow/_session';
-// 			// $url = 'https://localhost:4985/todos/_session';
-// 			$data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
-// 			$json = json_encode ( $data );
-// 			$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-// 			$context = stream_context_create ( $options );
-// 			$default_context = stream_context_set_default ( $options );
-			
-// 			$result = file_get_contents ( $url, false, $context );
-// 		}
-		
-// 		$json = json_decode ( $result, true );
-		
-// 		if (isset ( $json ['session_id'] )) {
-			
-// 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
-// 			$result = array ('sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => $user ['username'], 'email' => $email);
-			
-// 			echo json_encode ( $result );
-			
-// 			$app->stop ();
-// 		} else {
-// 			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'The session could not be set!') ) );
-// 		}
-
-// 		$url = 'https://localhost:4985/openmoney_shadow/_user/' . strtolower( $username );
-			
-// 		$options = array ('http' => array ('method' => 'GET', 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-// 		$context = stream_context_create ( $options );
-// 		$default_context = stream_context_set_default ( $options );
-			
-// 		$response_code = get_http_response_code ( $url );
-// 		if ($response_code == 404) {
-// 			//insert data
-// 			$data = array ('name' => strtolower( $username ), 'password' => $password);
-// 			$json = json_encode ( $data );
-// 			$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-// 			$context = stream_context_create ( $options );
-// 			$default_context = stream_context_set_default ( $options );
-		
-// 			$result = file_get_contents ( $url, false, $context );
-// 		} else {
-// 			$result = file_get_contents ( $url, false, $context );
-// 			$json = json_decode ( $result, true );
-				
-// 			if ((isset($json['password']) && $json['password'] != $password) || !isset($json['password'])) {
-// 				//update data
-// 				$json['name'] = strtolower( $username );
-// 				$json['password'] = $password;
-// 				$json = json_encode ( $json );
-// 				$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-// 				$context = stream_context_create ( $options );
-// 				$default_context = stream_context_set_default ( $options );
-					
-// 				$result = file_get_contents ( $url, false, $context );
-// 			}
-// 		}
-		
-// 		$url = 'https://localhost:4985/openmoney_shadow/_session';
-// 		// $url = 'https://localhost:4985/todos/_session';
-// 		$data = array ('name' => strtolower( $username ), 'password' => $password, 'ttl' => 86400); // time to live 24hrs
-// 		$json = json_encode ( $data );
-// 		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-// 		$context = stream_context_create ( $options );
-// 		$default_context = stream_context_set_default ( $options );
-		
-// 		$response_code = get_http_response_code ( $url );
-		
-// 		$result = file_get_contents ( $url, false, $context );
-		
-// 		$json = json_decode ( $result, true );
-		
-// 		if (isset ( $json ['session_id'] )) {
-			
-// 			session_start();
-// 			$_SESSION['username'] = strtolower( $username );
-// 			$_SESSION['password'] = $user ['password']; // store encrypted password in session.
-// 			$_SESSION['session_id'] = $json ['session_id'];
-// 			$_SESSION['expires'] = strtotime ( $json ['expires'] );
-// 			session_write_close();
-				
-// 			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
-// 			$result = array ('cookie_name' => $json['cookie_name'], 'sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => strtolower( $username ), 'email' => $email);
-		
-// 			echo json_encode ( $result );
-// 			$app->stop ();
-// 		} else {
-// 			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'The session could not be set!') ) );
-// 		}
-
-		$url = 'https://localhost:4985/openmoney_shadow/_user/' . $user['username'];
-			
-		$options = array ('http' => array ('method' => 'GET', 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-		$context = stream_context_create ( $options );
-		$default_context = stream_context_set_default ( $options );
-			
-		$response_code = get_http_response_code ( $url );
-		$json = array();
-		if( $response_code != 404) {
-			$json = json_decode ( file_get_contents ( $url, false, $context ), true);
-		}
-		
-		if (! isset( $json['name'] ) || (isset($json['password']) && $json['password'] != $password)) {
-			//insert data
-			$data = array ('name' => $user ['username'], 'password' => $password);
-			$json = json_encode ( $data );
-			$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-			$context = stream_context_create ( $options );
-			$default_context = stream_context_set_default ( $options );
-		
-			$result = file_get_contents ( $url, false, $context );
-		}
-		
-		$session_token = randomString( 64 );
-		
-		$url = 'https://localhost:4985/openmoney_shadow/_session';
-		// $url = 'https://localhost:4985/todos/_session';
-		$data = array ('name' => $user ['username'], 'password' => $session_token , 'ttl' => 86400); // time to live 24hrs
-		$json = json_encode ( $data );
-		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-		$context = stream_context_create ( $options );
-		$default_context = stream_context_set_default ( $options );
-		
-		//$response_code = get_http_response_code ( $url );
-		
-		$result = file_get_contents ( $url, false, $context );
-		
-		$json = json_decode ( $result, true );
-		
-		if (isset ( $json ['session_id'] )) {
-				
 			session_start();
 			$_SESSION['username'] = strtolower( $user ['username'] );
 			$_SESSION['password'] = $session_token;
-			$_SESSION['session_id'] = $json ['session_id'];
-				
+			$_SESSION['session_id'] = $session ['session_id'];
+		
 			$_SESSION['expires'] = time() + 86400;
 			session_write_close();
-				
-			setcookie ( $json ['cookie_name'], $json ['session_id'], strtotime ( $json ['expires'] ) );
-			$result = array ('cookie_name' => $json['cookie_name'], 'sessionID' => $json ['session_id'], 'expires' => $json ['expires'], 'username' => $user ['username'], 'session_token' => $session_token, 'email' => $email);
+		
+			setcookie ( $json ['cookie_name'], $session ['session_id'], strtotime ( $session ['expires'] ) );
+			$result = array ('cookie_name' => $session['cookie_name'], 'sessionID' => $session ['session_id'], 'expires' => $session ['expires'], 'username' => $user ['username'], 'session_token' => $session_token, 'email' => $email);
 		
 			echo json_encode ( $result );
 			$app->stop ();
