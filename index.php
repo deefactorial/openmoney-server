@@ -57,10 +57,7 @@ $app->post ( '/login', function () use($app) {
 	$username = '';
 	$password = '';
 	$email = '';
-	function get_http_response_code($url) {
-		$headers = get_headers ( $url );
-		return substr ( $headers [0], 9, 3 );
-	}
+
 	$session = false;
 	session_start();
 	if( isset( $_SESSION['username'] ) && isset( $_SESSION['expires'] ) && isset( $_SESSION['password'] ) && $_SESSION['expires'] > time() ) {
@@ -549,10 +546,7 @@ $app->post ( '/lostpw', function () use($app) {
 	
 	$username = '';
 	$email = '';
-	function get_http_response_code($url) {
-		$headers = get_headers ( $url );
-		return substr ( $headers [0], 9, 3 );
-	}
+
 	
 	if (($username == '') && (! isset ( $_POST ['username'] ))) {
 		$post = json_decode ( file_get_contents ( 'php://input' ), true );
@@ -647,10 +641,7 @@ $app->post ( '/lookupTag', function () use($app) {
 	$username = '';
 	$password = '';
 	$key = '';
-	function get_http_response_code($url) {
-		$headers = get_headers ( $url );
-		return substr ( $headers [0], 9, 3 );
-	}
+
 	
 	if (($username == '' && $password == '') && (! isset ( $_POST ['username'] ) || ! isset ( $_POST ['password'] ))) {
 		$post = json_decode ( file_get_contents ( 'php://input' ), true );
@@ -763,10 +754,7 @@ $app->post ( '/customerLookup', function () use($app) {
 	
 	$username = '';
 	$password = '';
-	function get_http_response_code($url) {
-		$headers = get_headers ( $url );
-		return substr ( $headers [0], 9, 3 );
-	}
+
 	
 	if (($username == '' && $password == '') && (! isset ( $_POST ['username'] ) || ! isset ( $_POST ['password'] ))) {
 		$post = json_decode ( file_get_contents ( 'php://input' ), true );
@@ -891,10 +879,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 	}
 	session_write_close();
 	
-	function get_http_response_code($url) {
-		$headers = get_headers ( $url );
-		return substr ( $headers [0], 9, 3 );
-	}
+
 	
 	if (($username == '' && $password == '') && (! isset ( $_POST ['username'] ) || ! isset ( $_POST ['password'] ))) {
 		$post = json_decode ( file_get_contents ( 'php://input' ), true );
