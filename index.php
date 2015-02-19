@@ -23,12 +23,10 @@ function ajax_get($doc_id) {
 	$options = array ('http' => array ('method' => 'GET', 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 	$context = stream_context_create ( $options );
 	$response_code = get_http_response_code ( $url );
-	$json = array();
-	if( $response_code != 404) {
+	if( $response_code == 200) {
 		return ( file_get_contents ( $url, false, $context ) );
-		//$json = json_decode ( file_get_contents ( $url, false, $context ), true);
 	} else {
-		return array();
+		return "{}";
 	}
 	
 }
