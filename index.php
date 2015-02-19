@@ -1,4 +1,9 @@
 <?php
+function get_http_response_code($url) {
+	$headers = get_headers ( $url );
+	return substr ( $headers [0], 9, 3 );
+}
+
 //global functions 
 //https://stackoverflow.com/questions/4757392/php-fast-random-string-function
 function randomString($length = 10) {
@@ -17,7 +22,15 @@ function ajax_get($doc_id) {
 	$url = "https://localhost:4985/openmoney_shadow/" . $doc_id;
 	$options = array ('http' => array ('method' => 'GET', 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 	$context = stream_context_create ( $options );
-	return( file_get_contents ( $url, false, $context ) );
+	$response_code = get_http_response_code ( $url );
+	$json = array();
+	if( $response_code != 404) {
+		return ( file_get_contents ( $url, false, $context ) );
+		//$json = json_decode ( file_get_contents ( $url, false, $context ), true);
+	} else {
+		return array();
+	}
+	
 }
 
 // adjust these parameters to match your installation
@@ -185,10 +198,7 @@ $app->post ( '/registration', function () use($app) {
 	$username = '';
 	$password = '';
 	$email = '';
-	function get_http_response_code($url) {
-		$headers = get_headers ( $url );
-		return substr ( $headers [0], 9, 3 );
-	}
+
 	
 	if (($username == '' && $password == '' && $email == '') && (! isset ( $_POST ['username'] ) || ! isset ( $_POST ['password'] ) || ! isset ( $_POST ['email'] ))) {
 		$post = json_decode ( file_get_contents ( 'php://input' ), true );
