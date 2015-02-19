@@ -881,7 +881,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		}
 	}
 	
-	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney_shadow" );
+	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney_shadow", "", "openmoney_shadow" );
 	
 	$cb->setTimeout( 1000 * 60 * 5 );
 	
