@@ -226,7 +226,7 @@ $app->post ( '/registration', function () use($app) {
 	$user = ajax_get ( "users," . $username );
 	$user = json_decode ( $user, true );
 	
-	if( $email != null && $user ['password'] == '') {
+	if( $email != null && isset($user['password']) && $user ['password'] != '') {
 		
 		$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
 		$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
