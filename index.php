@@ -5,6 +5,21 @@ function randomString($length = 10) {
 	return bin2hex( openssl_random_pseudo_bytes( $length / 2 ) );
 }
 
+function ajax_put($doc_id, $document) {
+	$url = "https://localhost:4985/openmoney_shadow/" . $doc_id;
+	$json = json_encode ( $document );
+	$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+	$context = stream_context_create ( $options );
+	return( file_get_contents ( $url, false, $context ) );
+}
+
+function ajax_get($doc_id) {
+	$url = "https://localhost:4985/openmoney_shadow/" . $doc_id;
+	$options = array ('http' => array ('method' => 'GET', 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+	$context = stream_context_create ( $options );
+	return( file_get_contents ( $url, false, $context ) );
+}
+
 // adjust these parameters to match your installation
 // $cb = new Couchbase("127.0.0.1:8091", "users", "", "users");
 // $cb->set("a", 101);
@@ -76,7 +91,7 @@ $app->post ( '/login', function () use($app) {
 	
 	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 	
-	$user = $cb->get ( "users," . $username );
+	$user = ajax_get ( "users," . $username );
 	$user = json_decode ( $user, true );
 	
 	// TODO: cytpographically decode password using cryptographic algorithms specified in the $user ['cryptographic_algorithms'] array.
@@ -94,7 +109,7 @@ $app->post ( '/login', function () use($app) {
 	
 		
 		foreach ( $profile_result ['rows'] as $row ) {
-			$user = json_decode ( $cb->get ( "users," . $row['value'] ), true );
+			$user = json_decode ( ajax_get ( "users," . $row['value'] ), true );
 		}
 		
 	}
@@ -165,6 +180,8 @@ $app->post ( '/login', function () use($app) {
 
 $app->post ( '/registration', function () use($app) {
 	
+
+	
 	$username = '';
 	$password = '';
 	$email = '';
@@ -198,7 +215,7 @@ $app->post ( '/registration', function () use($app) {
 	}
 	
 	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
-	$user = $cb->get ( "users," . $username );
+	$user = ajax_get ( "users," . $username );
 	$user = json_decode ( $user, true );
 	
 	if( $email != null && $user ['password'] == '') {
@@ -213,7 +230,7 @@ $app->post ( '/registration', function () use($app) {
 	
 
 		foreach ( $profile_result ['rows'] as $row ) {
-			$user = $cb->get ( "users," . $row['value'] );
+			$user = ajax_get ( "users," . $row['value'] );
 			$user = json_decode ( $user, true );
 		}
 		
@@ -289,7 +306,9 @@ $app->post ( '/registration', function () use($app) {
 		$user ['password_encryption_algorithm'] = array (PASSWORD_BCRYPT);
 		$user ['created'] = intval( round(microtime(true) * 1000) );
 		
-		$cb->set ( "users," . strtolower( $username ), json_encode ( $user ) );
+		ajax_put( "users," . strtolower( $username ), json_encode ( $user ) );
+		//$cb->set ( "users," . strtolower( $username ), json_encode ( $user ) );
+		
 		$subusername = $username;
 		if( strpos ( $username, "@" ) !== false)
 			$subusername = substr ( $username, 0, strpos ( $username, "@" ) );
@@ -303,7 +322,7 @@ $app->post ( '/registration', function () use($app) {
 			$tradingName = substr( $subusername, 0, strpos( $subusername, ".") );
 			$subspace = substr( $subusername, strpos( $subusername, ".") + 1,strlen($subusername) );
 			unset($space);
-			$space = json_decode( $cb->get( "space," . strtolower($subspace) ), true);
+			$space = json_decode( ajax_get( "space," . strtolower($subspace) ), true);
 			if( isset( $space['steward'] ) ) {
 				
 				$spaces_array = explode(".",$subspace);
@@ -315,7 +334,8 @@ $app->post ( '/registration', function () use($app) {
 				$trading_name_space_view ['steward'] = array ( strtolower($username) );
 				$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 					
-				$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+				ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+				//$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 				
 				for($i = count($spaces_array) - 2; $i >= 0; $i--){
 					$current_space =  $spaces_array[$i] . "." . $current_space ;
@@ -325,7 +345,8 @@ $app->post ( '/registration', function () use($app) {
 					$trading_name_space_view ['steward'] = array ( strtolower($username) );
 					$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 					
-					$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+					ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+					//$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 				}
 				
 				$subspace = $current_space;
@@ -345,7 +366,7 @@ $app->post ( '/registration', function () use($app) {
 						$current_space =  $spaces_array[$i] . "." . $current_space ;
 						//if space doesn't exist create it.
 						unset($space);
-						$space = json_decode( $cb->get( "space," . strtolower($current_space) ), true);
+						$space = json_decode( ajax_get( "space," . strtolower($current_space) ), true);
 						if( ! isset( $space['steward'] ) ) {
 							
 							//create the space as this users
@@ -355,7 +376,8 @@ $app->post ( '/registration', function () use($app) {
 							$trading_name_space ['steward'] = array (strtolower($username));
 							$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
 							
-							$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
+							ajax_put ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
+							//$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
 
 						}
 						
@@ -364,7 +386,8 @@ $app->post ( '/registration', function () use($app) {
 						$trading_name_space_view ['steward'] = array ( strtolower($username) );
 						$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 							
-						$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+						ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+						//$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 						
 						$subspace = $current_space;
 					}
@@ -379,21 +402,21 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name_space ['steward'] = array ( strtolower($username) );
 		$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
 		
-		$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
+		ajax_put ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
 		
 		$trading_name_space_view ['type'] = "space_view";
 		$trading_name_space_view ['space'] = $subspace != "" ? $tradingName . "." . $subspace : $tradingName . ".cc";
 		$trading_name_space_view ['steward'] = array ( strtolower($username) );
 		$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 		
-		$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+		ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 		
 		$trading_name_space_view ['type'] = "space_view";
 		$trading_name_space_view ['space'] = "cc";
 		$trading_name_space_view ['steward'] = array ( strtolower($username) );
 		$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 		
-		$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );	
+		ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );	
 		
 		$trading_name ['type'] = "trading_name";
 		$trading_name ['trading_name'] = $tradingName;
@@ -403,12 +426,12 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name ['steward'] = array (strtolower($username));
 		$trading_name ['created'] = intval( round(microtime(true) * 1000) );
 		
-		$exists = json_decode( $cb->get ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ) ), true);
+		$exists = json_decode( ajax_get ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ) ), true);
 		
 		if( isset( $exists['steward'] ) ){
 			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'User already exists!') ) );
 		} else {
-			$cb->set ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
+			ajax_put ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
 		}
 		
 		$currency_view ['type'] = "currency_view";
@@ -416,27 +439,27 @@ $app->post ( '/registration', function () use($app) {
 		$currency_view ['steward'] = array (strtolower($username));
 		$currency_view ['created'] = intval( round(microtime(true) * 1000) );
 		
-		$cb->set ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
+		ajax_put ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
 		
-		$subspace_document = json_decode( $cb->get( "space," . strtolower( $subspace ) ), true);
+		$subspace_document = json_decode( ajax_get( "space," . strtolower( $subspace ) ), true);
 		$defaultcurrency = strtolower( $subspace );
 		if(isset($subspace_document['defaultcurrency'])){
 			$defaultcurrency = strtolower( $subspace_document['defaultcurrency'] );
 		}
 		
 		unset($currency);
-		$currency = json_decode( $cb->get( "currency," . strtolower( $defaultcurrency ) ), true);
+		$currency = json_decode( ajax_get( "currency," . strtolower( $defaultcurrency ) ), true);
 		if( isset( $currency['steward'] ) ) {
 			$trading_name ['currency'] = $currency['currency'];
 			
-			$exists = json_decode( $cb->get ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ) ), true);
+			$exists = json_decode( ajax_get ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ) ), true);
 			
 			if( isset( $exists['steward'] )){
 				if( $exists['steward'] != $trading_name['steward'] ) {  
 					$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'User already exists!') ) );
 				}
 			} else {
-				$cb->set ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
+				ajax_put ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
 			}
 			
 			$currency_view ['type'] = "currency_view";
@@ -444,7 +467,7 @@ $app->post ( '/registration', function () use($app) {
 			$currency_view ['steward'] = array (strtolower($username));
 			$currency_view ['created'] = intval( round(microtime(true) * 1000) );
 			
-			$cb->set ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
+			ajax_put ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
 		}
 		
 		$profile ['type'] = "profile";
@@ -455,7 +478,7 @@ $app->post ( '/registration', function () use($app) {
 		$profile ['theme'] = false;
 		$profile ['created'] = intval( round(microtime(true) * 1000) );
 		
-		$cb->set ( "profile," . strtolower( $username ) , json_encode ( $profile ) );
+		ajax_put ( "profile," . strtolower( $username ) , json_encode ( $profile ) );
 		
 		if (isset ( $session ['session_id'] )) {
 		
@@ -551,7 +574,7 @@ $app->post ( '/lostpw', function () use($app) {
 		
 		$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 		
-		$user = $cb->get ( "users," . $username );
+		$user = ajax_get ( "users," . $username );
 		
 		$user = json_decode ( $user, true );
 		
@@ -569,7 +592,7 @@ $app->post ( '/lostpw', function () use($app) {
 		
 		
 			foreach ( $profile_result ['rows'] as $row ) {
-				$user = json_decode ( $cb->get ( "users," . $row['value'] ), true );
+				$user = json_decode ( ajax_get ( "users," . $row['value'] ), true );
 				$email = $username;
 			}
 			
@@ -589,7 +612,7 @@ $app->post ( '/lostpw', function () use($app) {
 		// update key on user table, then verify in resetPassword.php
 		
 		$user ['reset_token_key'] = $reset_key;
-		$cb->set ( "users," . $user ['username'], json_encode ( $user ) );
+		ajax_put ( "users," . $user ['username'], json_encode ( $user ) );
 		
 		$msg = "To Reset your password click on this link <a href='https://cloud.openmoney.cc/resetPassword.php?email=" . urlencode ( $user ['username'] ) . "&reset=" . urlencode ( $reset_hash ) . "'>Reset Password</a>";
 		$msg .= "<p>OpenMoney IT Team</p>";
@@ -601,7 +624,7 @@ $app->post ( '/lostpw', function () use($app) {
 		if ($email != '') {
 			$sentEmail = email_letter ( "\"" . $dear . "\"<" . $email . ">", "noreply@openmoney.cc", $subject, $msg );
 		} else {
-			$profile = json_decode($cb->get("profile," . strtolower( $user['username'] ) ), true);
+			$profile = json_decode(ajax_get("profile," . strtolower( $user['username'] ) ), true);
 			$sentEmail = email_letter ( "\"" . $dear . "\"<" . $profile ['email'] . ">", "noreply@openmoney.cc", $subject, $msg );
 		}
 		echo json_encode ( array ('sentEmail' => $sentEmail) );
@@ -643,7 +666,7 @@ $app->post ( '/lookupTag', function () use($app) {
 		
 		$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 		
-		$user = $cb->get ( "users," . $username );
+		$user = ajax_get ( "users," . $username );
 		
 		$user = json_decode ( $user, true );
 		
@@ -697,7 +720,7 @@ $app->post ( '/lookupTag', function () use($app) {
 					
 					if( isset( $trading_name['trading_name'] ) && $trading_name['trading_name'] != null ) {
 					
-						$trading_name_view = json_decode( $cb->get("trading_name_view," . $username . "," . $trading_name['trading_name'] . "," . $trading_name['currency']) , true);
+						$trading_name_view = json_decode( ajax_get("trading_name_view," . $username . "," . $trading_name['trading_name'] . "," . $trading_name['currency']) , true);
 						if (!isset($trading_name_view['trading_name'])) {
 								
 							$trading_name_from_view['type'] = "trading_name_view";
@@ -705,7 +728,7 @@ $app->post ( '/lookupTag', function () use($app) {
 							$trading_name_from_view['trading_name'] = $trading_name['trading_name'];
 							$trading_name_from_view['currency'] = $trading_name['currency'];
 							$trading_name_from_view['created'] = intval( round(microtime(true) * 1000) );
-							$cb->set ("trading_name_view," . $username . "," . $trading_name_from_view['trading_name'] . "," . $trading_name_from_view['currency'] , json_encode ( $trading_name_from_view ) );
+							ajax_put ("trading_name_view," . $username . "," . $trading_name_from_view['trading_name'] . "," . $trading_name_from_view['currency'] , json_encode ( $trading_name_from_view ) );
 						}
 					
 					}
@@ -755,7 +778,7 @@ $app->post ( '/customerLookup', function () use($app) {
 	
 	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 	
-	$user = $cb->get ( "users," . $username );
+	$user = ajax_get ( "users," . $username );
 	
 	$user = json_decode ( $user, true );
 	
@@ -885,7 +908,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 	
 	$cb->setTimeout( 1000 * 60 * 5 );
 	
-	$user = $cb->get ( "users," . $username );
+	$user = ajax_get ( "users," . $username );
 	
 	$user = json_decode ( $user, true );
 	
@@ -957,7 +980,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				foreach($account['key']['steward'] as $steward) {
 					if($steward == $username){
 						if($include_docs){
-							$account['doc'] = json_decode ( $cb->get ( $account['id'] ), true );
+							$account['doc'] = json_decode ( ajax_get ( $account['id'] ), true );
 							$account['doc']['_id'] = $account['id'];
 						}
 						$account['value'] = '';
@@ -978,7 +1001,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			foreach ( $trading_name_view_result ['rows'] as $trading_name ) {
 				if( ! in_array( $trading_name['value'], $tradingname_id_array ) ) {
 					unset($object);
-					$object['doc'] = json_decode ( $cb->get ( $trading_name['value'] ), true );
+					$object['doc'] = json_decode ( ajax_get ( $trading_name['value'] ), true );
 					if ($object['doc']) {
 						$object['doc']['_id'] = $trading_name['value'];
 						$object['id'] = $trading_name['value'];
@@ -1007,7 +1030,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			}
 			
 			if (isset($options['startkey'])) {
-				$trading_name = json_decode ( $cb->get ( $options['startkey'] ), true );
+				$trading_name = json_decode ( ajax_get ( $options['startkey'] ), true );
 				
 				if ($trading_name) {
 					unset($trading_name_object);
@@ -1042,7 +1065,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			foreach ( $currency_view_result ['rows'] as $currency ) {
 				if( ! in_array( $currency['value'], $currency_id_array ) ) {
 					
-					$currency_object = json_decode ( $cb->get ( strtolower( $currency['value'] ) ), true );
+					$currency_object = json_decode ( ajax_get ( strtolower( $currency['value'] ) ), true );
 					if ($currency_object) {
 						unset($value);
 						$value['currency'] = $currency_object['currency'];
@@ -1080,7 +1103,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			foreach ( $space_view ['rows'] as $space ) {
 				if( ! in_array( $space['value'], $space_id_array ) ) {
 						
-					$space_object = json_decode ( $cb->get ( strtolower( $space['value'] ) ), true );
+					$space_object = json_decode ( ajax_get ( strtolower( $space['value'] ) ), true );
 					if ($space_object) {
 						unset($value);
 						$value['space'] = $space_object['space'];
@@ -1120,7 +1143,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 // 				$object['value'] = '';
 				
 // 				if($include_docs) {
-// 					$object['doc'] = json_decode ( $cb->get ( $space['id'] ), true );
+// 					$object['doc'] = json_decode ( ajax_get ( $space['id'] ), true );
 // 					$object['doc']['_id'] = $space['id'];
 // 				}
 				
@@ -1138,7 +1161,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			//print_r($options);
 			
 			if (isset($options['endkey'])) {
-				$trading_name = json_decode ( $cb->get ( trim( $options['endkey'], '"') ), true );
+				$trading_name = json_decode ( ajax_get ( trim( $options['endkey'], '"') ), true );
 				
 				$options['startkey'] = array( $options['startkey'] );
 				$options['endkey'] = array( $options['endkey'] );
