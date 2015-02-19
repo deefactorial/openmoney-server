@@ -881,7 +881,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		}
 	}
 	
-	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
+	$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney_shadow" );
 	
 	$cb->setTimeout( 1000 * 60 * 5 );
 	
@@ -1142,7 +1142,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				
 				$options['startkey'] = array( $options['startkey'] );
 				$options['endkey'] = array( $options['endkey'] );
-				$options['stale'] = $stale;
+				//$options['stale'] = $stale;
 				
 				
 				//print_r($options);
