@@ -11,15 +11,15 @@ function randomString($length = 10) {
 }
 
 function ajax_put($doc_id, $document) {
-	$url = "http://localhost:4985/openmoney_shadow/" . urlencode($doc_id);
-	$json = json_encode ( $document );
-	$options = array ('http' => array ('method' => 'PUT', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+	$url = "https://localhost:4985/openmoney_shadow/" . urlencode($doc_id);
+	//$json = json_encode ( $document );
+	$options = array ('http' => array ('method' => 'PUT', 'content' => $document, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 	$context = stream_context_create ( $options );
 	return( file_get_contents ( $url, false, $context ) );
 }
 
 function ajax_get($doc_id) {
-	$url = "http://localhost:4985/openmoney_shadow/" . urlencode($doc_id);
+	$url = "https://localhost:4985/openmoney_shadow/" . urlencode($doc_id);
 	$options = array ('http' => array ('method' => 'GET', 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 	$context = stream_context_create ( $options );
 	$response_code = get_http_response_code ( $url );
