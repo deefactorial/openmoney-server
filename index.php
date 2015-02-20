@@ -1233,6 +1233,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 	} else {
 		echo "failed to autheticate!:(" . $username . "):(" . $password . "):" . $expires;
 		print_r(getallheaders ());
+		print_r($_GET);
 	}
 	
 	
