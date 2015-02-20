@@ -1198,8 +1198,8 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			if (isset($options['endkey'])) {
 				$trading_name = json_decode ( ajax_get ( trim( $options['endkey'], '"') ), true );
 				
-				$options['startkey'] = json_encode( array( '"' . $options['startkey'] . '"' , '""' ) );
-				$options['endkey'] = json_encode( array( '"' . $options['endkey'] . '"' , '"\ueff"') );
+				$options['startkey'] = json_encode( array( '"' . $options['startkey'] . '"', '"\ueff"'  ) );
+				$options['endkey'] = json_encode( array( '"' . $options['endkey'] . '"' , '""') );
 				if( ! $stale ) {
 					$options['stale'] = 'false';
 				}
