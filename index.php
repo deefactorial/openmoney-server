@@ -31,6 +31,18 @@ function ajax_get($doc_id) {
 	
 }
 
+function ajax_getView($design_doc, $view, $options, $errors = false) {
+	$url = "https://localhost:4985/openmoney_shadow/_design/" . urlencode($design_doc) . "/_view/" . urlencode($view) ;
+	$options = array ('http' => array ('method' => 'GET','content' => json_encode( $options ) , 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+	$context = stream_context_create ( $options );
+	$response_code = get_http_response_code ( $url );
+	if( $response_code == 200) {
+		return ( json_decode( file_get_contents ( $url, false, $context ) , true ) );
+	} else {
+		return json_decode( "{}", true );
+	}
+}
+
 // adjust these parameters to match your installation
 // $cb = new Couchbase("127.0.0.1:8091", "users", "", "users");
 // $cb->set("a", 101);
@@ -962,7 +974,9 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		if ($viewname == 'accounts') {
 		
 			$options['stale'] = false;
-			$accounts = $cb->view ( 'dev_openmoney', $viewname, $options , true);
+			
+			$accounts = ajax_getView ( 'dev_openmoney', $viewname, $options , true);
+			//$accounts = $cb->view ( 'dev_openmoney', $viewname, $options , true);
 			//$options['stale'] = $stale;
 			
 			$tradingname_array = array ();
