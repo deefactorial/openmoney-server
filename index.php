@@ -33,7 +33,7 @@ function randomString($length = 10) {
 }
 
 function ajax_put($doc_id, $document) {
-	$url = "https://localhost:4985/openmoney_shadow/" . urlencode($doc_id);
+	$url = "https://cloud.openmoney.cc:4985/openmoney_shadow/" . urlencode($doc_id);
 	//$json = json_encode ( $document );
 	$options = array ('http' => array ('method' => 'PUT', 'content' => $document, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 	$context = stream_context_create ( $options );
@@ -41,7 +41,7 @@ function ajax_put($doc_id, $document) {
 }
 
 function ajax_get($doc_id) {
-	$url = "https://localhost:4985/openmoney_shadow/" . urlencode($doc_id);
+	$url = "https://cloud.openmoney.cc:4985/openmoney_shadow/" . urlencode($doc_id);
 	$options = array ('http' => array ('method' => 'GET', 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 	$context = stream_context_create ( $options );
 	$response_code = get_http_response_code ( $url );
@@ -54,7 +54,7 @@ function ajax_get($doc_id) {
 }
 
 function ajax_getView($design_doc, $view, $options, $errors = false) {
-	$url = "https://localhost:4985/openmoney_shadow/_design/" . urlencode($design_doc) . "/_view/" . urlencode($view) ;
+	$url = "https://cloud.openmoney.cc:4985/openmoney_shadow/_design/" . urlencode($design_doc) . "/_view/" . urlencode($view) ;
 	$client = new GuzzleHttp\Client();
 	$request_options = array( "query" => $options);
 	
