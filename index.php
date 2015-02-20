@@ -976,9 +976,10 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 							$account['doc'] = json_decode ( ajax_get ( $account['id'] ), true );
 							$account['doc']['_id'] = $account['value'];
 						}
+						array_push($tradingname_id_array, $account['value']);
 						$account['value'] = '';
 						array_push($tradingname_array, $account);
-						array_push($tradingname_id_array, $account['value']);
+						
 					}
 				}
 			}
