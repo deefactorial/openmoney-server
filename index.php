@@ -993,7 +993,10 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		
 			//$options['stale'] = false;
 			
-			$accounts = ajax_getView ( 'dev_openmoney', $viewname, $options , true);
+			//this view needs to be steward accounts.
+			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+			$options['stale'] = $stale;
+			$accounts = ajax_getView ( 'dev_openmoney', 'steward_accounts', $options , true);
 			//$accounts = $cb->view ( 'dev_openmoney', $viewname, $options , true);
 			//$options['stale'] = $stale;
 			
@@ -1001,20 +1004,14 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			$tradingname_id_array = array ();
 			if( isset( $accounts ['rows'] ) ) {
 				foreach ( $accounts ['rows'] as $account ) {
-					//print_r($account);
 					
-					foreach($account['key']['steward'] as $steward) {
-						if($steward == $username){
-							if($include_docs){
-								$account['doc'] = json_decode ( ajax_get ( $account['id'] ), true );
-								$account['doc']['_id'] = $account['value'];
-							}
-							array_push($tradingname_id_array, $account['value']);
-							$account['value'] = '';
-							array_push($tradingname_array, $account);
-							
-						}
+					if($include_docs){
+						$account['doc'] = json_decode ( ajax_get ( $account['id'] ), true );
+						$account['doc']['_id'] = $account['value'];
 					}
+					array_push($tradingname_id_array, $account['value']);
+					$account['value'] = '';
+					array_push($tradingname_array, $account);
 				}
 			}
 
