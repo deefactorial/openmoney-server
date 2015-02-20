@@ -994,6 +994,10 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		if( ! $stale ) {
 			$options['stale'] = 'false';
 		}
+		
+		if( isset( $options['descending'] ) ) {
+			$descending = $options['descending'];
+		}
 			
 		//$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
 		
@@ -1194,8 +1198,8 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			if (isset($options['endkey'])) {
 				$trading_name = json_decode ( ajax_get ( trim( $options['endkey'], '"') ), true );
 				
-				$options['startkey'] = json_encode( array( '"' . $options['startkey'] . '"' ) );
-				$options['endkey'] = json_encode( array( '"' . $options['endkey'] . '"' ) );
+				$options['startkey'] = json_encode( array( '"' . $options['startkey'] . '"' , '""' ) );
+				$options['endkey'] = json_encode( array( '"' . $options['endkey'] . '"' ) , '"\ueff"' );
 				if( ! $stale ) {
 					$options['stale'] = 'false';
 				}
@@ -1205,7 +1209,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				
 				//print_r($options);
 				
-				if ($trading_name) {
+				if (isset( $trading_name['steward'] ) ) {
 					
 					foreach($trading_name['steward'] as $steward) {
 						if ($steward == $username) {
