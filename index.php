@@ -56,8 +56,9 @@ function ajax_get($doc_id) {
 function ajax_getView($design_doc, $view, $options, $errors = false) {
 	$url = "https://localhost:4985/openmoney_shadow/_design/" . urlencode($design_doc) . "/_view/" . urlencode($view) ;
 	$client = new GuzzleHttp\Client();
+	$request_options = array( "query" => $options);
 	
-	$response = $client->get( $url, $options);
+	$response = $client->get( $url, $request_options);
 	
 // 	$options = array ('http' => array ('method' => 'GET','content' => json_encode( $options ) , 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 // 	$context = stream_context_create ( $options );
