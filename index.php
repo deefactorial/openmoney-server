@@ -974,11 +974,11 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 					if($steward == $username){
 						if($include_docs){
 							$account['doc'] = json_decode ( ajax_get ( $account['id'] ), true );
-							$account['doc']['_id'] = $account['id'];
+							$account['doc']['_id'] = $account['value'];
 						}
 						$account['value'] = '';
 						array_push($tradingname_array, $account);
-						array_push($tradingname_id_array, $account['id']);
+						array_push($tradingname_id_array, $account['value']);
 					}
 				}
 			}
