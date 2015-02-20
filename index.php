@@ -1199,7 +1199,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				$trading_name = json_decode ( ajax_get ( trim( $options['endkey'], '"') ), true );
 				
 				//$lastchar = substr( $options['startkey'], strlen($options['startkey'])-1, strlen($options['startkey']))
-				$options['startkey'] = json_encode( array( '"' . $options['startkey'] . '"', '""' ) );
+				$options['startkey'] = json_encode( array( '"' . $options['endkey'] . '\uefff"' ) );
 				$options['endkey'] = json_encode( array( '"' . $options['endkey'] . '"' ) );
 				if( ! $stale ) {
 					$options['stale'] = 'false';
