@@ -990,6 +990,10 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			//this is the default
 			unset($options['stale']);
 		}
+		
+		if( ! $stale ) {
+			$options['stale'] = 'false';
+		}
 			
 		//$options = array ('startkey' => array ($username), 'endkey' => array ($username . '\uefff', '\uefff', '\uefff'));
 		
@@ -1070,7 +1074,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			//echo $username;
 		} else if($viewname == 'account_balance') {
 			
-			$account_balance_result = $cb->view ( 'dev_openmoney', $viewname, $options );
+			$account_balance_result = ajax_getView ( 'dev_openmoney', $viewname, $options );
 			
 			$balance = 0;
 			$tradingname_array = array ();
@@ -1098,16 +1102,14 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				echo json_encode ( $rows );
 			}
 		} else if ($viewname == 'currencies') {
-			
-			//$currencies_result = $cb->view ( 'dev_openmoney', $viewname, $options );
-			
 
-			
-			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
-			$options['stale'] = $stale;
+			$options = array ('startkey' => '"' . $username . '"', 'endkey' => '"' . $username . '\uefff"'  );
+			if( ! $stale ) {
+				$options['stale'] = 'false';
+			}
 			
 			// do currency view lookup 
-			$currency_view_result = $cb->view ( 'dev_openmoney_helper', 'currency_view', $options );
+			$currency_view_result = ajax_getView ( 'dev_openmoney_helper', 'currency_view', $options );
 			
 			$currency_id_array = array();
 			$currency_array = array();
@@ -1141,11 +1143,13 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			
 		} else if($viewname == 'spaces') {
 			
-			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
-			$options['stale'] = $stale;
+			$options = array ('startkey' => '"' . $username . '"', 'endkey' => '"' . $username . '\uefff"'  );
+			if( ! $stale ) {
+				$options['stale'] = 'false';
+			}
 				
 			// do currency view lookup
-			$space_view = $cb->view ( 'dev_openmoney_helper', 'space_view', $options );
+			$space_view = ajax_getView ( 'dev_openmoney_helper', 'space_view', $options );
 				
 			$space_id_array = array();
 			$space_array = array();
@@ -1177,31 +1181,6 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				
 			echo json_encode ( $rows );
 			
-// 			unset($options);
-			
-// 			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
-// 			$options['stale'] = false;
-			
-// 			$spaces_result = $cb->view ( 'dev_openmoney', $viewname, $options );
-			
-// 			$spaces_array = array();
-// 			foreach($spaces_result['rows'] as $space){
-// 				unset($object);
-// 				$object['id'] = $space['id'];
-// 				$object['key'] = $space['value'];
-// 				$object['value'] = '';
-				
-// 				if($include_docs) {
-// 					$object['doc'] = json_decode ( ajax_get ( $space['id'] ), true );
-// 					$object['doc']['_id'] = $space['id'];
-// 				}
-				
-// 				array_push($spaces_array, $object);
-// 			}
-			
-// 			$rows = array("rows"=>$spaces_array);
-				
-// 			echo json_encode ( $rows );
 			
 		} else if ($viewname == 'account_details') {
 		
@@ -1223,7 +1202,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 					
 					foreach($trading_name['steward'] as $steward) {
 						if ($steward == $username) {
-							$account_details = $cb->view ( 'dev_openmoney', $viewname, $options );
+							$account_details = ajax_getView ( 'dev_openmoney', $viewname, $options );
 							
 							echo json_encode ($account_details);
 						}
@@ -1234,10 +1213,15 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			
 		} else if ($viewname == 'nfc_tags') {
 			
-			$options = array ( 'startkey' => array($username), 'endkey' => array($username . '\uefff') ) ;
-			$options['stale'] = $stale;
+// 			$options = array ( 'startkey' => array($username), 'endkey' => array($username . '\uefff') ) ;
+// 			$options['stale'] = $stale;
 			
-			$nfc_tags = $cb->view ( 'dev_openmoney', $viewname, $options );
+			$options = array ('startkey' => array( '"' . $username . '"' ), 'endkey' => array( '"' . $username . '\uefff"' ) );
+			if( ! $stale ) {
+				$options['stale'] = 'false';
+			}
+			
+			$nfc_tags = ajax_getView ( 'dev_openmoney', $viewname, $options );
 			
 			echo json_encode ($nfc_tags);
 			
@@ -1251,9 +1235,9 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		
 	} else {
 		echo "failed to autheticate!:(" . $username . "):(" . $password . "):" . $expires .":\n";
-		print_r(getallheaders ());
-		print_r($_GET);
-		print_r($_SESSION);
+// 		print_r(getallheaders ());
+// 		print_r($_GET);
+// 		print_r($_SESSION);
 	}
 	
 	
