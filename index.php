@@ -1,4 +1,26 @@
 <?php
+
+//Guzzle Docs
+/*
+$client = new GuzzleHttp\Client();
+$response = $client->get('http://guzzlephp.org');
+$res = $client->get('https://api.github.com/user', ['auth' =>  ['user', 'pass']]);
+echo $res->getStatusCode();
+// "200"
+echo $res->getHeader('content-type');
+// 'application/json; charset=utf8'
+echo $res->getBody();
+// {"type":"User"...'
+var_export($res->json());
+// Outputs the JSON decoded data
+
+// Send an asynchronous request.
+$req = $client->createRequest('GET', 'http://httpbin.org', ['future' => true]);
+$client->send($req)->then(function ($response) {
+	echo 'I completed! ' . $response;
+});
+*/
+
 function get_http_response_code($url) {
 	$headers = get_headers ( $url );
 	return substr ( $headers [0], 9, 3 );
@@ -309,8 +331,6 @@ $app->post ( '/registration', function () use($app) {
 		$result = file_get_contents ( $url, false, $context );
 		
 		$session = json_decode ( $result, true );
-		
-
 		
 		$user ['username'] = strtolower( $username );
 		$user ['email'] = $email;
@@ -973,7 +993,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		// do trading name lookup on
 		if ($viewname == 'accounts') {
 		
-			$options['stale'] = false;
+			//$options['stale'] = false;
 			
 			$accounts = ajax_getView ( 'dev_openmoney', $viewname, $options , true);
 			//$accounts = $cb->view ( 'dev_openmoney', $viewname, $options , true);
