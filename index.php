@@ -1005,7 +1005,8 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			$options['stale'] = $stale;
 				
 			// do trading name lookup on
-			$trading_name_view_result = $cb->view ( 'dev_openmoney_helper', 'trading_name_view', $options );
+			//$trading_name_view_result = $cb->view ( 'dev_openmoney_helper', 'trading_name_view', $options );
+			$trading_name_view_result = ajax_getView ( 'dev_openmoney_helper', 'trading_name_view', $options );
 			
 			foreach ( $trading_name_view_result ['rows'] as $trading_name ) {
 				if( ! in_array( $trading_name['value'], $tradingname_id_array ) ) {
