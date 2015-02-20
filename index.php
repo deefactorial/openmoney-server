@@ -898,7 +898,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 	$expires = '';
 	$session = false;
 	session_start();
-	if( isset( $_SESSION['username'] ) && isset( $_SESSION['expires'] ) && isset( $_SESSION['password'] ) && $_SESSION['expires'] > time() ) {
+	if( isset( $_SESSION['username'] ) && isset( $_SESSION['expires'] ) && isset( $_SESSION['password'] ) && $_SESSION['expires'] > time() && $password == '' ) {
 		$username = $_SESSION['username'];
 		$password = $_SESSION['password'];
 		$expires = $_SESSION['expires'];
@@ -933,14 +933,12 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 	
 	$cb->setTimeout( 1000 * 60 * 5 );
 	
-	$user = ajax_get ( "users," . $username );
-	
-	$user = json_decode ( $user, true );
+	$user = json_decode ( ajax_get ( "users," . $username ), true );
 	
 	// TODO: cytpographically decode password using cryptographic algorithms specified in the $user ['cryptographic_algorithms'] array.
 	require ("password.php");
 	
-	if (password_verify ( $password, $user ['password'] ) || $session) {
+	if ( isset( $user ['password'] ) && password_verify ( $password, $user ['password'] ) || $session) {
 		
 // 		$trading_name_view_lookup_function = 'function (doc, meta) { if( doc.type == \"trading_name_view\" && doc.steward && doc.trading_name && doc.currency && !doc.archived) { doc.steward.forEach(function( steward ) { emit( steward , \"trading_name,\" + doc.trading_name + \",\" + doc.currency ); } ); } }';
 			
