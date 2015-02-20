@@ -1010,13 +1010,26 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			if( isset( $accounts ['rows'] ) ) {
 				foreach ( $accounts ['rows'] as $account ) {
 					
-					if($include_docs){
-						$account['doc'] = json_decode ( ajax_get ( $account['id'] ), true );
-						$account['doc']['_id'] = $account['value'];
+// 					if($include_docs){
+// 						$account['doc'] = json_decode ( ajax_get ( $account['id'] ), true );
+// 						$account['doc']['_id'] = $account['value'];
+// 					}
+// 					array_push($tradingname_id_array, $account['value']);
+// 					$account['value'] = '';
+// 					array_push($tradingname_array, $account);
+					
+					unset($object);
+					$object['doc'] = json_decode ( ajax_get ( $account['id'] ), true );
+					if ($object['doc']) {
+						$object['doc']['_id'] = $account['value'];
+						$object['id'] = $account['value'];
+						$object['key']['currency'] = $object['doc']['currency'];
+						$object['key']['steward'] = $object['doc']['steward'];
+						$object['key']['trading_name'] = $object['doc']['name'];
+						$object['value'] = '';
+						array_push($tradingname_array, $object);
+						array_push($tradingname_id_array, $object['id']);
 					}
-					array_push($tradingname_id_array, $account['value']);
-					$account['value'] = '';
-					array_push($tradingname_array, $account);
 				}
 			}
 
