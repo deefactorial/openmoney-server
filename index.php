@@ -1074,6 +1074,9 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			//echo $username;
 		} else if($viewname == 'account_balance') {
 			
+			$options['startkey'] =  '"' . $options['startkey'] . '"' ;
+			$options['endkey'] =  '"' . $options['endkey'] . '"' ;
+			
 			$account_balance_result = ajax_getView ( 'dev_openmoney', $viewname, $options );
 			
 			$balance = 0;
@@ -1193,6 +1196,9 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				
 				$options['startkey'] = json_encode( array( '"' . $options['startkey'] . '"' ) );
 				$options['endkey'] = json_encode( array( '"' . $options['endkey'] . '"' ) );
+				if( ! $stale ) {
+					$options['stale'] = 'false';
+				}
 				
 				//$options['stale'] = $stale;
 				
