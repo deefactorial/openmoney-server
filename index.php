@@ -967,23 +967,24 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			
 			$tradingname_array = array ();
 			$tradingname_id_array = array ();
-			foreach ( $accounts ['rows'] as $account ) {
-				//print_r($account);
-				
-				foreach($account['key']['steward'] as $steward) {
-					if($steward == $username){
-						if($include_docs){
-							$account['doc'] = json_decode ( ajax_get ( $account['id'] ), true );
-							$account['doc']['_id'] = $account['value'];
+			if( isset( $accounts ['rows'] ) ) {
+				foreach ( $accounts ['rows'] as $account ) {
+					//print_r($account);
+					
+					foreach($account['key']['steward'] as $steward) {
+						if($steward == $username){
+							if($include_docs){
+								$account['doc'] = json_decode ( ajax_get ( $account['id'] ), true );
+								$account['doc']['_id'] = $account['value'];
+							}
+							array_push($tradingname_id_array, $account['value']);
+							$account['value'] = '';
+							array_push($tradingname_array, $account);
+							
 						}
-						array_push($tradingname_id_array, $account['value']);
-						$account['value'] = '';
-						array_push($tradingname_array, $account);
-						
 					}
 				}
 			}
-			
 
 			
 			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
