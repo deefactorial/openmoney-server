@@ -962,7 +962,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 		if ($viewname == 'accounts') {
 		
 			//$options['stale'] = true;
-			$accounts = $cb->view ( 'dev_openmoney', $viewname, $options );
+			$accounts = $cb->view ( 'dev_openmoney', $viewname, $options , true);
 			//$options['stale'] = $stale;
 			
 			$tradingname_array = array ();
