@@ -898,7 +898,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 	$expires = '';
 	$session = false;
 	session_start();
-	if( isset( $_SESSION['username'] ) && isset( $_SESSION['expires'] ) && isset( $_SESSION['password'] ) && $_SESSION['expires'] > time() && $password == '' ) {
+	if( isset( $_SESSION['username'] ) && isset( $_SESSION['expires'] ) && isset( $_SESSION['password'] ) && $_SESSION['expires'] > time()  ) {
 		$username = $_SESSION['username'];
 		$password = $_SESSION['password'];
 		$expires = $_SESSION['expires'];
