@@ -999,7 +999,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			//$options['stale'] = false;
 			
 			//this view needs to be steward accounts.
-			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+			$options = array ('startkey' => $username, 'endkey' => $username );
 			//$options['stale'] = $stale;
 			$accounts = ajax_getView ( 'dev_openmoney', 'steward_accounts', $options , true);
 			//$accounts = $cb->view ( 'dev_openmoney', $viewname, $options , true);
@@ -1021,7 +1021,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			}
 
 			
-			$options = array ('startkey' => $username, 'endkey' => $username . '\uefff');
+			$options = array ('startkey' => $username, 'endkey' => $username );
 			$options['stale'] = $stale;
 				
 			// do trading name lookup on
