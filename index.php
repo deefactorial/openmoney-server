@@ -1211,6 +1211,16 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 						if ($steward == $username) {
 							$account_details = ajax_getView ( 'dev_openmoney', $viewname, $options );
 							
+							$newRows = array();
+							foreach($account_details['rows'] as $row ) {
+// 								$key = $row['value']['timestamp'];
+// 								$value = $row;
+								$newRows[$row['value']['timestamp']] = $row;
+							}
+							if( krsort($newRows) ) {
+								$account_details['rows'] = array_values( $newRows );
+							}
+							
 							echo json_encode ($account_details);
 						}
 					}
