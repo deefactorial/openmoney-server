@@ -1215,7 +1215,11 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 							foreach($account_details['rows'] as $row ) {
 // 								$key = $row['value']['timestamp'];
 // 								$value = $row;
-								$newRows[$row['value']['timestamp']][$row['value']['amount']] = $row;
+								if($row['value']['amount']) {
+									$newRows[$row['value']['timestamp'] + 1] = $row;
+								} else {
+									$newRows[$row['value']['timestamp']] = $row;
+								}
 							}
 							if( krsort($newRows) ) {
 								$account_details['rows'] = array_values( $newRows );
