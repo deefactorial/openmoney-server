@@ -1223,10 +1223,10 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 								
 // 							}
 							usort($account_details['rows'], function ($a, $b) {
-							    if ( $a['value']['timestamp'] > $b['value']['timestamp'] ) {
+							    if ( $a['value']['timestamp'] < $b['value']['timestamp'] ) {
 							    	return true;
 							    } else if ( $a['value']['timestamp'] == $b['value']['timestamp']) {
-							    	if( $a['value']['amount'] > $b['value']['amount'] ) {
+							    	if( $a['value']['amount'] < $b['value']['amount'] ) {
 							    		return true;
 							    	} else {
 							    		return false;
