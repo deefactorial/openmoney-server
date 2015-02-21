@@ -1218,7 +1218,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 								if($row['value']['amount']) {
 									$newRows[$row['value']['timestamp'] + 1] = $row;
 								} else {
-									$newRows[$row['value']['timestamp']] = $row;
+									$newRows[$row['value']['timestamp'] - 1] = $row;
 								}
 							}
 							if( krsort($newRows) ) {
