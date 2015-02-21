@@ -1211,18 +1211,31 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 						if ($steward == $username) {
 							$account_details = ajax_getView ( 'dev_openmoney', $viewname, $options );
 							
-							$newRows = array();
-							foreach($account_details['rows'] as $row ) {
-// 								$key = $row['value']['timestamp'];
-// 								$value = $row;
-								if($row['value']['amount']) {
-									$newRows[intval($row['value']['timestamp']) + 1] = $row;
-								} else {
-									$newRows[intval($row['value']['timestamp']) - 1] = $row;
-								}
-							}
-							if( krsort($newRows) ) {
-								$account_details['rows'] = array_values( $newRows );
+// 							$timestampRows = array();
+// 							$amountRows = array();
+// 							foreach($account_details['rows'] as $row ) {
+// // 								$key = $row['value']['timestamp'];
+// // 								$value = $row;
+								
+// 								$timestampRows[$row['value']['timestamp']] = $row;
+// 								$amountRows[$row['value']['amount']] = $row;
+								
+								
+// 							}
+							if (usort($account_details['rows'], function ($a, $b) {
+							    if ( $a['value']['timestamp'] > $b['value']['timestamp'] ) {
+							    	return true;
+							    } else if ( $a['value']['timestamp'] == $b['value']['timestamp']) {
+							    	if( $a['value']['amount'] > $b['value']['amount'] ) {
+							    		return true;
+							    	} else {
+							    		return false;
+							    	}
+							    } else {
+							    	return false;
+							    }
+							} ) ) {
+								$account_details['rows'] = array_values( $timestampRows );
 							}
 							
 							echo json_encode ($account_details);
