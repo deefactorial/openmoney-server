@@ -1222,7 +1222,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 								
 								
 // 							}
-							if (usort($account_details['rows'], function ($a, $b) {
+							usort($account_details['rows'], function ($a, $b) {
 							    if ( $a['value']['timestamp'] > $b['value']['timestamp'] ) {
 							    	return true;
 							    } else if ( $a['value']['timestamp'] == $b['value']['timestamp']) {
@@ -1234,9 +1234,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 							    } else {
 							    	return false;
 							    }
-							} ) ) {
-								$account_details['rows'] = array_values( $timestampRows );
-							}
+							} );
 							
 							echo json_encode ($account_details);
 						}
