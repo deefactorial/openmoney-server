@@ -572,12 +572,25 @@ $app->get ( '/logout', function () use($app) {
 	
 	session_write_close();
 	
-	unset ( $_COOKIE ['SyncGatewaySession'] );
-	setcookie ( "SyncGatewaySession", '', time () - 3600, '/' );
+	//unset ( $_COOKIE ['SyncGatewaySession'] );
+	//setcookie ( "SyncGatewaySession", '', time () - 3600, '/' );
+	
+	// unset cookies
+	if (isset($_SERVER['HTTP_COOKIE'])) {
+		$cookies = explode(';', $_SERVER['HTTP_COOKIE']);
+		foreach($cookies as $cookie) {
+			$parts = explode('=', $cookie);
+			$name = trim($parts[0]);
+			setcookie($name, '', time()-1000);
+			setcookie($name, '', time()-1000, '/');
+		}
+	}
 	
 	echo json_encode ( array ('error' => false, 'msg' => 'you are now logged out') );
 	$app->stop ();
 } );
+
+
 
 $app->post ( '/lostpw', function () use($app) {
 	
