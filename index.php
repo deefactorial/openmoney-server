@@ -1078,21 +1078,23 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 			//echo $username;
 		} else if($viewname == 'account_balance') {
 			
-			$options['startkey'] =  '"' . $options['startkey'] . '"' ;
-			$options['endkey'] =  '"' . $options['endkey'] . '"' ;
+			$trading_name = json_decode ( ajax_get ( $options['startkey'] ), true );
 			
-			$account_balance_result = ajax_getView ( 'dev_openmoney', $viewname, $options );
+			if ($trading_name) {
 			
-			$balance = 0;
-			$tradingname_array = array ();
-			foreach ( $account_balance_result ['rows'] as $entry ) {
-				$balance += $entry['value'];
-			}
-			
-			if (isset($options['startkey'])) {
-				$trading_name = json_decode ( ajax_get ( $options['startkey'] ), true );
+				$options['startkey'] =  '"' . $options['startkey'] . '"' ;
+				$options['endkey'] =  '"' . $options['endkey'] . '"' ;
 				
-				if ($trading_name) {
+				$account_balance_result = ajax_getView ( 'dev_openmoney', $viewname, $options );
+				
+				$balance = 0;
+				$tradingname_array = array ();
+				foreach ( $account_balance_result ['rows'] as $entry ) {
+					$balance += $entry['value'];
+				}
+				
+				if (isset($options['startkey'])) {
+
 					unset($trading_name_object);
 					$trading_name_object['currency'] = $trading_name['currency'];
 					$trading_name_object['trading_name'] = $trading_name['name'];
@@ -1219,8 +1221,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 								
 // 								$timestampRows[$row['value']['timestamp']] = $row;
 // 								$amountRows[$row['value']['amount']] = $row;
-								
-								
+																
 // 							}
 							usort($account_details['rows'], function ($a, $b) {
 							    if ( $a['value']['timestamp'] < $b['value']['timestamp'] ) {
