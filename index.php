@@ -107,8 +107,8 @@ function ajax_bulkPut($docs) {
 	}
 	
 	$response_code = $response->getStatusCode();
-	if( $response_code == 200 || $response_code == 204) {
-		return $response_code;
+	if( $response_code == 201) {
+		return $response->json() ;
 	} else {
 		return $response_code;
 	}
