@@ -393,7 +393,7 @@ $app->post ( '/registration', function () use($app) {
 		//$cb->set ( "users," . strtolower( $username ), json_encode ( $user ) );
 		
 		$bulk_docs = array();
-		$user ['id'] = "users," . strtolower( $username );
+		$user ['_id'] = "users," . strtolower( $username );
 		array_push($bulk_docs, $user);
 		
 		$subusername = $username;
@@ -424,7 +424,7 @@ $app->post ( '/registration', function () use($app) {
 				//ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 				//$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 				
-				$trading_name_space_view ['id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
+				$trading_name_space_view ['_id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
 				array_push($bulk_docs, $trading_name_space_view);
 				
 				for($i = count($spaces_array) - 2; $i >= 0; $i--){
@@ -438,7 +438,7 @@ $app->post ( '/registration', function () use($app) {
 					//ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 					//$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 					
-					$trading_name_space_view ['id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
+					$trading_name_space_view ['_id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
 					array_push($bulk_docs, $trading_name_space_view);
 				}
 				
@@ -475,7 +475,7 @@ $app->post ( '/registration', function () use($app) {
 							//ajax_put ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
 							//$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
 							
-							$trading_name_space ['id'] = "space," . strtolower( $trading_name_space ['space'] );
+							$trading_name_space ['_id'] = "space," . strtolower( $trading_name_space ['space'] );
 							array_push($bulk_docs, $trading_name_space);
 
 						}
@@ -488,7 +488,7 @@ $app->post ( '/registration', function () use($app) {
 						//ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 						//$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 						
-						$trading_name_space_view ['id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
+						$trading_name_space_view ['_id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
 						array_push($bulk_docs, $trading_name_space_view);
 						
 						$subspace = $current_space;
@@ -506,7 +506,7 @@ $app->post ( '/registration', function () use($app) {
 		
 		//ajax_put ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
 		
-		$trading_name_space ['id'] = "space," . strtolower( $trading_name_space ['space'] );
+		$trading_name_space ['_id'] = "space," . strtolower( $trading_name_space ['space'] );
 		array_push($bulk_docs, $trading_name_space);
 		
 		$trading_name_space_view ['type'] = "space_view";
@@ -516,7 +516,7 @@ $app->post ( '/registration', function () use($app) {
 		
 		//ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 		
-		$trading_name_space_view ['id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
+		$trading_name_space_view ['_id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
 		array_push($bulk_docs, $trading_name_space_view);
 		
 		$trading_name_space_view ['type'] = "space_view";
@@ -526,7 +526,7 @@ $app->post ( '/registration', function () use($app) {
 		
 		//ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );	
 		
-		$trading_name_space_view ['id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
+		$trading_name_space_view ['_id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
 		array_push($bulk_docs, $trading_name_space_view);
 		
 		$trading_name ['type'] = "trading_name";
@@ -544,7 +544,7 @@ $app->post ( '/registration', function () use($app) {
 		} else {
 			//ajax_put ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
 			
-			$trading_name ['id'] = "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] );
+			$trading_name ['_id'] = "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] );
 			array_push($bulk_docs, $trading_name);
 		}
 		
@@ -555,7 +555,7 @@ $app->post ( '/registration', function () use($app) {
 		
 		//ajax_put ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
 		
-		$currency_view ['id'] = "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] );
+		$currency_view ['_id'] = "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] );
 		array_push($bulk_docs, $currency_view);
 		
 		$subspace_document = json_decode( ajax_get( "space," . strtolower( $subspace ) ), true);
@@ -578,7 +578,7 @@ $app->post ( '/registration', function () use($app) {
 			} else {
 				//ajax_put ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
 				
-				$trading_name ['id'] = "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] );
+				$trading_name ['_id'] = "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] );
 				array_push($bulk_docs, $trading_name);
 			}
 			
@@ -589,7 +589,7 @@ $app->post ( '/registration', function () use($app) {
 			
 			//ajax_put ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
 			
-			$currency_view ['id'] = "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] );
+			$currency_view ['_id'] = "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] );
 			array_push($bulk_docs, $currency_view);
 		}
 		
@@ -603,7 +603,7 @@ $app->post ( '/registration', function () use($app) {
 		
 		//ajax_put ( "profile," . strtolower( $username ) , json_encode ( $profile ) );
 		
-		$profile ['id'] = "profile," . strtolower( $username ) ;
+		$profile ['_id'] = "profile," . strtolower( $username ) ;
 		array_push($bulk_docs, $profile);
 		
 		$bulk = array( "docs" => $bulk_docs );
