@@ -1,4 +1,7 @@
 <?php
+require 'vendor/autoload.php';
+
+use GuzzleHttp\Exception\ClientException;
 
 //Guzzle Docs
 /*
@@ -49,13 +52,12 @@ function ajax_put($doc_id, $document) {
 	}
 }
 
-use GuzzleHttp\Exception\ClientException;
+
 
 function ajax_get($doc_id) {
 	
 	$url = "https://cloud.openmoney.cc:4985/openmoney_shadow/" . urlencode($doc_id);	
 	$client = new GuzzleHttp\Client();
-	//$request_options = array( "query" => $options);
 	
 	try {
 		$response = $client->get( $url );
@@ -76,14 +78,20 @@ function ajax_getView($design_doc, $view, $options, $errors = false) {
 	$client = new GuzzleHttp\Client();
 	$request_options = array( "query" => $options);
 	
-	$response = $client->get( $url, $request_options);
+	
+	try {
+		$response = $client->get( $url, $request_options);
+	} catch (ClientException $e) {
+		$response = $e->getResponse();
+	}
 	
 	$response_code = $response->getStatusCode();
 	if( $response_code == 200) {
-		return ( $response->json() );
+		return ( $response->json()  );
 	} else {
 		return json_decode( "{}", true );
 	}
+	
 }
 
 function ajax_bulkPut($docs) {
@@ -92,10 +100,14 @@ function ajax_bulkPut($docs) {
 	
 	$request_options = array( "json" => $docs);
 	
-	$response = $client->post( $url, $request_options);
+	try {
+		$response = $client->post( $url, $request_options);
+	} catch (ClientException $e) {
+		$response = $e->getResponse();
+	}
 	
 	$response_code = $response->getStatusCode();
-	if( $response_code == 200) {
+	if( $response_code == 200 || $response_code == 204) {
 		return ( $response->json() );
 	} else {
 		return json_decode( "{}", true );
@@ -106,7 +118,7 @@ function ajax_bulkPut($docs) {
 // $cb = new Couchbase("127.0.0.1:8091", "users", "", "users");
 // $cb->set("a", 101);
 // var_dump($cb->get("a"));
-require 'vendor/autoload.php';
+
 
 $app = new \Slim\Slim ();
 
@@ -361,9 +373,6 @@ $app->post ( '/registration', function () use($app) {
 		$json = json_encode ( $data );
 		$options = array ('http' => array ('method' => 'POST', 'content' => $json, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
 		$context = stream_context_create ( $options );
-		$default_context = stream_context_set_default ( $options );
-		
-		//$response_code = get_http_response_code ( $url );
 		
 		$result = file_get_contents ( $url, false, $context );
 		
@@ -380,8 +389,12 @@ $app->post ( '/registration', function () use($app) {
 		$user ['password_encryption_algorithm'] = array (PASSWORD_BCRYPT);
 		$user ['created'] = intval( round(microtime(true) * 1000) );
 		
-		ajax_put( "users," . strtolower( $username ), json_encode ( $user ) );
+		//ajax_put( "users," . strtolower( $username ), json_encode ( $user ) );
 		//$cb->set ( "users," . strtolower( $username ), json_encode ( $user ) );
+		
+		$bulk_docs = array();
+		$user ['id'] = "users," . strtolower( $username );
+		array_push($bulk_docs, $user);
 		
 		$subusername = $username;
 		if( strpos ( $username, "@" ) !== false)
@@ -408,8 +421,11 @@ $app->post ( '/registration', function () use($app) {
 				$trading_name_space_view ['steward'] = array ( strtolower($username) );
 				$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 					
-				ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+				//ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 				//$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+				
+				$trading_name_space_view ['id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
+				array_push($bulk_docs, $trading_name_space_view);
 				
 				for($i = count($spaces_array) - 2; $i >= 0; $i--){
 					$current_space =  $spaces_array[$i] . "." . $current_space ;
@@ -419,8 +435,11 @@ $app->post ( '/registration', function () use($app) {
 					$trading_name_space_view ['steward'] = array ( strtolower($username) );
 					$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 					
-					ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+					//ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 					//$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+					
+					$trading_name_space_view ['id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
+					array_push($bulk_docs, $trading_name_space_view);
 				}
 				
 				$subspace = $current_space;
@@ -453,8 +472,11 @@ $app->post ( '/registration', function () use($app) {
 							
 							//$space = ajax_get ( "space," . strtolower( $trading_name_space ['space'] ) );
 							
-							ajax_put ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
+							//ajax_put ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
 							//$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
+							
+							$trading_name_space ['id'] = "space," . strtolower( $trading_name_space ['space'] );
+							array_push($bulk_docs, $trading_name_space);
 
 						}
 						
@@ -463,8 +485,11 @@ $app->post ( '/registration', function () use($app) {
 						$trading_name_space_view ['steward'] = array ( strtolower($username) );
 						$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 							
-						ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+						//ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
 						//$cb->set ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+						
+						$trading_name_space_view ['id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
+						array_push($bulk_docs, $trading_name_space_view);
 						
 						$subspace = $current_space;
 					}
@@ -479,21 +504,30 @@ $app->post ( '/registration', function () use($app) {
 		$trading_name_space ['steward'] = array ( strtolower($username) );
 		$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
 		
-		ajax_put ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
+		//ajax_put ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
+		
+		$trading_name_space ['id'] = "space," . strtolower( $trading_name_space ['space'] );
+		array_push($bulk_docs, $trading_name_space);
 		
 		$trading_name_space_view ['type'] = "space_view";
 		$trading_name_space_view ['space'] = $subspace != "" ? $tradingName . "." . $subspace : $tradingName . ".cc";
 		$trading_name_space_view ['steward'] = array ( strtolower($username) );
 		$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 		
-		ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+		//ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );
+		
+		$trading_name_space_view ['id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
+		array_push($bulk_docs, $trading_name_space_view);
 		
 		$trading_name_space_view ['type'] = "space_view";
 		$trading_name_space_view ['space'] = "cc";
 		$trading_name_space_view ['steward'] = array ( strtolower($username) );
 		$trading_name_space_view ['created'] = intval( round( microtime(true) * 1000) );
 		
-		ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );	
+		//ajax_put ( "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] ), json_encode ( $trading_name_space_view ) );	
+		
+		$trading_name_space_view ['id'] = "space_view," . strtolower($username) . "," . strtolower( $trading_name_space_view ['space'] );
+		array_push($bulk_docs, $trading_name_space_view);
 		
 		$trading_name ['type'] = "trading_name";
 		$trading_name ['trading_name'] = $tradingName;
@@ -508,7 +542,10 @@ $app->post ( '/registration', function () use($app) {
 		if( isset( $exists['steward'] ) ){
 			$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'User already exists!') ) );
 		} else {
-			ajax_put ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
+			//ajax_put ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
+			
+			$trading_name ['id'] = "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] );
+			array_push($bulk_docs, $trading_name);
 		}
 		
 		$currency_view ['type'] = "currency_view";
@@ -516,7 +553,10 @@ $app->post ( '/registration', function () use($app) {
 		$currency_view ['steward'] = array (strtolower($username));
 		$currency_view ['created'] = intval( round(microtime(true) * 1000) );
 		
-		ajax_put ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
+		//ajax_put ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
+		
+		$currency_view ['id'] = "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] );
+		array_push($bulk_docs, $currency_view);
 		
 		$subspace_document = json_decode( ajax_get( "space," . strtolower( $subspace ) ), true);
 		$defaultcurrency = strtolower( $subspace );
@@ -536,7 +576,10 @@ $app->post ( '/registration', function () use($app) {
 					$app->halt ( 401, json_encode ( array ('error' => true, 'msg' => 'User already exists!') ) );
 				}
 			} else {
-				ajax_put ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
+				//ajax_put ( "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] ), json_encode ( $trading_name ) );
+				
+				$trading_name ['id'] = "trading_name," . strtolower( $trading_name ['name'] ) . "," . strtolower( $trading_name ['currency'] );
+				array_push($bulk_docs, $trading_name);
 			}
 			
 			$currency_view ['type'] = "currency_view";
@@ -544,7 +587,10 @@ $app->post ( '/registration', function () use($app) {
 			$currency_view ['steward'] = array (strtolower($username));
 			$currency_view ['created'] = intval( round(microtime(true) * 1000) );
 			
-			ajax_put ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
+			//ajax_put ( "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] ), json_encode ( $currency_view ) );
+			
+			$currency_view ['id'] = "currency_view," . strtolower( $username ) . "," . strtolower( $currency_view ['currency'] );
+			array_push($bulk_docs, $currency_view);
 		}
 		
 		$profile ['type'] = "profile";
@@ -555,7 +601,14 @@ $app->post ( '/registration', function () use($app) {
 		$profile ['theme'] = false;
 		$profile ['created'] = intval( round(microtime(true) * 1000) );
 		
-		ajax_put ( "profile," . strtolower( $username ) , json_encode ( $profile ) );
+		//ajax_put ( "profile," . strtolower( $username ) , json_encode ( $profile ) );
+		
+		$profile ['id'] = "profile," . strtolower( $username ) ;
+		array_push($bulk_docs, $profile);
+		
+		$bulk = array( "docs" => $bulk__docs );
+		
+		ajax_bulkPut( $bulk );
 		
 		if (isset ( $session ['session_id'] )) {
 		
