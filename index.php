@@ -53,7 +53,7 @@ function ajax_get($doc_id) {
 	$client = new GuzzleHttp\Client();
 	//$request_options = array( "query" => $options);
 	
-	$response = $client->get( $url, $request_options);
+	$response = $client->get( $url );
 	
 	$response_code = $response->getStatusCode();
 	if( $response_code == 200) {
