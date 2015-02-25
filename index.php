@@ -621,7 +621,7 @@ $app->post ( '/registration', function () use($app) {
 			session_write_close();
 		
 			setcookie ( $session ['cookie_name'], $session ['session_id'], strtotime ( $session ['expires'] ) );
-			$result = array ('cookie_name' => $session['cookie_name'], 'sessionID' => $session ['session_id'], 'expires' => $session ['expires'], 'username' => $user ['username'], 'session_token' => $session_token, 'email' => $email);
+			$result = array ('cookie_name' => $session['cookie_name'], 'sessionID' => $session ['session_id'], 'expires' => $session ['expires'], 'username' => $user ['username'], 'session_token' => $session_token, 'email' => $email, 'bulk_result' => $bulk_result);
 		
 			echo json_encode ( $result );
 			$app->stop ();
