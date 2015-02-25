@@ -610,6 +610,8 @@ $app->post ( '/registration', function () use($app) {
 		
 		$bulk_result = ajax_bulkPut( $bulk );
 		
+		$bulk_result = $bulk;
+		
 		if (isset ( $session ['session_id'] )) {
 		
 			session_start();
