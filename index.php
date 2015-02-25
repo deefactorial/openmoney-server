@@ -33,7 +33,8 @@ function randomString($length = 10) {
 }
 
 function ajax_put($doc_id, $document) {
-
+	$url = "https://cloud.openmoney.cc:4985/openmoney_shadow/" . urlencode($doc_id);
+	
 	$client = new GuzzleHttp\Client();
 	
 	$request_options = array( "json" => json_decode( $document, true ) );
