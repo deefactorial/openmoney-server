@@ -48,21 +48,19 @@ function ajax_put($doc_id, $document) {
 	}
 }
 
+use GuzzleHttp\Exception\ClientException;
+
 function ajax_get($doc_id) {
+	
 	$url = "https://cloud.openmoney.cc:4985/openmoney_shadow/" . urlencode($doc_id);	
 	$client = new GuzzleHttp\Client();
 	//$request_options = array( "query" => $options);
 	
 	try {
 		$response = $client->get( $url );
-	} catch (RequestException $e) {
-// 		echo $e->getRequest();
-// 		if ($e->hasResponse()) {
-// 			echo $e->getResponse();
-// 		}
+	} catch (ClientException $e) {
 		$response = $e->getResponse();
 	}
-	//$response = $client->get( $url );
 	
 	$response_code = $response->getStatusCode();
 	if( $response_code == 200) {
