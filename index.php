@@ -110,7 +110,7 @@ function ajax_bulkPut($docs) {
 	if( $response_code == 200 || $response_code == 204) {
 		return ( $response->json() );
 	} else {
-		return json_decode( "{}", true );
+		return json_decode( "{'code'=> " . $response_code .  "}", true );
 	}
 }
 
@@ -608,7 +608,7 @@ $app->post ( '/registration', function () use($app) {
 		
 		$bulk = array( "docs" => $bulk_docs );
 		
-		ajax_bulkPut( $bulk );
+		$bulk_result = ajax_bulkPut( $bulk );
 		
 		if (isset ( $session ['session_id'] )) {
 		
