@@ -33,24 +33,34 @@ function randomString($length = 10) {
 }
 
 function ajax_put($doc_id, $document) {
-	$url = "https://cloud.openmoney.cc:4985/openmoney_shadow/" . urlencode($doc_id);
-	//$json = json_encode ( $document );
-	$options = array ('http' => array ('method' => 'PUT', 'content' => $document, 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-	$context = stream_context_create ( $options );
-	return( file_get_contents ( $url, false, $context ) );
+
+	$client = new GuzzleHttp\Client();
+	
+	$request_options = array( "json" => json_decode( $document, true ) );
+	
+	$response = $client->put( $url, $request_options);
+	
+	$response_code = $response->getStatusCode();
+	if( $response_code == 200 || $response_code == 204) {
+		return ( $response->json() );
+	} else {
+		return json_decode( "{}", true );
+	}
 }
 
 function ajax_get($doc_id) {
-	$url = "https://cloud.openmoney.cc:4985/openmoney_shadow/" . urlencode($doc_id);
-	$options = array ('http' => array ('method' => 'GET', 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-	$context = stream_context_create ( $options );
-	$response_code = get_http_response_code ( $url );
-	if( $response_code == 200) {
-		return ( file_get_contents ( $url, false, $context ) );
-	} else {
-		return "{}";
-	}
+	$url = "https://cloud.openmoney.cc:4985/openmoney_shadow/" . urlencode($doc_id);	
+	$client = new GuzzleHttp\Client();
+	//$request_options = array( "query" => $options);
 	
+	$response = $client->get( $url, $request_options);
+	
+	$response_code = $response->getStatusCode();
+	if( $response_code == 200) {
+		return ( $response->getBody() );
+	} else {
+		return  "{}";
+	}
 }
 
 function ajax_getView($design_doc, $view, $options, $errors = false) {
@@ -60,8 +70,22 @@ function ajax_getView($design_doc, $view, $options, $errors = false) {
 	
 	$response = $client->get( $url, $request_options);
 	
-// 	$options = array ('http' => array ('method' => 'GET','content' => json_encode( $options ) , 'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-// 	$context = stream_context_create ( $options );
+	$response_code = $response->getStatusCode();
+	if( $response_code == 200) {
+		return ( $response->json() );
+	} else {
+		return json_decode( "{}", true );
+	}
+}
+
+function ajax_bulkPut($docs) {
+	$url = "https://cloud.openmoney.cc:4985/openmoney_shadow/_bulk_docs";
+	$client = new GuzzleHttp\Client();
+	
+	$request_options = array( "json" => $docs);
+	
+	$response = $client->post( $url, $request_options);
+	
 	$response_code = $response->getStatusCode();
 	if( $response_code == 200) {
 		return ( $response->json() );
@@ -409,6 +433,7 @@ $app->post ( '/registration', function () use($app) {
 						//if space doesn't exist create it.
 						unset($space);
 						$space = json_decode( ajax_get( "space," . strtolower($current_space) ), true);
+						
 						if( ! isset( $space['steward'] ) ) {
 							
 							//create the space as this users
@@ -417,6 +442,8 @@ $app->post ( '/registration', function () use($app) {
 							$trading_name_space ['subspace'] = $subspace;
 							$trading_name_space ['steward'] = array (strtolower($username));
 							$trading_name_space ['created'] = intval( round( microtime(true) * 1000) );
+							
+							//$space = ajax_get ( "space," . strtolower( $trading_name_space ['space'] ) );
 							
 							ajax_put ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
 							//$cb->set ( "space," . strtolower( $trading_name_space ['space'] ), json_encode ( $trading_name_space ) );
