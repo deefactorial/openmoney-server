@@ -606,7 +606,7 @@ $app->post ( '/registration', function () use($app) {
 		$profile ['id'] = "profile," . strtolower( $username ) ;
 		array_push($bulk_docs, $profile);
 		
-		$bulk = array( "docs" => $bulk__docs );
+		$bulk = array( "docs" => $bulk_docs );
 		
 		ajax_bulkPut( $bulk );
 		
