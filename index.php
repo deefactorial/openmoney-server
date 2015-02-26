@@ -42,11 +42,15 @@ function ajax_put($doc_id, $document) {
 	
 	$request_options = array( "json" => json_decode( $document, true ) );
 	
-	$response = $client->put( $url, $request_options);
+	try {
+		$response = $client->put( $url, $request_options);
+	} catch (ClientException $e) {
+		$response = $e->getResponse();
+	}
 	
 	$response_code = $response->getStatusCode();
-	if( $response_code == 200 || $response_code == 204) {
-		return ( $response->json() );
+	if( $response_code == 200 || $response_code == 204 || $response_code == 201) {
+		return $response->json();
 	} else {
 		return json_decode( "{}", true );
 	}

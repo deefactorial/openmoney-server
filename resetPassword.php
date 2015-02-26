@@ -125,7 +125,7 @@ if (password_verify( $reset_key, $reset_hash) ) {
 	$debug = true;
 	if($debug) {
 		$subject = "Could Not Verify Link on $CFG->url";
-		$msg =  "Supplied Username: $username ~ System username: " . $user['user_name'] . " <br/>";
+		$msg =  "Supplied Username: $username ~ System username: " . $user['username'] . " <br/>";
 		$msg .= "Supplied Email: $email ~ System Email: " . $user['email'] . " <br/>";
 		$msg .= "Supplied Reset: $reset_hash ~ System Reset Key: " . $user['password2'] . " <br/>";
 		email_letter($CFG->maintainer,$CFG->system_email,$subject,$msg);
