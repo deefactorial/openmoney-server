@@ -7,7 +7,7 @@ $email = isset($_GET['email'])?$_GET['email']:'';
 $email = urldecode($email);
 $email = str_replace(" ","+",$email);//plus sign gets replaced with a space
 
-$username = '';
+$username = $email;
 
 $cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 
@@ -127,7 +127,7 @@ if (password_verify( $reset_key, $reset_hash) ) {
 		$subject = "Could Not Verify Link on $CFG->url";
 		$msg =  "Supplied Username: $username ~ System username: " . $user['username'] . " <br/>";
 		$msg .= "Supplied Email: $email ~ System Email: " . $user['email'] . " <br/>";
-		$msg .= "Supplied Reset: $reset_hash ~ System Reset Key: " . $user['password2'] . " <br/>";
+		$msg .= "Supplied Reset: $reset_hash ~ System Reset Key: " . $reset_key . " <br/>";
 		email_letter($CFG->maintainer,$CFG->system_email,$subject,$msg);
 	
 	}
