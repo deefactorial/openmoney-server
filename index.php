@@ -71,7 +71,7 @@ function ajax_get($doc_id) {
 	
 	$response_code = $response->getStatusCode();
 	if( $response_code == 200) {
-		return ( $response->getBody() );
+		return  $response->getBody();
 	} else {
 		return  "{}";
 	}
@@ -718,9 +718,8 @@ $app->post ( '/lostpw', function () use($app) {
 		
 		$cb = new Couchbase ( "127.0.0.1:8091", "openmoney", "", "openmoney" );
 		
-		$user = ajax_get ( "users," . $username );
 		
-		$user = json_decode ( $user, true );
+		$user = json_decode ( ajax_get ( "users," . $username ), true );
 		
 		if (! isset ( $user ['username'] ) || $user ['username'] == '') {
 			
@@ -750,8 +749,8 @@ $app->post ( '/lostpw', function () use($app) {
 
 		// email passed check send email with password reset link
 		
-		$reset_key = strtotime ( "now" ) * rand ();
-		$reset_hash = password_hash ( ( string ) $reset_key, PASSWORD_BCRYPT );
+		$reset_key = ( string ) strtotime ( "now" ) * rand ();
+		$reset_hash = password_hash ( $reset_key, PASSWORD_BCRYPT );
 		
 		// update key on user table, then verify in resetPassword.php
 		
@@ -842,9 +841,6 @@ $app->post ( '/lookupTag', function () use($app) {
 				// remove users, from id
 				$trading_names = $row ['value'];
 				foreach($trading_names as $trading_name) {
-				
-					// echo $username;
-					
 				
 					$options = array ('startkey' => "trading_name," . $trading_name['trading_name'] . "," . $trading_name['currency'], 'endkey' => "trading_name," . $trading_name['trading_name'] . "," . $trading_name['currency'] . '\uefff');
 				
