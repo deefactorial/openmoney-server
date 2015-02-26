@@ -749,7 +749,7 @@ $app->post ( '/lostpw', function () use($app) {
 
 		// email passed check send email with password reset link
 		
-		$reset_key = ( string ) strtotime ( "now" ) * rand ();
+		$reset_key = randomString( 64 );
 		$reset_hash = password_hash ( $reset_key, PASSWORD_BCRYPT );
 		
 		// update key on user table, then verify in resetPassword.php
