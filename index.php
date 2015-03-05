@@ -1350,7 +1350,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 // 			$options = array ( 'startkey' => array($username), 'endkey' => array($username . '\uefff') ) ;
 // 			$options['stale'] = $stale;
 			
-			$options = array ('startkey' => array( '"' . $username . '"' , '""' ), 'endkey' => array( '"' . $username . '\uefff"' , '"\uefff"') );
+			$options = array ('startkey' => '"' . $username . '"', 'endkey' => '"' . $username . '\uefff"' );
 			if( ! $stale ) {
 				$options['stale'] = 'false';
 			}
