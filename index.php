@@ -1307,7 +1307,7 @@ $app->get ( '/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function
 				if( ! $stale ) {
 					$options['stale'] = 'false';
 				}
-				$options['stale'] = 'false';
+				
 				
 				if (isset( $trading_name['steward'] ) ) {
 					
