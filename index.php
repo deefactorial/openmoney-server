@@ -817,10 +817,9 @@ $app->post ( '/lookupTag', function () use($app) {
 		
 		$session = json_decode ( ajax_get ( "_session/" . $password ), true );
 		
-		//require ("password.php");
+		require ("password.php");
 		
-		//if (password_verify ( $password, $user ['password'] )) {
-		if ($user['username'] == $session['userCtx']['name']) {
+		if ($user['username'] == $session['userCtx']['name'] || password_verify ( $password, $user ['password'] )) {
 			// user is verified
 			// do lookup on tag
 			
