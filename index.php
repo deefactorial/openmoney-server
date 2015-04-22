@@ -782,21 +782,6 @@ $app->post ( '/lookupTag', function () use($app) {
 	$username = '';
 	$password = '';
 	$key = '';
-
-	$session = false;
-	session_start();
-	if( isset( $_SESSION['username'] ) && isset( $_SESSION['expires'] ) && isset( $_SESSION['password'] ) && $_SESSION['expires'] > time() ) {
-		$username = $_SESSION['username'];
-		$password = $_SESSION['password'];
-		$expires = $_SESSION['expires'];
-		$session = true;
-	} else {
-		// remove all session variables
-		session_unset();
-		// destroy the session
-		session_destroy();
-	}
-	session_write_close();
 	
 	if (($username == '' && $password == '') && (! isset ( $_POST ['username'] ) || ! isset ( $_POST ['password'] ))) {
 		$post = json_decode ( file_get_contents ( 'php://input' ), true );
@@ -830,9 +815,12 @@ $app->post ( '/lookupTag', function () use($app) {
 			$app->halt ( $responseCode, json_encode ( array ('error' => true, 'msg' => 'Email ' . $username . ' was not found !' . $user) ) );
 		}
 		
-		require ("password.php");
+		$session = json_decode ( ajax_get ( "_session/" . $password ), true );
 		
-		if (password_verify ( $password, $user ['password'] )) {
+		//require ("password.php");
+		
+		//if (password_verify ( $password, $user ['password'] )) {
+		if ($user['username'] == $session['userCtx']['name']) {
 			// user is verified
 			// do lookup on tag
 			
