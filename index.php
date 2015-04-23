@@ -898,6 +898,8 @@ $app->post ( '/lookupTag', function () use($app) {
 			echo json_encode ( $trading_names_array );
 			
 			$app->stop ();
+		} else {
+			$app->halt ( 401, json_encode ( array ('error' => true, msg => 'Authorization Failed!') ) );
 		}
 	} else {
 		$app->halt ( 401, json_encode ( array ('error' => true, msg => 'Email is required!') ) );
