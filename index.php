@@ -829,7 +829,7 @@ $app->post('/lookupTag', function () use($app) {
 				$trading_names = $row['value'];
 			
 				foreach($trading_names as $trading_name) {
-					array_push($trading_names_array, $tranding_name);
+					array_push($trading_names_array, $trading_name);
 					//$options = array('startkey' => "trading_name," . $trading_name['trading_name'] . "," . $trading_name['currency'],'endkey' => "trading_name," . $trading_name['trading_name'] . "," . $trading_name['currency'] . '\uefff');
 					
 					// do trading name lookup on
