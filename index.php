@@ -830,11 +830,11 @@ $app->post ( '/lookupTag', function () use($app) {
 			$app->halt ( $responseCode, json_encode ( array ('error' => true, 'msg' => 'Email ' . $username . ' was not found !' . $user) ) );
 		}
 		
-		//$session = json_decode ( ajax_get ( "_session/" . $password ), true );
+		$session = json_decode ( ajax_get ( "_session/" . $password ), true );
 		
 		require ("password.php");
 		
-		if (password_verify ( $password, $user ['password'] ) || $session) {
+		if (password_verify ( $password, $user ['password'] ) || $user['username'] == $session['userCtx']['name']) {
 			// user is verified
 			// do lookup on tag
 			
