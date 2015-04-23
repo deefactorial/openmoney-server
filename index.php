@@ -814,27 +814,34 @@ $app->post('/lookupTag', function () use($app) {
 			
 			//$cb->setDesignDoc("dev_nfctag", $designDoc);
 			
-			$result = $cb->view('dev_nfctag', 'beamlookup2', array('startkey' => $key,'endkey' => $key . '\uefff'));
+			//$result = $cb->view('dev_nfctag', 'beamlookup2', array('startkey' => $key,'endkey' => $key . '\uefff'));
+			
+			$viewname = 'beamtag';
+			$options = array('startkey' => '"' . $key . '"','endkey' => '"' . $key . '\uefff"');			
+			$options['stale'] = 'false';
+				
+			$result = ajax_getView('dev_openmoney', $viewname, $options);
 			
 			$trading_names_array = array();
 			
 			foreach($result['rows'] as $row) {
 				// remove users, from id
 				$trading_names = $row['value'];
+			
 				foreach($trading_names as $trading_name) {
-					
-					$options = array('startkey' => "trading_name," . $trading_name['trading_name'] . "," . $trading_name['currency'],'endkey' => "trading_name," . $trading_name['trading_name'] . "," . $trading_name['currency'] . '\uefff');
+					array_push($trading_names_array, $tranding_name);
+					//$options = array('startkey' => "trading_name," . $trading_name['trading_name'] . "," . $trading_name['currency'],'endkey' => "trading_name," . $trading_name['trading_name'] . "," . $trading_name['currency'] . '\uefff');
 					
 					// do trading name lookup on
-					$tradingname_result = $cb->view('dev_nfctag', 'tradingnamelookup4', $options);
+					//$tradingname_result = $cb->view('dev_nfctag', 'tradingnamelookup4', $options);
 					
 					// print_r($tradingname_result);
-					foreach($tradingname_result['rows'] as $row) {
+					//foreach($tradingname_result['rows'] as $row) {
 						// unset ( $object );
 						// $object ['id'] = $row ['id'];
 						// $object ['value'] = $row ['value'];
-						array_push($trading_names_array, $row['value']);
-					}
+						//array_push($trading_names_array, $row['value']);
+					//}
 					
 					if (isset($trading_name['trading_name']) && $trading_name['trading_name'] != null) {
 						
