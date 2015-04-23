@@ -816,7 +816,7 @@ $app->post('/lookupTag', function () use($app) {
 			
 			//$result = $cb->view('dev_nfctag', 'beamlookup2', array('startkey' => $key,'endkey' => $key . '\uefff'));
 			
-			$viewname = 'beamtag';
+			$viewname = 'beamtag2';
 			$options = array('startkey' => '"' . $key . '"','endkey' => '"' . $key . '\uefff"');			
 			$options['stale'] = 'false';
 				
