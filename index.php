@@ -812,7 +812,7 @@ $app->post('/lookupTag', function () use($app) {
 			
 			// echo $designDoc;
 			
-			$cb->setDesignDoc("dev_nfctag", $designDoc);
+			//$cb->setDesignDoc("dev_nfctag", $designDoc);
 			
 			$result = $cb->view('dev_nfctag', 'beamlookup2', array('startkey' => $key,'endkey' => $key . '\uefff'));
 			
