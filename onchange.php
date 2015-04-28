@@ -798,8 +798,8 @@ foreach ( $profiles ['rows'] as $profile ) {
 					$this_trading_name = $trading_name['value']['trading_name'];
 					$currency = $trading_name['value']['currency'] ;
 					$ismessage = false;
-					$message = "<h1>Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "</h1><br/>".
-							   "<table style='border:0;'><tr><td>TIMESTAMP</td><td>FROM</td><td>TO</td><td>DESCRIPTION</td><td>AMOUNT</td><td>CURRENCY</td></tr>";
+					$message = "<h1>Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "</h1><br/>\r\n".
+							   "<table style='border:0;'><tr><td>TIMESTAMP</td><td>FROM</td><td>TO</td><td>DESCRIPTION</td><td>AMOUNT</td><td>CURRENCY</td></tr>\r\n";
 					//get all transactions by this trading name within the last 24hrs or the last time this was run.
 					$options = array('startkey' => "trading_name,".$trading_name['value']['trading_name'].",".$trading_name['value']['currency'], 
 							          'endkey' => "trading_name,".$trading_name['value']['trading_name'].",".$trading_name['value']['currency'] . '\uefff');
@@ -854,7 +854,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 							"</td><td>" . $journal_trading_name['value'] . "</td>";
 							
 							$message .=
-							"<td>" . $trading_name_journal['currency'] ."</td></tr>";
+							"<td>" . $trading_name_journal['currency'] ."</td></tr>\r\n";
 							//$trading_name['']
 							
 							if($trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
@@ -872,7 +872,7 @@ foreach ( $profiles ['rows'] as $profile ) {
 							}
 						}
 					}
-					$message .= "<tr><td></td><td></td><td></td><td>DIGEST TOTAL:</td><td>" . $total_amount . "</td><td>" . $currency . "</td></tr></table>";
+					$message .= "<tr><td></td><td></td><td></td><td>DIGEST TOTAL:</td><td>" . $total_amount . "</td><td>" . $currency . "</td></tr></table>\r\n";
 					if ($ismessage) {
 						$master_message .= $message;
 					}
