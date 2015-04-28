@@ -209,7 +209,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 						$profiles = $cb->view( $design_doc_name, $profile_function_name, $options );
 						foreach ( $profiles ['rows'] as $profile ) {
 							if (isset( $profile ['value'] ) && $profile ['value'] != '') {
-								if( email_letter($profile ['value'], $CFG->system_email, 'New Trading Name Created', $message) ) {
+								if( email_letter($profile ['value'], $CFG->system_email, 'Trading Name Created: ' . $trading_name_array['name'] . " " . $trading_name_array['currency'], $message) ) {
 									echo str_replace("<br/>","\n",$message);
 									$trading_name_array['notified'] = true;
 									$cb->set ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
@@ -552,7 +552,7 @@ foreach ( $currencies ['rows'] as $currency ) {
 // 			foreach ( $spaces ['rows'] as $space ) {
 				foreach( $space ['steward'] as $space_steward ) {
 					if( strpos($space_steward,"@") !== false ) {
-						if( email_letter($space_steward, $CFG->system_email, 'New Currency Created', $message) ) {
+						if( email_letter($space_steward, $CFG->system_email, 'Currency Created: ' . $currency['currency'], $message) ) {
 							echo str_replace("<br/>","\n",$message);
 							$currency['notified'] = true;
 							$cb->set ( "currency," . $currency['currency'], json_encode ( $currency ) );
@@ -688,7 +688,7 @@ foreach ( $spaces ['rows'] as $space ) {
 // 			foreach ( $spaces ['rows'] as $subspace ) {
 				foreach( $subspace ['steward'] as $subspace_steward ) {
 					if( strpos($subspace_steward,"@") !== false ) {
-						if( email_letter($subspace_steward, $CFG->system_email, 'New Space Created', $message) ) {
+						if( email_letter($subspace_steward, $CFG->system_email, 'Space Created: ' . $space['space'], $message) ) {
 							echo str_replace("<br/>","\n",$message);
 							$space['notified'] = true;
 							$cb->set ( "space," . $space['space'], json_encode ( $space ) );
