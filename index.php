@@ -108,6 +108,26 @@ function ajax_bulkPut($docs) {
 	}
 }
 
+
+
+function updateSession(){	
+	if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 86400)) {
+		// last request was more than 30 minutes ago
+		session_unset();     // unset $_SESSION variable for the run-time
+		session_destroy();   // destroy session data in storage
+	}
+	$_SESSION['LAST_ACTIVITY'] = time(); // update last activity time stamp
+	
+	if (!isset($_SESSION['CREATED'])) {
+		ini_set('session.gc-maxlifetime', 86400);
+		$_SESSION['CREATED'] = time();
+	} else if (time() - $_SESSION['CREATED'] > 86400) {
+		// session started more than 30 minutes ago
+		session_regenerate_id(true);    // change session ID for the current session and invalidate old session ID
+		$_SESSION['CREATED'] = time();  // update creation time
+	}
+}
+
 // adjust these parameters to match your installation
 // $cb = new Couchbase("127.0.0.1:8091", "users", "", "users");
 // $cb->set("a", 101);
@@ -136,6 +156,7 @@ $app->post('/login', function () use($app) {
 	
 	$session = false;
 	session_start();
+	updateSession();
 	if (isset($_SESSION['username']) && isset($_SESSION['expires']) && isset($_SESSION['password']) && $_SESSION['expires'] > time()) {
 		$username = $_SESSION['username'];
 		$password = $_SESSION['password'];
@@ -999,6 +1020,7 @@ $app->get('/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function (
 	$expires = '';
 	$session = false;
 	session_start();
+	updateSession();
 	if (isset($_SESSION['username']) && isset($_SESSION['expires']) && isset($_SESSION['password']) && $_SESSION['expires'] > time()) {
 		$username = $_SESSION['username'];
 		$password = $_SESSION['password'];

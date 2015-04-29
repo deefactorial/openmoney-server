@@ -198,7 +198,7 @@ foreach ( $tradingname_result ['rows'] as $trading_name ) {
 // 			foreach ( $currencies ['rows'] as $currency_array ) {
 				foreach( $currency_array ['steward'] as $currency_steward ) {
 					if( strpos($currency_steward,"@") !== false ) {
-						if( email_letter($currency_steward, $CFG->system_email, 'New Trading Name Created', $message) ) {
+						if( email_letter($currency_steward, $CFG->system_email, 'Trading Name Created: ' . $trading_name_array['name'] . " " . $trading_name_array['currency'], $message) ) {
 							echo str_replace("<br/>","\n",$message);
 							$trading_name_array['notified'] = true;
 							$cb->set ( "trading_name," . $trading_name_array['name'] . "," . $trading_name_array['currency'], json_encode ( $trading_name_array ) );
@@ -367,15 +367,20 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 					"<br/>" .
 					"<br/>Thank you,<br/>openmoney<br/>";
 					
+					$first = $trading_name_journal['from'] < $trading_name_journal['to'] ? $trading_name_journal['from'] : $trading_name_journal['to'];
+					$second = $trading_name_journal['from'] >= $trading_name_journal['to'] ? $trading_name_journal['from'] : $trading_name_journal['to'];
+					
+					//Sent Payment Email
+					if( email_letter($profile_array['email'], $CFG->system_email, 'Payment: ' . $first . ' ' . $trading_name_journal['currency'] . ' :: ' . $second . ' ' . $trading_name_journal['currency'] . " :: " . $journal_trading_name['value'] . " " . $trading_name_journal['currency'] . " :: " . $trading_name_journal['description']. $amount , $message) ) {
 					if( (!isset($profile_array['digest']) || $profile_array['digest'] === false) && $trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
-						if( email_letter($profile_array['email'], $CFG->system_email, 'Sent Payment To: ' . $trading_name_journal['to'], $message) ) {
 							echo str_replace("<br/>","\n",$message);
 							$trading_name_journal['from_emailed'] = true;
 								
 							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 						}
 					} else if ((!isset($profile_array['digest']) || $profile_array['digest'] === false) && $trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
-						if( email_letter($profile_array['email'], $CFG->system_email, 'Received Payment From: ' . $trading_name_journal['from'], $message) ) {
+						//Received Payment Email
+						if( email_letter($profile_array['email'], $CFG->system_email, 'Payment: ' . $first . ' ' . $trading_name_journal['currency'] . ' :: ' . $second . ' ' . $trading_name_journal['currency'] . " :: " . $journal_trading_name['value'] . " " . $trading_name_journal['currency'] . " :: " . $trading_name_journal['description'], $message) ) {
 							echo str_replace("<br/>","\n",$message);
 							$trading_name_journal['to_emailed'] = true;
 								
