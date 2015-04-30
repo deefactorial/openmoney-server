@@ -371,14 +371,14 @@ foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
 					$second = $trading_name_journal['from'] >= $trading_name_journal['to'] ? $trading_name_journal['from'] : $trading_name_journal['to'];
 					
 					if( (!isset($profile_array['digest']) || $profile_array['digest'] === false) && $trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
-						if( email_letter($profile_array['email'], $CFG->system_email, 'Payment: ' . $first . ' ' . $trading_name_journal['currency'] . ' :: ' . $second . ' ' . $trading_name_journal['currency'] . " :: " . $journal_trading_name['value'] .  " " . $trading_name_journal['currency'] . " :: " . $trading_name_journal['description'], $message) ) {
+						if( email_letter($profile_array['email'], $CFG->system_email, 'Payment: ' . $first . ' :: ' . $second . " :: " . $journal_trading_name['value'] .  " " . $trading_name_journal['currency'] . " :: " . $trading_name_journal['description'], $message) ) {
 							echo str_replace("<br/>","\n",$message);
 							$trading_name_journal['from_emailed'] = true;
 								
 							$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
 						}
 					} else if ((!isset($profile_array['digest']) || $profile_array['digest'] === false) && $trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
-						if( email_letter($profile_array['email'], $CFG->system_email, 'Payment: ' . $first . ' ' . $trading_name_journal['currency'] . ' :: ' . $second . ' ' . $trading_name_journal['currency'] . " :: " . $journal_trading_name['value'] .  " " . $trading_name_journal['currency'] . " :: " . $trading_name_journal['description'], $message) ) {
+						if( email_letter($profile_array['email'], $CFG->system_email, 'Payment: ' . $first . ' :: ' . $second . " :: " . $journal_trading_name['value'] .  " " . $trading_name_journal['currency'] . " :: " . $trading_name_journal['description'], $message) ) {
 							echo str_replace("<br/>","\n",$message);
 							$trading_name_journal['to_emailed'] = true;
 								
