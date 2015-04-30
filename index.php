@@ -1317,22 +1317,40 @@ $app->get('/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function (
 					$options['stale'] = 'false';
 				}
 				
-				if (isset($trading_name['steward'])) {
+				$finished = false;
+				
+				if (isset($trading_name['currency'])) {
+					$currency = json_decode(ajax_get("currency," . $trading_name['currency']), true);
+					foreach($currency['steward'] as $steward){
+						if ($steward == $username) {
+							$account_details = ajax_getView('dev_openmoney', $viewname, $options);
+								
+							usort($account_details['rows'], function ($a, $b) {
+								if ($a['value']['timestamp'] < $b['value']['timestamp']) {
+									return true;
+								} else if ($a['value']['timestamp'] == $b['value']['timestamp']) {
+									if ($a['value']['amount'] < $b['value']['amount']) {
+										return true;
+									} else {
+										return false;
+									}
+								} else {
+									return false;
+								}
+							});
+									
+							echo json_encode($account_details);
+							$finished = true;
+						}
+					}
+				}
+				
+				if (isset($trading_name['steward']) && finished == false) {
 					
 					foreach($trading_name['steward'] as $steward) {
 						if ($steward == $username) {
 							$account_details = ajax_getView('dev_openmoney', $viewname, $options);
 							
-							// $timestampRows = array();
-							// $amountRows = array();
-							// foreach($account_details['rows'] as $row ) {
-							// // $key = $row['value']['timestamp'];
-							// // $value = $row;
-							
-							// $timestampRows[$row['value']['timestamp']] = $row;
-							// $amountRows[$row['value']['amount']] = $row;
-							
-							// }
 							usort($account_details['rows'], function ($a, $b) {
 								if ($a['value']['timestamp'] < $b['value']['timestamp']) {
 									return true;
