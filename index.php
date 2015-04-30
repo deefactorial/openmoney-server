@@ -1345,7 +1345,7 @@ $app->get('/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function (
 					}
 				}
 				
-				if (isset($trading_name['steward']) && finished == false) {
+				if (isset($trading_name['steward']) && $finished == false) {
 					
 					foreach($trading_name['steward'] as $steward) {
 						if ($steward == $username) {
