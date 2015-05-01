@@ -1192,7 +1192,7 @@ $app->get('/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function (
 		} else if ($viewname == 'currency_accounts') {
 			
 			// $options['stale'] = false;
-			$currency = json_decode(ajax_get(trim($options['endkey'], '"')), true);
+			$currency = json_decode(ajax_get("currency," . trim($options['endkey'], '"')), true);
 			// this view needs to be steward accounts.
 			//$options = array('startkey' => '"' . $username . '"','endkey' => '"' . $username . '\uefff"');
 			if (!$stale) {
