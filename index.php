@@ -1189,6 +1189,51 @@ $app->get('/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function (
 			
 			echo json_encode($rows);
 			// echo $username;
+		} else if ($viewname == 'currency_accounts') {
+			
+			// $options['stale'] = false;
+			$currency = json_decode(ajax_get(trim($options['endkey'], '"')), true);
+			// this view needs to be steward accounts.
+			//$options = array('startkey' => '"' . $username . '"','endkey' => '"' . $username . '\uefff"');
+			if (!$stale) {
+				$options['stale'] = 'false';
+			}
+			// $options['stale'] = $stale;
+			$accounts = ajax_getView('dev_openmoney_helper', 'currency_accounts', $options, true);
+			
+			$isSteward = false;
+			foreach($currency['steward'] as $steward){
+				if(	$steward == $username ){
+					$isSteward = true;
+				}
+			}
+			
+			$tradingname_array = array();
+			$tradingname_id_array = array();
+			
+			
+			if (isset($accounts['rows']) && $isSteward) {
+				foreach($accounts['rows'] as $account) {
+					
+					unset($object);
+					$object['doc'] = json_decode(ajax_get($account['id']), true);
+					if ($object['doc']) {
+						$object['doc']['_id'] = $account['value'];
+						$object['id'] = $account['value'];
+						$object['key']['currency'] = $object['doc']['currency'];
+						$object['key']['steward'] = $object['doc']['steward'];
+						$object['key']['trading_name'] = $object['doc']['name'];
+						$object['value'] = '';
+						array_push($tradingname_array, $object);
+						array_push($tradingname_id_array, $object['id']);
+					}
+				}
+			}
+			
+			$rows = array("rows" => $tradingname_array);
+			
+			echo json_encode($rows);
+			// echo $username;
 		} else if ($viewname == 'account_balance') {
 			
 			$trading_name = json_decode(ajax_get($options['startkey']), true);
