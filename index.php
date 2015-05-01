@@ -1194,7 +1194,7 @@ $app->get('/openmoney_shadow/_design/dev_openmoney/_view/:viewname/', function (
 			// $options['stale'] = false;
 			$currency = json_decode(ajax_get("currency," . trim($options['endkey'], '"')), true);
 			// this view needs to be steward accounts.
-			//$options = array('startkey' => '"' . $username . '"','endkey' => '"' . $username . '\uefff"');
+			$options = array('startkey' => '"' . $currency['currency'] . '"','endkey' => '"' . $currency['currency'] . '\uefff"');
 			if (!$stale) {
 				$options['stale'] = 'false';
 			}
