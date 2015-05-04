@@ -276,7 +276,7 @@ $app->post('/login', function () use($app) {
 		session_write_close();
 		
 		setcookie($json['cookie_name'], $json['session_id'], strtotime($json['expires']));
-		$result = array('cookie_name' => $json['cookie_name'],'sessionID' => $json['session_id'],'expires' => $json['expires'],'username' => $user['username'],'session_token' => $session_token,'email' => $email);
+		$result = array('cookie_name' => $json['cookie_name'],'sessionID' => $json['session_id'],'expires' => $json['expires'],'username' => $user['username'],'session_token' => $session_token,'email' => $user['email']);
 		
 		echo json_encode($result);
 		$app->stop();
