@@ -232,8 +232,17 @@ $app->post('/login', function () use($app) {
 	$user = authenticate($app);
 		
 	$session_token = randomString(64);
+	
+	if (isset($user['session_expires']) ){
+		$expires =  new DateTime( $user['session_expires'] );
+		$expiryseconds = $expires->format('U');
+		$now = new DateTime();
+		$nowseconds = $now->format('U');
+	}
+	
 	//note check expiry has not happened.
-	if( isset($user['session_expires']) && (new DateTime( $user['session_expires'] ))->format('U') > (new DateTime())->format('U') ){
+	if( isset($user['session_expires']) && $expiryseconds > $nowseconds){
+		
 		$session_token = $user['session_token'];
 		$sessionID = $user['session_id'];
 		$expiry = $user['session_expires'];
