@@ -235,10 +235,21 @@ $app->post('/login', function () use($app) {
 	
 	if (isset($user['session_expires']) ){
 		// example format 2015-05-05T19:42:24.349453085Z
-// 		$expires = DateTime::createFromFormat('Y-m-d\TH:i:su*P', $user['session_expires']);
+// 		
 // 		$expiryseconds = $expires->format('U');
-		$date = date_create_from_format('Y-m-d\TH:i:su*P', $user['session_expires']);
-		$expiryseconds = date_format($date, 'U');
+		try {
+			$expires = DateTime::createFromFormat('Y-m-d\TH:i:su*P', $user['session_expires']);
+		} catch (Exception $e) {
+			// For demonstration purposes only...
+			//print_r(DateTime::getLastErrors());
+		
+			// The real object oriented way to do this is
+			//echo $e->getMessage();
+			$app->halt(400, json_encode(array('error' => true,'msg' => $e->getMessage())));
+			exit();
+		}
+// 		$date = date_create_from_format('Y-m-d\TH:i:su*P', $user['session_expires']);
+// 		$expiryseconds = date_format($date, 'U');
 		$now = new DateTime();
 		$nowseconds = $now->format('U');
 	}
