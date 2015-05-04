@@ -128,7 +128,7 @@ function updateSession(){
 	}
 }
 
-function authenticate(){
+function authenticate($app){
 	$username = '';
 	$password = '';
 	$email = '';
@@ -229,7 +229,7 @@ $app->get('/', function () use($app) {
 
 $app->post('/login', function () use($app) {
 	
-	$user = authenticate();
+	$user = authenticate($app);
 		
 	$session_token = randomString(64);
 	
