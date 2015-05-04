@@ -128,28 +128,7 @@ function updateSession(){
 	}
 }
 
-// adjust these parameters to match your installation
-// $cb = new Couchbase("127.0.0.1:8091", "users", "", "users");
-// $cb->set("a", 101);
-// var_dump($cb->get("a"));
-
-$app = new \Slim\Slim();
-
-$app->response->headers->set('Content-Type', 'application/json');
-
-$app->notFound(function () use($app) {
-	$app->halt(404, json_encode(array('error' => true,'msg' => 'Page Not Found')));
-});
-
-// $app->view ( new \JsonApiView () );
-// $app->add ( new \JsonApiMiddleware () );
-$app->get('/', function () use($app) {
-	$app->redirect('/webclient/');
-	// echo json_encode ( array ('message' => "Welcome the openmoney json API! go to https://cloud.openmoney.cc/README.md for more information.") );
-});
-
-$app->post('/login', function () use($app) {
-	
+function authenticate(){
 	$username = '';
 	$password = '';
 	$email = '';
@@ -172,16 +151,17 @@ $app->post('/login', function () use($app) {
 	
 	if (($username == '' && $password == '' && $email == '') && (!isset($_POST['username']) || !isset($_POST['password']) || !isset($_POST['email']))) {
 		$post = json_decode(file_get_contents('php://input'), true);
-		
+	
 		if (isset($post['username']))
 			$username = $post['username'];
 		if (isset($post['password']))
 			$password = $post['password'];
 		if (isset($post['email']))
 			$email = $post['email'];
-		
+	
 		if (($username != '' || $email != '') && $password == '') {
 			$app->halt(401, json_encode(array('error' => true,'msg' => 'Email or Username and password are required !')));
+			exit();
 		}
 	} else {
 		if ($username == '' && $password == '' && $email == '' && $session == false) {
@@ -194,7 +174,7 @@ $app->post('/login', function () use($app) {
 		}
 	}
 	
-	$cb = new Couchbase("127.0.0.1:8091", "openmoney", "", "openmoney");
+	
 	
 	$user = ajax_get("users," . $username);
 	$user = json_decode($user, true);
@@ -203,82 +183,107 @@ $app->post('/login', function () use($app) {
 	require ("password.php");
 	
 	if ($email != '' && !password_verify($password, $user['password'])) {
-		
+	
+		//this needs to be switched to use the sync_gateway
+		$cb = new Couchbase("127.0.0.1:8091", "openmoney", "", "openmoney");
 		$profile_lookup_function = 'function (doc, meta) { if( doc.type == \"profile\" && doc.email && doc.username) {  emit( doc.email, doc.username ); } }';
 		$designDoc = '{ "views": { "profileLookup" : { "map": "' . $profile_lookup_function . '" } } }';
 		$cb->setDesignDoc("dev_profile", $designDoc);
 		$options = array('startkey' => $email,'endkey' => $email . '\uefff');
-		
+	
 		// do trading name lookup on
 		$profile_result = $cb->view('dev_profile', 'profileLookup', $options);
-		
+	
 		foreach($profile_result['rows'] as $row) {
 			$user = json_decode(ajax_get("users," . $row['value']), true);
 		}
 	}
 	
 	if ((isset($user['password']) && password_verify($password, $user['password'])) || $session) {
-		
-		$url = 'https://localhost:4985/openmoney_shadow/_user/' . $user['username'];
-		
-		$options = array('http' => array('method' => 'GET','header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-		$context = stream_context_create($options);
-		$default_context = stream_context_set_default($options);
-		
-		$response_code = get_http_response_code($url);
-		$json = array();
-		if ($response_code != 404) {
-			$json = json_decode(file_get_contents($url, false, $context), true);
-		}
-		
-		if (!isset($json['name']) || (isset($json['password']) && $json['password'] != $password)) {
-			// insert data
-			$data = array('name' => $user['username'],'password' => $password);
-			$json = json_encode($data);
-			$options = array('http' => array('method' => 'PUT','content' => $json,'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-			$context = stream_context_create($options);
-			$default_context = stream_context_set_default($options);
-			
-			$result = file_get_contents($url, false, $context);
-		}
-		
-		$session_token = randomString(64);
-		
-		$url = 'https://localhost:4985/openmoney_shadow/_session';
-		// $url = 'https://localhost:4985/todos/_session';
-		$data = array('name' => $user['username'],'password' => $session_token,'ttl' => 86400); // time to live 24hrs
-		$json = json_encode($data);
-		$options = array('http' => array('method' => 'POST','content' => $json,'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-		$context = stream_context_create($options);
-		$default_context = stream_context_set_default($options);
-		
-		// $response_code = get_http_response_code ( $url );
-		
-		$result = file_get_contents($url, false, $context);
-		
-		$json = json_decode($result, true);
-		
-		if (isset($json['session_id'])) {
-			
-			session_start();
-			$_SESSION['username'] = strtolower($user['username']);
-			$_SESSION['password'] = $session_token;
-			$_SESSION['session_id'] = $json['session_id'];
-			
-			$_SESSION['expires'] = time() + 86400;
-			session_write_close();
-			
-			setcookie($json['cookie_name'], $json['session_id'], strtotime($json['expires']));
-			$result = array('cookie_name' => $json['cookie_name'],'sessionID' => $json['session_id'],'expires' => $json['expires'],'username' => $user['username'],'session_token' => $session_token,'email' => $email);
-			
-			echo json_encode($result);
-			$app->stop();
-		} else {
-			$app->halt(401, json_encode(array('error' => true,'msg' => 'The session could not be set!')));
-		}
-	} else {
+		return $user;
+	} else{
 		$app->halt(401, json_encode(array('error' => true,'msg' => 'Password did not match!')));
+		exit();
 	}
+}
+
+// adjust these parameters to match your installation
+// $cb = new Couchbase("127.0.0.1:8091", "users", "", "users");
+// $cb->set("a", 101);
+// var_dump($cb->get("a"));
+
+$app = new \Slim\Slim();
+
+$app->response->headers->set('Content-Type', 'application/json');
+
+$app->notFound(function () use($app) {
+	$app->halt(404, json_encode(array('error' => true,'msg' => 'Page Not Found')));
+});
+
+// $app->view ( new \JsonApiView () );
+// $app->add ( new \JsonApiMiddleware () );
+$app->get('/', function () use($app) {
+	$app->redirect('/webclient/');
+	// echo json_encode ( array ('message' => "Welcome the openmoney json API! go to https://cloud.openmoney.cc/README.md for more information.") );
+});
+
+$app->post('/login', function () use($app) {
+	
+	$user = authenticate();
+		
+	$session_token = randomString(64);
+	
+	$url = 'https://localhost:4985/openmoney_shadow/_user/' . $user['username'];
+	
+// 	$options = array('http' => array('method' => 'GET','header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+// 	$context = stream_context_create($options);
+// 	$default_context = stream_context_set_default($options);
+	
+// 	$response_code = get_http_response_code($url);
+// 	$json = array();
+// 	if ($response_code != 404) {
+// 		$json = json_decode(file_get_contents($url, false, $context), true);
+// 	}
+	
+// 	if (!isset($json['name']) || (isset($json['password']) && $json['session_token'] != $password)) {
+	// update user
+	$data = array('name' => $user['username'],'password' => $session_token);
+	$json = json_encode($data);
+	$options = array('http' => array('method' => 'PUT','content' => $json,'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+	$context = stream_context_create($options);
+	$default_context = stream_context_set_default($options);
+	$result = file_get_contents($url, false, $context);
+//	}
+	
+	$url = 'https://localhost:4985/openmoney_shadow/_session';
+	$data = array('name' => $user['username'],'password' => $session_token); // time to live 24hrs
+	$json = json_encode($data);
+	$options = array('http' => array('method' => 'POST','content' => $json,'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+	$context = stream_context_create($options);
+	$default_context = stream_context_set_default($options);
+	
+	$result = file_get_contents($url, false, $context);
+	
+	$json = json_decode($result, true);
+	
+	if (isset($json['session_id'])) {
+		
+		session_start();
+		$_SESSION['username'] = strtolower($user['username']);
+		$_SESSION['password'] = $session_token;
+		$_SESSION['session_id'] = $json['session_id'];
+		$_SESSION['expires'] = strtotime($json['expires']);
+		session_write_close();
+		
+		setcookie($json['cookie_name'], $json['session_id'], strtotime($json['expires']));
+		$result = array('cookie_name' => $json['cookie_name'],'sessionID' => $json['session_id'],'expires' => $json['expires'],'username' => $user['username'],'session_token' => $session_token,'email' => $email);
+		
+		echo json_encode($result);
+		$app->stop();
+	} else {
+		$app->halt(401, json_encode(array('error' => true,'msg' => 'The session could not be set!')));
+	}
+	
 });
 
 $app->post('/registration', function () use($app) {
