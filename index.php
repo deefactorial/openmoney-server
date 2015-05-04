@@ -135,7 +135,7 @@ function authenticate($app){
 	
 	$session = false;
 	session_start();
-	updateSession();
+	updateSession();//&& $_SESSION['expires'] > time()
 	if (isset($_SESSION['username']) && isset($_SESSION['expires']) && isset($_SESSION['password']) ) {
 		$username = $_SESSION['username'];
 		$password = $_SESSION['password'];
@@ -771,64 +771,66 @@ $app->post('/lostpw', function () use($app) {
 
 $app->post('/lookupTag', function () use($app) {
 	
-	$username = '';
-	$password = '';
-	$key = '';
+// 	$username = '';
+// 	$password = '';
+// 	$key = '';
 	
-	// $session = false;
-	// session_start();
-	// if( isset( $_SESSION['username'] ) && isset( $_SESSION['expires'] ) && isset( $_SESSION['password'] ) && $_SESSION['expires'] > time() ) {
-	// $username = $_SESSION['username'];
-	// $password = $_SESSION['password'];
-	// $expires = $_SESSION['expires'];
-	// $session = true;
-	// } else {
-	// // remove all session variables
-	// session_unset();
-	// // destroy the session
-	// session_destroy();
-	// }
-	// session_write_close();
+// 	// $session = false;
+// 	// session_start();
+// 	// if( isset( $_SESSION['username'] ) && isset( $_SESSION['expires'] ) && isset( $_SESSION['password'] ) && $_SESSION['expires'] > time() ) {
+// 	// $username = $_SESSION['username'];
+// 	// $password = $_SESSION['password'];
+// 	// $expires = $_SESSION['expires'];
+// 	// $session = true;
+// 	// } else {
+// 	// // remove all session variables
+// 	// session_unset();
+// 	// // destroy the session
+// 	// session_destroy();
+// 	// }
+// 	// session_write_close();
 	
-	if (($username == '' && $password == '') && (!isset($_POST['username']) || !isset($_POST['password']))) {
-		$post = json_decode(file_get_contents('php://input'), true);
+// 	if (($username == '' && $password == '') && (!isset($_POST['username']) || !isset($_POST['password']))) {
+// 		$post = json_decode(file_get_contents('php://input'), true);
 		
-		$username = $post['username'];
-		$password = $post['password'];
-		$key = $post['key'];
+// 		$username = $post['username'];
+// 		$password = $post['password'];
+// 		$key = $post['key'];
 		
-		if ($username == '' || $password == '' || $key == '') {
-			$app->halt(401, json_encode(array('error' => true,'msg' => 'Email, password and key are required !')));
-		}
-	} else {
-		if ($username == '' && $password == '') {
-			$username = $_POST['username'];
-			$password = $_POST['password'];
-			$key = $_POST['key'];
-		}
-	}
+// 		if ($username == '' || $password == '' || $key == '') {
+// 			$app->halt(401, json_encode(array('error' => true,'msg' => 'Email, password and key are required !')));
+// 		}
+// 	} else {
+// 		if ($username == '' && $password == '') {
+// 			$username = $_POST['username'];
+// 			$password = $_POST['password'];
+// 			$key = $_POST['key'];
+// 		}
+// 	}
 	
-	if ($username != '') {
+// 	if ($username != '') {
 		
-		$cb = new Couchbase("127.0.0.1:8091", "openmoney", "", "openmoney");
+// 		$cb = new Couchbase("127.0.0.1:8091", "openmoney", "", "openmoney");
 		
-		$user = ajax_get("users," . $username);
+// 		$user = ajax_get("users," . $username);
 		
-		$user = json_decode($user, true);
+// 		$user = json_decode($user, true);
 		
-		if (!isset($user['username']) || $user['username'] == '') {
-			// user is undefined
-			$responseCode = 404;
-			$app->halt($responseCode, json_encode(array('error' => true,'msg' => 'Email ' . $username . ' was not found !' . $user)));
-		}
+// 		if (!isset($user['username']) || $user['username'] == '') {
+// 			// user is undefined
+// 			$responseCode = 404;
+// 			$app->halt($responseCode, json_encode(array('error' => true,'msg' => 'Email ' . $username . ' was not found !' . $user)));
+// 		}
 		
-		$session = json_decode(ajax_get("_session/" . $password), true);
+// 		$session = json_decode(ajax_get("_session/" . $password), true);
 		
-		require ("password.php");
+// 		require ("password.php");
 		
-		if (password_verify($password, $user['password']) || $user['username'] == $session['userCtx']['name']) {
+// 		if (password_verify($password, $user['password']) || $user['username'] == $session['userCtx']['name']) {
 			// user is verified
 			// do lookup on tag
+			
+		$user = authenticate($app);
 			
 			$beamlookup_function = 'function (doc, meta) { if( doc.type == \"beamtag\" ) { if(typeof doc.archived == \"undefined\" || doc.archived === false) { emit(doc.hashTag, doc.trading_names); } } }';
 			
@@ -842,11 +844,11 @@ $app->post('/lookupTag', function () use($app) {
 			
 			//$result = $cb->view('dev_nfctag', 'beamlookup2', array('startkey' => $key,'endkey' => $key . '\uefff'));
 			
-			$viewname = 'beamtag2';
+			$viewname = 'beamtag';
 			$options = array('startkey' => '"' . $key . '"','endkey' => '"' . $key . '\uefff"');			
 			$options['stale'] = 'false';
 				
-			$result = ajax_getView('dev_openmoney', $viewname, $options);
+			$result = ajax_getView('dev_rest', $viewname, $options);
 			
 			$trading_names_array = array();
 			
@@ -905,12 +907,12 @@ $app->post('/lookupTag', function () use($app) {
 			}
 			
 			
-		} else {
-			$app->halt(401, json_encode(array('error' => true,msg => 'Authorization Failed!')));
-		}
-	} else {
-		$app->halt(401, json_encode(array('error' => true,msg => 'Email is required!')));
-	}
+// 		} else {
+// 			$app->halt(401, json_encode(array('error' => true,msg => 'Authorization Failed!')));
+// 		}
+// 	} else {
+// 		$app->halt(401, json_encode(array('error' => true,msg => 'Email is required!')));
+// 	}
 });
 
 $app->post('/customerLookup', function () use($app) {
