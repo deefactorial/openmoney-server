@@ -876,7 +876,7 @@ $app->post('/lookupTag', function () use($app) {
 					
 					if (isset($trading_name['trading_name']) && $trading_name['trading_name'] != null) {
 						
-						$trading_name_view = json_decode(ajax_get("trading_name_view," . $username . "," . $trading_name['trading_name'] . "," . $trading_name['currency']), true);
+						$trading_name_view = json_decode(ajax_get("trading_name_view," . $user['username'] . "," . $trading_name['trading_name'] . "," . $trading_name['currency']), true);
 						if (!isset($trading_name_view['trading_name'])) {
 							
 							// add them to their list of senders
