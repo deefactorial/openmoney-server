@@ -649,21 +649,21 @@ $app->post('/registration', function () use($app) {
 $app->get('/logout', function () use($app) {
 	
 	session_start();
-	if (isset($_SESSION['session_id'])) {
-		$url = 'https://localhost:4985/openmoney_shadow/_session/' . $_SESSION['session_id'];
-		// $url = 'https://localhost:4985/todos/_session';
-		// $data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
-		// $json = json_encode ( $data );
-		$options = array('http' => array('method' => 'DELETE','header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-		$context = stream_context_create($options);
-		$default_context = stream_context_set_default($options);
+// 	if (isset($_SESSION['session_id'])) {
+// 		$url = 'https://localhost:4985/openmoney_shadow/_session/' . $_SESSION['session_id'];
+// 		// $url = 'https://localhost:4985/todos/_session';
+// 		// $data = array ('name' => $user ['username'], 'ttl' => 86400); // time to live 24hrs
+// 		// $json = json_encode ( $data );
+// 		$options = array('http' => array('method' => 'DELETE','header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+// 		$context = stream_context_create($options);
+// 		$default_context = stream_context_set_default($options);
 		
-		// $response_code = get_http_response_code ( $url );
+// 		// $response_code = get_http_response_code ( $url );
 		
-		$result = file_get_contents($url, false, $context);
+// 		$result = file_get_contents($url, false, $context);
 		
-		$json = json_decode($result, true);
-	}
+// 		$json = json_decode($result, true);
+// 	}
 	
 	// remove all session variables
 	session_unset();
