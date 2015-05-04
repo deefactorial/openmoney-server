@@ -270,7 +270,7 @@ $app->post('/login', function () use($app) {
 		$user['session_expires'] = $expiry;
 		$user['session_cookie_name'] = $json['cookie_name'];
 		 
-		ajax_put( "users," . strtolower( $username ), json_encode ( $user ) );
+		ajax_put( "users," . strtolower( $user['username'] ), json_encode ( $user ) );
 	
 	}
 	
