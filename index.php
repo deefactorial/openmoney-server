@@ -234,7 +234,8 @@ $app->post('/login', function () use($app) {
 	$session_token = randomString(64);
 	
 	if (isset($user['session_expires']) ){
-		$expires =  new DateTime( $user['session_expires'] );
+		// example format 2015-05-05T19:42:24.349453085Z
+		$expires = DateTime::createFromFormat('Y-m-d\TH:i:suO', $user['session_expires']);
 		$expiryseconds = $expires->format('U');
 		$now = new DateTime();
 		$nowseconds = $now->format('U');
