@@ -832,7 +832,7 @@ $app->post('/lookupTag', function () use($app) {
 			
 		$user = authenticate($app);
 		
-		$key = $_POST[key];
+		$key = $_POST['key'];
 			
 			$beamlookup_function = 'function (doc, meta) { if( doc.type == \"beamtag\" ) { if(typeof doc.archived == \"undefined\" || doc.archived === false) { emit(doc.hashTag, doc.trading_names); } } }';
 			
