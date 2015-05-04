@@ -232,51 +232,59 @@ $app->post('/login', function () use($app) {
 	$user = authenticate($app);
 		
 	$session_token = randomString(64);
+	//note check expiry has not happened.
+	if(isset($user['session_token'])) {
+		$session_token = $user['session_token'];
+		$sessionID = $user['session_id'];
+		$expiry = $user['session_expiry'];
+		$cookie_name = $user['session_cookie_name'];
+	} else {
 	
-	$url = 'https://localhost:4985/openmoney_shadow/_user/' . $user['username'];
+		$url = 'https://localhost:4985/openmoney_shadow/_user/' . $user['username'];
 	
-// 	$options = array('http' => array('method' => 'GET','header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-// 	$context = stream_context_create($options);
-// 	$default_context = stream_context_set_default($options);
+		// update user
+		$data = array('name' => $user['username'],'password' => $session_token);
+		$json = json_encode($data);
+		$options = array('http' => array('method' => 'PUT','content' => $json,'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+		$context = stream_context_create($options);
+		$default_context = stream_context_set_default($options);
+		$result = file_get_contents($url, false, $context);
+		
+		$url = 'https://localhost:4985/openmoney_shadow/_session';
+		$data = array('name' => $user['username'],'password' => $session_token); // time to live 24hrs
+		$json = json_encode($data);
+		$options = array('http' => array('method' => 'POST','content' => $json,'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+		$context = stream_context_create($options);
+		$default_context = stream_context_set_default($options);
+		
+		$result = file_get_contents($url, false, $context);
+		
+		$json = json_decode($result, true);
+		
+		$sessionID = $json['session_id'];
+		$expiry = $json['expires'];
+		$cookie_name = $json['cookie_name'];
+		
+		$user['session_id'] = $sessionID;
+		$user['session_token'] = $session_token;
+		$user['session_expires'] = $expiry;
+		$user['session_cookie_name'] = $json['cookie_name'];
+		 
+		ajax_put( "users," . strtolower( $username ), json_encode ( $user ) );
 	
-// 	$response_code = get_http_response_code($url);
-// 	$json = array();
-// 	if ($response_code != 404) {
-// 		$json = json_decode(file_get_contents($url, false, $context), true);
-// 	}
+	}
 	
-// 	if (!isset($json['name']) || (isset($json['password']) && $json['session_token'] != $password)) {
-	// update user
-	$data = array('name' => $user['username'],'password' => $session_token);
-	$json = json_encode($data);
-	$options = array('http' => array('method' => 'PUT','content' => $json,'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-	$context = stream_context_create($options);
-	$default_context = stream_context_set_default($options);
-	$result = file_get_contents($url, false, $context);
-//	}
-	
-	$url = 'https://localhost:4985/openmoney_shadow/_session';
-	$data = array('name' => $user['username'],'password' => $session_token); // time to live 24hrs
-	$json = json_encode($data);
-	$options = array('http' => array('method' => 'POST','content' => $json,'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-	$context = stream_context_create($options);
-	$default_context = stream_context_set_default($options);
-	
-	$result = file_get_contents($url, false, $context);
-	
-	$json = json_decode($result, true);
-	
-	if (isset($json['session_id'])) {
+	if (isset($sessionID)) {
 		
 		session_start();
 		$_SESSION['username'] = strtolower($user['username']);
 		$_SESSION['password'] = $session_token;
-		$_SESSION['session_id'] = $json['session_id'];
-		$_SESSION['expires'] = strtotime($json['expires']);
+		$_SESSION['session_id'] = $sessionID;
+		$_SESSION['expires'] = strtotime($expiry);
 		session_write_close();
 		
-		setcookie($json['cookie_name'], $json['session_id'], strtotime($json['expires']));
-		$result = array('cookie_name' => $json['cookie_name'],'sessionID' => $json['session_id'],'expires' => $json['expires'],'username' => $user['username'],'session_token' => $session_token,'email' => $user['email']);
+		setcookie($cookie_name, $sessionID, strtotime($expiry));
+		$result = array('cookie_name' => $cookie_name,'sessionID' => $sessionID,'expires' => $expiry,'username' => $user['username'],'session_token' => $session_token,'email' => $user['email']);
 		
 		echo json_encode($result);
 		$app->stop();
