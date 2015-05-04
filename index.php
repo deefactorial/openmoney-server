@@ -236,7 +236,7 @@ $app->post('/login', function () use($app) {
 	if(isset($user['session_token'])) {
 		$session_token = $user['session_token'];
 		$sessionID = $user['session_id'];
-		$expiry = $user['session_expiry'];
+		$expiry = $user['session_expires'];
 		$cookie_name = $user['session_cookie_name'];
 	} else {
 	
