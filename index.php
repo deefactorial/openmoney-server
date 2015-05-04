@@ -233,7 +233,7 @@ $app->post('/login', function () use($app) {
 		
 	$session_token = randomString(64);
 	//note check expiry has not happened.
-	if( isset($user['session_expires']) && strtotime( $user['session_expires'] ) > time() ){
+	if( isset($user['session_expires']) && strtotime( $user['session_expires'] ) > strtotime("NOW") ){
 		$session_token = $user['session_token'];
 		$sessionID = $user['session_id'];
 		$expiry = $user['session_expires'];
