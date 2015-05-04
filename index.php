@@ -235,8 +235,10 @@ $app->post('/login', function () use($app) {
 	
 	if (isset($user['session_expires']) ){
 		// example format 2015-05-05T19:42:24.349453085Z
-		$expires = DateTime::createFromFormat('Y-m-d\TH:i:su*P', $user['session_expires']);
-		$expiryseconds = $expires->format('U');
+// 		$expires = DateTime::createFromFormat('Y-m-d\TH:i:su*P', $user['session_expires']);
+// 		$expiryseconds = $expires->format('U');
+		$date = date_create_from_format('Y-m-d\TH:i:su*P', $user['session_expires']);
+		$expiryseconds = date_format($date, 'U');
 		$now = new DateTime();
 		$nowseconds = $now->format('U');
 	}
