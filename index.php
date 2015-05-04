@@ -136,7 +136,7 @@ function authenticate($app){
 	$session = false;
 	session_start();
 	updateSession();
-	if (isset($_SESSION['username']) && isset($_SESSION['expires']) && isset($_SESSION['password']) && $_SESSION['expires'] > time()) {
+	if (isset($_SESSION['username']) && isset($_SESSION['expires']) && isset($_SESSION['password']) ) {
 		$username = $_SESSION['username'];
 		$password = $_SESSION['password'];
 		$expires = $_SESSION['expires'];
