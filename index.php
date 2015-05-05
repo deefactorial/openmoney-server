@@ -303,7 +303,7 @@ $app->get('/', function () use($app) {
 $app->post('/login', function () use($app) {
 	
 	$user = authenticate($app);
-	if($user['error']){
+	if(isset($user['error'])){
 		$app->halt(401, json_encode(array('error' => true,'msg' => $user['error'])));
 		exit();
 	}
