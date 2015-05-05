@@ -345,10 +345,8 @@ $app->post('/registration', function () use($app) {
 		//$cb->set ( "users," . strtolower( $username ), json_encode ( $user ) );
 		
  		$bulk_docs = array();
-		$user['_id'] = "users," . strtolower($username);
+		$user['_id'] = "users," . $user['username'];
 		array_push($bulk_docs, $user);
-		
-		
 		
 		$subusername = $user['username'];
 		if (strpos($username, "@") !== false)
