@@ -541,7 +541,7 @@ $app->post('/registration', function () use($app) {
 		
 		$profile['type'] = "profile";
 		$profile['username'] = $user['username'];
-		$profile['email'] = $email;
+		$profile['email'] = $user['email'];
 		$profile['notification'] = true;
 		$profile['mode'] = false;
 		$profile['theme'] = false;
