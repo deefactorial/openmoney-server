@@ -306,11 +306,17 @@ $app->post('/login', function () use($app) {
 	if(isset($user['error'])){
 		$app->halt(401, json_encode(array('error' => true,'msg' => $user['error'])));
 		exit();
-	}
+	} else {
 		
-	echo login($user, $app);
-	
-	$app->stop();
+		if(isset($user['new_user'])){
+			$app->halt(401, json_encode(array('error' => true,'msg' => "No user found!")));
+			exit();
+		} else {
+			echo login($user, $app);
+			
+			$app->stop();
+		}
+	}
 });
 
 $app->post('/registration', function () use($app) {
