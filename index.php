@@ -324,6 +324,8 @@ $app->post('/registration', function () use($app) {
 		$user['cost'] = $options['cost'] = 10;
 		$user['type'] = "users";
 		
+		require ("password.php");
+		
 		$password_hash = password_hash($password, PASSWORD_BCRYPT, $options);
 		
 		$user['password'] = $password_hash;
