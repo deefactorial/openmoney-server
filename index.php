@@ -326,7 +326,7 @@ $app->post('/registration', function () use($app) {
 		
 		require ("password.php");
 		
-		$password_hash = password_hash($password, PASSWORD_BCRYPT, $options);
+		$password_hash = password_hash($user['password'], PASSWORD_BCRYPT, $options);
 		
 		$user['password'] = $password_hash;
 		$user['password_encryption_algorithm'] = array(PASSWORD_BCRYPT);
