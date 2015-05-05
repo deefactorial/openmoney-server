@@ -349,7 +349,7 @@ $app->post('/registration', function () use($app) {
 		array_push($bulk_docs, $user);
 		
 		$subusername = $user['username'];
-		if (strpos($username, "@") !== false)
+		if (strpos($user['username'], "@") !== false)
 			$subusername = substr($user['username'], 0, strpos($user['username'], "@"));
 			// $subusername = str_replace ( ".", "", $subusername );
 		$subusername = preg_replace("/[^a-zA-Z\d_\.]*/", "", $subusername);
