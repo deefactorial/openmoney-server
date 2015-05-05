@@ -565,6 +565,12 @@ $app->post('/registration', function () use($app) {
 		
 		$bulk_result = ajax_bulkPut($bulk);
 		
+		$key = "trading_name," . strtolower($trading_name['name']) . "," . strtolower($trading_name['currency']);
+		$options = array('startkey' => '"' . $key . '"','endkey' => '"' . $key . '\uefff"');
+		$options['stale'] = 'false';
+		
+		$result = ajax_getView('dev_rest', "accounts", $options);
+		
 		echo login($user, $app);
 	
 		$app->stop();
