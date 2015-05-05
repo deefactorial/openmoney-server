@@ -224,44 +224,47 @@ function login($user, $app) {
 	
 	//note check expiry has not happened.
 	if( isset($user['session_expires']) && $expiryseconds > $nowseconds){
-	
 		$session_token = $user['session_token'];
 		$sessionID = $user['session_id'];
 		$expiry = $user['session_expires'];
 		$cookie_name = $user['session_cookie_name'];
 	} else {
 	
-		$url = 'https://localhost:4985/openmoney_shadow/_user/' . $user['username'];
-	
-		// update user
-		$data = array('name' => $user['username'],'password' => $session_token);
-		$json = json_encode($data);
-		$options = array('http' => array('method' => 'PUT','content' => $json,'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-		$context = stream_context_create($options);
-		$default_context = stream_context_set_default($options);
-		$result = file_get_contents($url, false, $context);
-	
-		$url = 'https://localhost:4985/openmoney_shadow/_session';
-		$data = array('name' => $user['username'],'password' => $session_token); // time to live 24hrs
-		$json = json_encode($data);
-		$options = array('http' => array('method' => 'POST','content' => $json,'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
-		$context = stream_context_create($options);
-		$default_context = stream_context_set_default($options);
-	
-		$result = file_get_contents($url, false, $context);
-	
-		$json = json_decode($result, true);
-	
-		$sessionID = $json['session_id'];
-		$expiry = $json['expires'];
-		$cookie_name = $json['cookie_name'];
-	
-		$user['session_id'] = $sessionID;
-		$user['session_token'] = $session_token;
-		$user['session_expires'] = $expiry;
-		$user['session_cookie_name'] = $json['cookie_name'];
+		if(isset($user['username'])) {
 			
-		ajax_put( "users," . strtolower( $user['username'] ), json_encode ( $user ) );
+			$url = 'https://localhost:4985/openmoney_shadow/_user/' . $user['username'];
+		
+			// update user
+			$data = array('name' => $user['username'],'password' => $session_token);
+			$json = json_encode($data);
+			$options = array('http' => array('method' => 'PUT','content' => $json,'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+			$context = stream_context_create($options);
+			$default_context = stream_context_set_default($options);
+			$result = file_get_contents($url, false, $context);
+		
+			$url = 'https://localhost:4985/openmoney_shadow/_session';
+			$data = array('name' => $user['username'],'password' => $session_token); // time to live 24hrs
+			$json = json_encode($data);
+			$options = array('http' => array('method' => 'POST','content' => $json,'header' => "Content-Type: application/json\r\n" . "Accept: application/json\r\n"));
+			$context = stream_context_create($options);
+			$default_context = stream_context_set_default($options);
+		
+			$result = file_get_contents($url, false, $context);
+		
+			$json = json_decode($result, true);
+		
+			$sessionID = $json['session_id'];
+			$expiry = $json['expires'];
+			$cookie_name = $json['cookie_name'];
+		
+			$user['session_id'] = $sessionID;
+			$user['session_token'] = $session_token;
+			$user['session_expires'] = $expiry;
+			$user['session_cookie_name'] = $json['cookie_name'];
+				
+			ajax_put( "users," . strtolower( $user['username'] ), json_encode ( $user ) );
+		
+		}
 	
 	}
 	
