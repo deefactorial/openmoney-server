@@ -317,7 +317,7 @@ $app->post('/registration', function () use($app) {
 	
 	$user = authenticate($app);
 	
-	if($user['error']){
+	if(isset($user['error'])){
 		if($user['error'] == 'Password did not match!'){
 			$app->halt(401, json_encode(array('error' => true,'msg' => 'User already exists!')));
 			exit();
@@ -327,7 +327,7 @@ $app->post('/registration', function () use($app) {
 		}
 	}
 	
-	if ($user['new_user']) {
+	if (isset($user['new_user']) && $user['new_user']) {
 		unset($user['new_user']);
 		
 		$user['cost'] = $options['cost'] = 10;
