@@ -751,11 +751,11 @@ $app->post('/lookupTag', function () use($app) {
 					
 					// add them to their list of senders
 					$trading_name_from_view['type'] = "trading_name_view";
-					$trading_name_from_view['steward'] = array($username);
+					$trading_name_from_view['steward'] = array($user['username']);
 					$trading_name_from_view['trading_name'] = $trading_name['trading_name'];
 					$trading_name_from_view['currency'] = $trading_name['currency'];
 					$trading_name_from_view['created'] = intval(round(microtime(true) * 1000));
-					ajax_put("trading_name_view," . $username . "," . $trading_name_from_view['trading_name'] . "," . $trading_name_from_view['currency'], json_encode($trading_name_from_view));
+					ajax_put("trading_name_view," . $user['username'] . "," . $trading_name_from_view['trading_name'] . "," . $trading_name_from_view['currency'], json_encode($trading_name_from_view));
 				}
 			}
 		}
