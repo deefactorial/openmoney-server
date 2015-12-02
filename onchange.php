@@ -721,188 +721,188 @@ foreach ( $spaces ['rows'] as $space ) {
 echo "space processing:" . (time() - $time) . " seconds, count: " . $count . "\n";
 $time = time();
 
-
-$options = array ();
-$profiles = $cb->view( $design_doc_name, $total_profile_function_name, $options );
-foreach ( $profiles ['rows'] as $profile ) {
-	
-	$profile_array = json_decode(  $cb->get ( "profile," . $profile ['key'] ) , true );
-	
-	$destroyed = false;
-	
-	$duplicate_array = array();
-	
-	$options = array ();
-	$profiles_search = $cb->view( $design_doc_name, $total_profile_function_name, $options );
-	foreach ( $profiles_search ['rows'] as $profile_search) {
-		if ($profile_search['value'] == $profile_array['email']) {
-			array_push($duplicate_array, $profile_search['key']);
-		}
-	}
-	
-	if (!empty($duplicate_array)) {
-		foreach($duplicate_array as $duplicate) {
-			$duplicate_array = json_decode(  $cb->get ( "profile," . $duplicate ) , true );
-			if ($profile_array['created'] > $duplicate_array['created']) {
-				//this profile was created after the duplicate so send an error to this profile.
-				$profile_array['email'] = '';
-				$profile_array['email_error'] = 'This email is already being used on another profile. Please update your profile with another email.';
-				$cb->set ( "profile," . $profile_array['username'], json_encode ( $profile_array ) );
-				$destroyed = true;
-			}
-		}
-	}
-	
-	//email digest
-	if (!$destroyed && isset($profile_array['digest']) && $profile_array['digest']) {
-		//check if it's time to send the digest
-		
-		if(isset($profile_array['offset'])) {
-			//set time zone to local time zone.
-			$timezone_name = timezone_name_from_abbr(null, $profile_array['offset'] * -60, false);
-			echo "current time zone " . $timezone_name . "\n";
-			$profile_array['timezone'] = $timezone_name;
-			$profile_array['timezone_offset'] = $profile_array['offset'];
-			unset($profile_array['offset']);
-			$cb->set ( "profile," . $profile_array['username'], json_encode ( $profile_array ) );
-		}
-		
-		date_default_timezone_set($profile_array['timezone']);
-		
-		echo "current time is " . date("G:i") . " run time is " . $profile_array['digesttime'] . "\n";
-		//if this is the minute
-		//this works because this script will once run every minute.
-		if (date("G:i") == $profile_array['digesttime'] || (isset($profile_array['digest_timestamp']) && strtotime("-1 day") > $profile_array['digest_timestamp']) ) {
-			//now is time to run the email digest.
-			echo "Run email digest for " . $profile_array['username'] . "\n";
-			$lastRun = strtotime("-1 day");
-			if(isset($profile_array['digest_timestamp'])){
-				if($lastRun < $profile_array['digest_timestamp']){
-					$lastRun = $profile_array['digest_timestamp'];
-				}
-			}
-			
-			
-			
-			$master_message = " Email Digest for " . date( DATE_RFC2822 ) . " <br/>";
-			$isemail = false;
-			
-			// do trading name lookup for this user.
-			//$options = array('startkey' => urlencode($profile_array['username']), 'endkey' => urlencode($profile_array['username']) . '\uefff');
-			$options = array();
-			$tradingname_result = $cb->view ( $design_doc_name, $stewardsTrading_name_function_name, $options );
-			//print_r( $tradingname_result );
-			foreach ( $tradingname_result ['rows'] as $trading_name ) {
-				//echo "key:" . $trading_name['key'][0] . " evals " . $trading_name['key'][0] == $profile_array['username'] . "\n";
-				if ($trading_name['key'][0] == $profile_array['username']) {
-					
-					//$trading_name = json_decode($trading_name['value'], true);
-					$total_amount = 0;
-					//echo "Check Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "\n";
-					$this_trading_name = $trading_name['value']['trading_name'];
-					$currency = $trading_name['value']['currency'] ;
-					$ismessage = false;
-					$message = "<h1>Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "</h1><br/>\r\n".
-							   "<table style='border:0;'><tr><td>TIMESTAMP</td><td>FROM</td><td>TO</td><td>DESCRIPTION</td><td>AMOUNT</td><td>CURRENCY</td></tr>\r\n";
-					//get all transactions by this trading name within the last 24hrs or the last time this was run.
-					$options = array('startkey' => "trading_name,".$trading_name['value']['trading_name'].",".$trading_name['value']['currency'], 
-							          'endkey' => "trading_name,".$trading_name['value']['trading_name'].",".$trading_name['value']['currency'] . '\uefff');
-					// do trading name journal lookup
-					$tradingnamejournal_result = $cb->view ( $design_doc_name, $trading_name_journal_function_name, $options );
-					$sorted_trading_name_jornal_result = array();
-					$sorted_trading_name_jornal_result['rows'] = array();
-					foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
-						$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
-						$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
-						$timestamp = $trading_name_journal['timestamp'];
-						if( ! isset( $sorted_trading_name_jornal_result['rows'][$timestamp] ) ) {
-							$sorted_trading_name_jornal_result['rows'][$timestamp] = $journal_trading_name;
-						} else {
-							$i = 1;
-							while( isset($sorted_trading_name_jornal_result['rows'][$timestamp+$i]) ){
-								$i++;
-							}
-							$sorted_trading_name_jornal_result['rows'][$timestamp+$i] = $journal_trading_name;
-						}
-						
-					}
-					ksort($sorted_trading_name_jornal_result['rows']);
-					
-					foreach ( $sorted_trading_name_jornal_result['rows'] as $journal_trading_name ) {
-						$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
-						$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
-						//echo "lastrun " . ($lastRun * 1000). " < journal " . $trading_name_journal['timestamp'] . "\n";
-						if(($lastRun * 1000) < $trading_name_journal['timestamp']) {
-							
-							$total_amount += $journal_trading_name['value'];
-							
-							$ismessage = true;
-							$isemail = true;
-							//report on it.
-							$message .=
-							"<tr><td>" . date( DATE_RFC2822, intval( round( $trading_name_journal['timestamp'] / 1000 ) ) ) . "</td>" ;
-							if ($this_trading_name == $trading_name_journal['from']) {
-								$message .= "<td></td>";
-							} else {
-								$message .= "<td>" . $trading_name_journal['from'] . "</td>";
-							}
-							if ($this_trading_name == $trading_name_journal['to']) {
-								$message .= "<td></td>";
-							} else {
-								$message .= "<td>" . $trading_name_journal['to'] . "</td>";
-							}
-							$message .=
-							"<td>";
-							isset($trading_name_journal['description']) ? $message .= $trading_name_journal['description'] : $message .= '';
-							$message .=
-							"</td><td>" . $journal_trading_name['value'] . "</td>";
-							
-							$message .=
-							"<td>" . $trading_name_journal['currency'] ."</td></tr>\r\n";
-							//$trading_name['']
-							
-							if($trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
-								
-								$trading_name_journal['from_emailed'] = true;
-									
-								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
-							
-							} else if ( $trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
-								
-								$trading_name_journal['to_emailed'] = true;
-									
-								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
-							
-							}
-						}
-					}
-					$message .= "<tr><td></td><td></td><td></td><td>DIGEST TOTAL:</td><td>" . $total_amount . "</td><td>" . $currency . "</td></tr></table>\r\n";
-					if ($ismessage) {
-						$master_message .= $message;
-					}
-				}
-			}
-			
-			if ($isemail) {
-				if( email_letter($profile_array ['email'], $CFG->system_email, 'Payment Digest ' . date("F j"), $master_message) ) {
-					//echo str_replace("<br/>","\n",$master_message) . "\n";
-					echo "digest message sent.\n";
-					$profile_array['digest_timestamp'] = time();
-					$cb->set ( "profile," . $profile_array['username'], json_encode ( $profile_array ) );
-				}
-			} else {
-				echo "No messages for this digest.\n";
-			}
-		}
-		
-		//set timezone back to zero
-		date_default_timezone_set("UTC");
-	}
-	
-}
-
-echo "digest processing:" . (time() - $time) . " seconds \n";
-$time = time();
+//
+//$options = array ();
+//$profiles = $cb->view( $design_doc_name, $total_profile_function_name, $options );
+//foreach ( $profiles ['rows'] as $profile ) {
+//
+//	$profile_array = json_decode(  $cb->get ( "profile," . $profile ['key'] ) , true );
+//
+//	$destroyed = false;
+//
+//	$duplicate_array = array();
+//
+//	$options = array ();
+//	$profiles_search = $cb->view( $design_doc_name, $total_profile_function_name, $options );
+//	foreach ( $profiles_search ['rows'] as $profile_search) {
+//		if ($profile_search['value'] == $profile_array['email']) {
+//			array_push($duplicate_array, $profile_search['key']);
+//		}
+//	}
+//
+//	if (!empty($duplicate_array)) {
+//		foreach($duplicate_array as $duplicate) {
+//			$duplicate_array = json_decode(  $cb->get ( "profile," . $duplicate ) , true );
+//			if ($profile_array['created'] > $duplicate_array['created']) {
+//				//this profile was created after the duplicate so send an error to this profile.
+//				$profile_array['email'] = '';
+//				$profile_array['email_error'] = 'This email is already being used on another profile. Please update your profile with another email.';
+//				$cb->set ( "profile," . $profile_array['username'], json_encode ( $profile_array ) );
+//				$destroyed = true;
+//			}
+//		}
+//	}
+//
+//	//email digest
+//	if (!$destroyed && isset($profile_array['digest']) && $profile_array['digest']) {
+//		//check if it's time to send the digest
+//
+//		if(isset($profile_array['offset'])) {
+//			//set time zone to local time zone.
+//			$timezone_name = timezone_name_from_abbr(null, $profile_array['offset'] * -60, false);
+//			echo "current time zone " . $timezone_name . "\n";
+//			$profile_array['timezone'] = $timezone_name;
+//			$profile_array['timezone_offset'] = $profile_array['offset'];
+//			unset($profile_array['offset']);
+//			$cb->set ( "profile," . $profile_array['username'], json_encode ( $profile_array ) );
+//		}
+//
+//		date_default_timezone_set($profile_array['timezone']);
+//
+//		echo "current time is " . date("G:i") . " run time is " . $profile_array['digesttime'] . "\n";
+//		//if this is the minute
+//		//this works because this script will once run every minute.
+//		if (date("G:i") == $profile_array['digesttime'] || (isset($profile_array['digest_timestamp']) && strtotime("-1 day") > $profile_array['digest_timestamp']) ) {
+//			//now is time to run the email digest.
+//			echo "Run email digest for " . $profile_array['username'] . "\n";
+//			$lastRun = strtotime("-1 day");
+//			if(isset($profile_array['digest_timestamp'])){
+//				if($lastRun < $profile_array['digest_timestamp']){
+//					$lastRun = $profile_array['digest_timestamp'];
+//				}
+//			}
+//
+//
+//
+//			$master_message = " Email Digest for " . date( DATE_RFC2822 ) . " <br/>";
+//			$isemail = false;
+//
+//			// do trading name lookup for this user.
+//			//$options = array('startkey' => urlencode($profile_array['username']), 'endkey' => urlencode($profile_array['username']) . '\uefff');
+//			$options = array();
+//			$tradingname_result = $cb->view ( $design_doc_name, $stewardsTrading_name_function_name, $options );
+//			//print_r( $tradingname_result );
+//			foreach ( $tradingname_result ['rows'] as $trading_name ) {
+//				//echo "key:" . $trading_name['key'][0] . " evals " . $trading_name['key'][0] == $profile_array['username'] . "\n";
+//				if ($trading_name['key'][0] == $profile_array['username']) {
+//
+//					//$trading_name = json_decode($trading_name['value'], true);
+//					$total_amount = 0;
+//					//echo "Check Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "\n";
+//					$this_trading_name = $trading_name['value']['trading_name'];
+//					$currency = $trading_name['value']['currency'] ;
+//					$ismessage = false;
+//					$message = "<h1>Trading Name:" . $trading_name['value']['trading_name'] . " " . $trading_name['value']['currency'] . "</h1><br/>\r\n".
+//							   "<table style='border:0;'><tr><td>TIMESTAMP</td><td>FROM</td><td>TO</td><td>DESCRIPTION</td><td>AMOUNT</td><td>CURRENCY</td></tr>\r\n";
+//					//get all transactions by this trading name within the last 24hrs or the last time this was run.
+//					$options = array('startkey' => "trading_name,".$trading_name['value']['trading_name'].",".$trading_name['value']['currency'],
+//							          'endkey' => "trading_name,".$trading_name['value']['trading_name'].",".$trading_name['value']['currency'] . '\uefff');
+//					// do trading name journal lookup
+//					$tradingnamejournal_result = $cb->view ( $design_doc_name, $trading_name_journal_function_name, $options );
+//					$sorted_trading_name_jornal_result = array();
+//					$sorted_trading_name_jornal_result['rows'] = array();
+//					foreach ( $tradingnamejournal_result ['rows'] as $journal_trading_name ) {
+//						$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
+//						$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
+//						$timestamp = $trading_name_journal['timestamp'];
+//						if( ! isset( $sorted_trading_name_jornal_result['rows'][$timestamp] ) ) {
+//							$sorted_trading_name_jornal_result['rows'][$timestamp] = $journal_trading_name;
+//						} else {
+//							$i = 1;
+//							while( isset($sorted_trading_name_jornal_result['rows'][$timestamp+$i]) ){
+//								$i++;
+//							}
+//							$sorted_trading_name_jornal_result['rows'][$timestamp+$i] = $journal_trading_name;
+//						}
+//
+//					}
+//					ksort($sorted_trading_name_jornal_result['rows']);
+//
+//					foreach ( $sorted_trading_name_jornal_result['rows'] as $journal_trading_name ) {
+//						$trading_name = json_decode( $cb->get ( $journal_trading_name['key'] ), true);
+//						$trading_name_journal = json_decode( $cb->get( $journal_trading_name['id'] ), true );
+//						//echo "lastrun " . ($lastRun * 1000). " < journal " . $trading_name_journal['timestamp'] . "\n";
+//						if(($lastRun * 1000) < $trading_name_journal['timestamp']) {
+//
+//							$total_amount += $journal_trading_name['value'];
+//
+//							$ismessage = true;
+//							$isemail = true;
+//							//report on it.
+//							$message .=
+//							"<tr><td>" . date( DATE_RFC2822, intval( round( $trading_name_journal['timestamp'] / 1000 ) ) ) . "</td>" ;
+//							if ($this_trading_name == $trading_name_journal['from']) {
+//								$message .= "<td></td>";
+//							} else {
+//								$message .= "<td>" . $trading_name_journal['from'] . "</td>";
+//							}
+//							if ($this_trading_name == $trading_name_journal['to']) {
+//								$message .= "<td></td>";
+//							} else {
+//								$message .= "<td>" . $trading_name_journal['to'] . "</td>";
+//							}
+//							$message .=
+//							"<td>";
+//							isset($trading_name_journal['description']) ? $message .= $trading_name_journal['description'] : $message .= '';
+//							$message .=
+//							"</td><td>" . $journal_trading_name['value'] . "</td>";
+//
+//							$message .=
+//							"<td>" . $trading_name_journal['currency'] ."</td></tr>\r\n";
+//							//$trading_name['']
+//
+//							if($trading_name_journal['from'] == $trading_name['name'] && ( !isset($trading_name_journal['from_emailed']) || ( isset($trading_name_journal['from_emailed']) && $trading_name_journal['from_emailed'] === false ) ) ) {
+//
+//								$trading_name_journal['from_emailed'] = true;
+//
+//								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+//
+//							} else if ( $trading_name_journal['to'] == $trading_name['name'] && ( !isset($trading_name_journal['to_emailed']) || ( isset($trading_name_journal['to_emailed']) && $trading_name_journal['to_emailed'] === false ) ) ) {
+//
+//								$trading_name_journal['to_emailed'] = true;
+//
+//								$cb->set ($journal_trading_name['id'] , json_encode ( $trading_name_journal ) );
+//
+//							}
+//						}
+//					}
+//					$message .= "<tr><td></td><td></td><td></td><td>DIGEST TOTAL:</td><td>" . $total_amount . "</td><td>" . $currency . "</td></tr></table>\r\n";
+//					if ($ismessage) {
+//						$master_message .= $message;
+//					}
+//				}
+//			}
+//
+//			if ($isemail) {
+//				if( email_letter($profile_array ['email'], $CFG->system_email, 'Payment Digest ' . date("F j"), $master_message) ) {
+//					//echo str_replace("<br/>","\n",$master_message) . "\n";
+//					echo "digest message sent.\n";
+//					$profile_array['digest_timestamp'] = time();
+//					$cb->set ( "profile," . $profile_array['username'], json_encode ( $profile_array ) );
+//				}
+//			} else {
+//				echo "No messages for this digest.\n";
+//			}
+//		}
+//
+//		//set timezone back to zero
+//		date_default_timezone_set("UTC");
+//	}
+//
+//}
+//
+//echo "digest processing:" . (time() - $time) . " seconds \n";
+//$time = time();
 
 
 //beamtag lookup
