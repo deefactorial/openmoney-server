@@ -290,6 +290,10 @@ function login($user, $app) {
 
 $app = new \Slim\Slim();
 
+$app->response->headers->set('Access-Control-Allow-Origin', '*');
+$app->response->headers->set('Access-Control-Allow-Credentials', 'true');
+$app->response->headers->set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+$app->response->headers->set('Access-Control-Allow-Headers', 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type');
 $app->response->headers->set('Content-Type', 'application/json');
 
 $app->notFound(function () use($app) {
