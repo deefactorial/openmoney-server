@@ -649,12 +649,28 @@ $app->post('/lostpw', function () use($app) {
 	if ($username != '') {
 		
 		require ("password.php");
-		function email_letter($to, $from, $subject = 'no subject', $msg = 'no msg') {
+		function email_letter($to, $from, $subject = 'no subject', $message = 'no msg') {
 			$headers = "From: $from\r\n";
 			$headers .= "MIME-Version: 1.0\r\n";
 			$headers .= "Content-type: text/html; charset=iso-8859-1\r\n";
 			$headers .= 'X-Mailer: PHP/' . phpversion();
-			return mail($to, $subject, $msg, $headers);
+
+			// Make sure linefeeds are in CRLF format - it is essential for signing
+			$message = preg_replace('/(?<!\r)\n/', "\r\n", $message);
+			$headers = preg_replace('/(?<!\r)\n/', "\r\n", $headers);
+
+			require_once 'mail-signature.class.php';
+			require_once 'mail-signature.config.php';
+
+			$signature = new mail_signature(
+				MAIL_RSA_PRIV,
+				MAIL_RSA_PASSPHRASE,
+				MAIL_DOMAIN,
+				MAIL_SELECTOR
+			);
+			$signed_headers = $signature -> get_signed_headers($to, $subject, $message, $headers);
+
+			return mail($to, $subject, $message, $signed_headers.$headers);
 		}
 		
 		$cb = new Couchbase("127.0.0.1:8091", "openmoney", "", "openmoney");
